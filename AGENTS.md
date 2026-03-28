@@ -1,0 +1,214 @@
+# AGENTS.md
+
+## Purpose
+
+This repository is currently used to design and prepare a PoC for a new CoCo壱番屋 mobile app.
+
+The main goal is not backend delivery. The main goal is to improve the native mobile UX/UI around ordering.
+
+Use this file as the entry point for understanding which document to read first for a given task.
+
+## Current Scope
+
+- New mobile app PoC
+- iOS-first
+- Native-first interaction
+- No backend service required for the PoC
+- No WebView-centered implementation
+- Focus on the ordering experience, saved combinations, coupon suggestion, and clear completion feedback
+
+## Source Of Truth Order
+
+When multiple docs overlap, use this order of precedence:
+
+1. `docs/poc-app-direction-2026-03-28.md`
+2. `docs/poc-screen-flow-2026-03-28.md`
+3. `docs/poc-wireframes-s2-s3-2026-03-28.md`
+4. `docs/poc-wireframes-s5-s6-2026-03-28.md`
+5. `docs/poc-wireframes-s8-2026-03-28.md`
+6. `docs/poc-visual-toneboard-2026-03-28.md`
+7. `docs/poc-design-tokens-2026-03-28.md`
+8. `docs/app-renewal-planning-611124786-jp-2026-03-28.md`
+9. `docs/appstore-review-analysis-611124786-jp-2026-03-23.md`
+
+If you find a conflict, prefer the higher item and then update the lower one later if needed.
+
+## Fast Doc Index
+
+### If you are defining product intent
+
+Read:
+
+- `docs/poc-app-direction-2026-03-28.md`
+
+This is the main PoC brief.
+
+Key points:
+
+- backend-less PoC
+- native-first UX
+- guest-first main flow
+- saved combos
+- coupon suggestion at the end
+- clear order completion
+
+### If you are working on navigation or app structure
+
+Read:
+
+- `docs/poc-app-direction-2026-03-28.md`
+- `docs/poc-screen-flow-2026-03-28.md`
+
+This defines:
+
+- the primary flow
+- push vs sheet responsibilities
+- screen IDs
+- P0/P1 screen priorities
+
+Primary flow:
+
+`Store Select -> Menu Discovery -> Curry Detail / Customize -> Order Review -> Coupon Suggestion -> Order Complete`
+
+### If you are working on screen UX
+
+Read the relevant wireframe doc first:
+
+- `docs/poc-wireframes-s2-s3-2026-03-28.md`
+- `docs/poc-wireframes-s5-s6-2026-03-28.md`
+- `docs/poc-wireframes-s8-2026-03-28.md`
+
+Use these docs for:
+
+- information hierarchy
+- CTA priority
+- state differences
+- animation requirements
+- accessibility notes
+
+### If you are working on visual design
+
+Read:
+
+- `docs/poc-visual-toneboard-2026-03-28.md`
+- `docs/poc-design-tokens-2026-03-28.md`
+
+Use these docs for:
+
+- visual direction
+- color system
+- typography roles
+- material usage
+- motion principles
+- semantic tokens by screen role
+
+### If you are trying to understand why this PoC exists
+
+Read:
+
+- `docs/appstore-review-analysis-611124786-jp-2026-03-23.md`
+- `docs/app-renewal-planning-611124786-jp-2026-03-28.md`
+
+These explain:
+
+- the failures in the current app
+- what needed to be fixed
+- why the PoC focuses on native ordering UX instead of backend integration
+
+## Working Rules
+
+### Product Rules
+
+- Do not reintroduce Web-like flows unless there is a strong reason.
+- Do not require login to complete the PoC’s main order flow.
+- Do not let coupon UX overpower the order flow.
+- Do not optimize for backend realism over experience quality.
+- Do optimize for a clear, enjoyable, native ordering journey.
+
+### Design Rules
+
+- Keep the app warm, layered, and native.
+- Avoid purple-heavy, futuristic, or overly transparent UI.
+- Use glass/material sparingly and only where it helps hierarchy.
+- Keep the primary CTA visually consistent across screens.
+- Keep price emphasis visually consistent across screens.
+
+### UX Rules
+
+- The user should always know:
+  - what store they are ordering from
+  - what they are building
+  - how much it costs
+  - what happens next
+- The order flow must not be blocked by account setup.
+- Completion must feel explicit, not implied.
+
+## Suggested Read Order By Task
+
+### Task: implement or refine `S2 Menu Discovery`
+
+Read in order:
+
+1. `docs/poc-screen-flow-2026-03-28.md`
+2. `docs/poc-wireframes-s2-s3-2026-03-28.md`
+3. `docs/poc-visual-toneboard-2026-03-28.md`
+4. `docs/poc-design-tokens-2026-03-28.md`
+
+### Task: implement or refine `S3 Curry Detail / Customize`
+
+Read in order:
+
+1. `docs/poc-screen-flow-2026-03-28.md`
+2. `docs/poc-wireframes-s2-s3-2026-03-28.md`
+3. `docs/poc-visual-toneboard-2026-03-28.md`
+4. `docs/poc-design-tokens-2026-03-28.md`
+
+### Task: implement or refine `S5 Order Review` / `S6 Coupon Suggestion`
+
+Read in order:
+
+1. `docs/poc-screen-flow-2026-03-28.md`
+2. `docs/poc-wireframes-s5-s6-2026-03-28.md`
+3. `docs/poc-visual-toneboard-2026-03-28.md`
+4. `docs/poc-design-tokens-2026-03-28.md`
+
+### Task: implement or refine `S8 Order Complete`
+
+Read in order:
+
+1. `docs/poc-screen-flow-2026-03-28.md`
+2. `docs/poc-wireframes-s8-2026-03-28.md`
+3. `docs/poc-visual-toneboard-2026-03-28.md`
+4. `docs/poc-design-tokens-2026-03-28.md`
+
+### Task: revisit PoC scope or feature priority
+
+Read in order:
+
+1. `docs/poc-app-direction-2026-03-28.md`
+2. `docs/app-renewal-planning-611124786-jp-2026-03-28.md`
+3. `docs/appstore-review-analysis-611124786-jp-2026-03-23.md`
+
+## Repository Notes
+
+- There is a Go CLI in `cmd/appstore-reviews`, but the current PoC planning work is document-driven.
+- The `docs/` directory is the main working area for product and design decisions.
+- Treat the PoC documents as the active workstream.
+
+## When Adding New Docs
+
+If you add a new canonical design or product doc:
+
+1. Link it from this file.
+2. Place it in the relevant priority order.
+3. Mention which existing doc it supersedes or complements.
+4. Keep names date-stamped like the current docs for traceability.
+
+## Minimal Startup Checklist For Agents
+
+Before starting substantial work:
+
+1. Read `AGENTS.md`
+2. Read the doc group relevant to your task
+3. Confirm whether your task is product, flow, wireframe, or visual-token work
+4. Avoid making assumptions that contradict the current PoC docs
