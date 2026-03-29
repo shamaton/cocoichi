@@ -157,6 +157,12 @@ These explain:
 - The order flow must not be blocked by account setup.
 - Completion must feel explicit, not implied.
 
+### Implementation Rules
+
+- When adding code comments, write them in Japanese.
+- Add comments only where the intent, constraint, or reason is not obvious from the code itself.
+- Prefer comments that explain `why this structure exists` or `what PoC assumption it depends on`, not comments that restate the code.
+
 ## Suggested Read Order By Task
 
 ### Task: implement or refine `S2 Menu Discovery`

@@ -1,0 +1,320 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000001 /* CocoichiPoCApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000001 /* CocoichiPoCApp.swift */; };
+		A00000000000000000000002 /* AppNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000002 /* AppNavigator.swift */; };
+		A00000000000000000000003 /* POCDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000003 /* POCDesignSystem.swift */; };
+		A00000000000000000000004 /* POCModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000004 /* POCModels.swift */; };
+		A00000000000000000000005 /* MockCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000005 /* MockCatalog.swift */; };
+		A00000000000000000000006 /* OrderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000006 /* OrderStore.swift */; };
+		A00000000000000000000007 /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000007 /* AppRootView.swift */; };
+		A00000000000000000000008 /* StoreSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000008 /* StoreSelectView.swift */; };
+		A00000000000000000000009 /* MenuDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000009 /* MenuDiscoveryView.swift */; };
+		A0000000000000000000000A /* OrderFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000A /* OrderFlowView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B00000000000000000000001 /* CocoichiPoCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CocoichiPoCApp.swift; sourceTree = "<group>"; };
+		B00000000000000000000002 /* AppNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigator.swift; sourceTree = "<group>"; };
+		B00000000000000000000003 /* POCDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = POCDesignSystem.swift; sourceTree = "<group>"; };
+		B00000000000000000000004 /* POCModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = POCModels.swift; sourceTree = "<group>"; };
+		B00000000000000000000005 /* MockCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCatalog.swift; sourceTree = "<group>"; };
+		B00000000000000000000006 /* OrderStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderStore.swift; sourceTree = "<group>"; };
+		B00000000000000000000007 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
+		B00000000000000000000008 /* StoreSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreSelectView.swift; sourceTree = "<group>"; };
+		B00000000000000000000009 /* MenuDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuDiscoveryView.swift; sourceTree = "<group>"; };
+		B0000000000000000000000A /* OrderFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderFlowView.swift; sourceTree = "<group>"; };
+		B0000000000000000000000B /* CocoichiPoC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoichiPoC.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D00000000000000000000003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C00000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000003 /* CocoichiPoC */,
+				C00000000000000000000002 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C00000000000000000000002 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B0000000000000000000000B /* CocoichiPoC.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000003 /* CocoichiPoC */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000004 /* App */,
+				C00000000000000000000005 /* DesignSystem */,
+				C00000000000000000000006 /* Domain */,
+				C00000000000000000000007 /* Data */,
+				C00000000000000000000008 /* State */,
+				C00000000000000000000009 /* Features */,
+			);
+			path = CocoichiPoC;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000004 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000001 /* CocoichiPoCApp.swift */,
+				B00000000000000000000002 /* AppNavigator.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000005 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000003 /* POCDesignSystem.swift */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000006 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000004 /* POCModels.swift */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000007 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000005 /* MockCatalog.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000008 /* State */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000006 /* OrderStore.swift */,
+			);
+			path = State;
+			sourceTree = "<group>";
+		};
+		C00000000000000000000009 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000007 /* AppRootView.swift */,
+				B00000000000000000000008 /* StoreSelectView.swift */,
+				B00000000000000000000009 /* MenuDiscoveryView.swift */,
+				B0000000000000000000000A /* OrderFlowView.swift */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D00000000000000000000002 /* CocoichiPoC */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E00000000000000000000002 /* Build configuration list for PBXNativeTarget "CocoichiPoC" */;
+			buildPhases = (
+				D00000000000000000000004 /* Sources */,
+				D00000000000000000000003 /* Frameworks */,
+				D00000000000000000000005 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CocoichiPoC;
+			productName = CocoichiPoC;
+			productReference = B0000000000000000000000B /* CocoichiPoC.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D00000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					D00000000000000000000002 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+				};
+			};
+			buildConfigurationList = E00000000000000000000001 /* Build configuration list for PBXProject "CocoichiPoC" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C00000000000000000000001;
+			productRefGroup = C00000000000000000000002 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D00000000000000000000002 /* CocoichiPoC */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D00000000000000000000005 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D00000000000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000001 /* CocoichiPoCApp.swift in Sources */,
+				A00000000000000000000002 /* AppNavigator.swift in Sources */,
+				A00000000000000000000003 /* POCDesignSystem.swift in Sources */,
+				A00000000000000000000004 /* POCModels.swift in Sources */,
+				A00000000000000000000005 /* MockCatalog.swift in Sources */,
+				A00000000000000000000006 /* OrderStore.swift in Sources */,
+				A00000000000000000000007 /* AppRootView.swift in Sources */,
+				A00000000000000000000008 /* StoreSelectView.swift in Sources */,
+				A00000000000000000000009 /* MenuDiscoveryView.swift in Sources */,
+				A0000000000000000000000A /* OrderFlowView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		E00000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		E00000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		E00000000000000000000005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.cocoichi.poc;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		E00000000000000000000006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.cocoichi.poc;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E00000000000000000000001 /* Build configuration list for PBXProject "CocoichiPoC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E00000000000000000000003 /* Debug */,
+				E00000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E00000000000000000000002 /* Build configuration list for PBXNativeTarget "CocoichiPoC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E00000000000000000000005 /* Debug */,
+				E00000000000000000000006 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D00000000000000000000001 /* Project object */;
+}
