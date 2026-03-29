@@ -102,6 +102,20 @@ Use these docs for:
 - motion principles
 - semantic tokens by screen role
 
+### If you are planning implementation work
+
+Read:
+
+- `docs/poc-app-direction-2026-03-28.md`
+- `docs/poc-screen-flow-2026-03-28.md`
+- `docs/poc-implementation-tasks-2026-03-29.md`
+
+Use these docs for:
+
+- implementation scope and non-goals
+- task ordering and dependencies
+- milestone acceptance criteria
+
 ### If you are trying to understand why this PoC exists
 
 Read:
@@ -189,10 +203,19 @@ Read in order:
 2. `docs/app-renewal-planning-611124786-jp-2026-03-28.md`
 3. `docs/appstore-review-analysis-611124786-jp-2026-03-23.md`
 
+### Task: break PoC into implementation tasks or pick the next task
+
+Read in order:
+
+1. `docs/poc-app-direction-2026-03-28.md`
+2. `docs/poc-screen-flow-2026-03-28.md`
+3. `docs/poc-implementation-tasks-2026-03-29.md`
+
 ## Repository Notes
 
 - There is a Go CLI in `cmd/appstore-reviews`, but the current PoC planning work is document-driven.
 - The `docs/` directory is the main working area for product and design decisions.
+- `docs/poc-implementation-tasks-2026-03-29.md` is the execution breakdown for the active PoC docs.
 - Treat the PoC documents as the active workstream.
 
 ## When Adding New Docs
@@ -210,5 +233,5 @@ Before starting substantial work:
 
 1. Read `AGENTS.md`
 2. Read the doc group relevant to your task
-3. Confirm whether your task is product, flow, wireframe, or visual-token work
+3. Confirm whether your task is product, flow, wireframe, visual-token, or implementation-planning work
 4. Avoid making assumptions that contradict the current PoC docs
