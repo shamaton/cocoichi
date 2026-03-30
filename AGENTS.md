@@ -224,6 +224,14 @@ Read in order:
 - `docs/poc-implementation-tasks-2026-03-29.md` is the execution breakdown for the active PoC docs.
 - Treat the PoC documents as the active workstream.
 
+## Tooling Notes
+
+- In this repo, nested sandboxing can break `codex exec --sandbox read-only` with `sandbox-exec: sandbox_apply: Operation not permitted`.
+- The only approved outer-sandbox bypass for this review flow is running `scripts/run-codex-review.sh` itself with elevated outer permissions while keeping the inner Codex sandbox as `read-only`.
+- Do not broaden that bypass to other commands. If elevated execution is not available, record the review as skipped instead of retrying with a wider unsandboxed command.
+- Prefer `scripts/run-codex-review.sh` so the repo uses `codex exec --sandbox read-only --ephemeral` consistently.
+- Before a review that uses `diff_range: HEAD`, check `git status --short` for untracked files. If a new file must be reviewed before commit, stage it first or use `git add -N` so it is visible to the diff-based review flow.
+
 ## When Adding New Docs
 
 If you add a new canonical design or product doc:
