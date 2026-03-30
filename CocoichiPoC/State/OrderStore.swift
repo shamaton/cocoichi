@@ -52,8 +52,10 @@ final class OrderStore: ObservableObject {
         draftOrder = DraftOrder(
             store: store,
             menuItem: menuItem,
+            currySauce: .original,
             spiceLevel: 2,
             riceGrams: 300,
+            sauceAmount: .regular,
             toppings: [],
             appliedCoupon: nil
         )
@@ -75,9 +77,19 @@ final class OrderStore: ObservableObject {
         self.draftOrder = draftOrder.with(spiceLevel: level)
     }
 
+    func setCurrySauce(_ sauce: CurrySauceOption) {
+        guard let draftOrder else { return }
+        self.draftOrder = draftOrder.with(currySauce: sauce)
+    }
+
     func setRiceGrams(_ grams: Int) {
         guard let draftOrder else { return }
         self.draftOrder = draftOrder.with(riceGrams: grams)
+    }
+
+    func setSauceAmount(_ amount: SauceAmountOption) {
+        guard let draftOrder else { return }
+        self.draftOrder = draftOrder.with(sauceAmount: amount)
     }
 
     func toggleTopping(_ topping: Topping) {

@@ -53,6 +53,82 @@ enum CouponEligibility: Codable, Hashable {
     case menu(String)
 }
 
+enum CurrySauceOption: String, CaseIterable, Codable, Hashable {
+    case original = "オリジナル"
+    case rich = "濃厚ビーフ"
+    case butter = "バターリッチ"
+
+    var subtitle: String {
+        switch self {
+        case .original:
+            return "迷わず始める定番のソース"
+        case .rich:
+            return "コクを足したい日に向く深めの味"
+        case .butter:
+            return "まろやかさを強めたい時の変化球"
+        }
+    }
+
+    var priceDelta: Int {
+        switch self {
+        case .original:
+            return 0
+        case .rich:
+            return 90
+        case .butter:
+            return 120
+        }
+    }
+
+    var accentColor: Color {
+        switch self {
+        case .original:
+            return Color(hex: 0x8B4A1F)
+        case .rich:
+            return Color(hex: 0x6E3A22)
+        case .butter:
+            return Color(hex: 0xE5B94E)
+        }
+    }
+}
+
+enum SauceAmountOption: String, CaseIterable, Codable, Hashable {
+    case light = "少なめ"
+    case regular = "ふつう"
+    case extra = "多め"
+
+    var subtitle: String {
+        switch self {
+        case .light:
+            return "ライスを軽めに楽しむ"
+        case .regular:
+            return "まずは基準の量で確認する"
+        case .extra:
+            return "最後までソース感を残したい"
+        }
+    }
+
+    var priceDelta: Int {
+        switch self {
+        case .light, .regular:
+            return 0
+        case .extra:
+            return 80
+        }
+    }
+
+    var accentColor: Color {
+        switch self {
+        case .light:
+            return Color(hex: 0xF2D7A6)
+        case .regular:
+            return Color(hex: 0xB8752C)
+        case .extra:
+            return Color(hex: 0xB84E2F)
+        }
+    }
+}
+
 struct Coupon: Identifiable, Hashable, Codable {
     let id: String
     let title: String
@@ -80,13 +156,62 @@ struct DraftOrder: Identifiable, Hashable, Codable {
     var id: UUID = UUID()
     var store: Store
     var menuItem: MenuItem
+    var currySauce: CurrySauceOption = .original
     var spiceLevel: Int
     var riceGrams: Int
+    var sauceAmount: SauceAmountOption = .regular
     var toppings: [Topping]
     var appliedCoupon: Coupon?
 
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case store
+        case menuItem
+        case currySauce
+        case spiceLevel
+        case riceGrams
+        case sauceAmount
+        case toppings
+        case appliedCoupon
+    }
+
+    init(
+        id: UUID = UUID(),
+        store: Store,
+        menuItem: MenuItem,
+        currySauce: CurrySauceOption = .original,
+        spiceLevel: Int,
+        riceGrams: Int,
+        sauceAmount: SauceAmountOption = .regular,
+        toppings: [Topping],
+        appliedCoupon: Coupon?
+    ) {
+        self.id = id
+        self.store = store
+        self.menuItem = menuItem
+        self.currySauce = currySauce
+        self.spiceLevel = spiceLevel
+        self.riceGrams = riceGrams
+        self.sauceAmount = sauceAmount
+        self.toppings = toppings
+        self.appliedCoupon = appliedCoupon
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        store = try container.decode(Store.self, forKey: .store)
+        menuItem = try container.decode(MenuItem.self, forKey: .menuItem)
+        currySauce = try container.decodeIfPresent(CurrySauceOption.self, forKey: .currySauce) ?? .original
+        spiceLevel = try container.decode(Int.self, forKey: .spiceLevel)
+        riceGrams = try container.decode(Int.self, forKey: .riceGrams)
+        sauceAmount = try container.decodeIfPresent(SauceAmountOption.self, forKey: .sauceAmount) ?? .regular
+        toppings = try container.decode([Topping].self, forKey: .toppings)
+        appliedCoupon = try container.decodeIfPresent(Coupon.self, forKey: .appliedCoupon)
+    }
+
     var subtotal: Int {
-        menuItem.basePrice + toppings.map(\.price).reduce(0, +)
+        menuItem.basePrice + currySauce.priceDelta + sauceAmount.priceDelta + toppings.map(\.price).reduce(0, +)
     }
 
     var discount: Int {
@@ -113,22 +238,31 @@ struct DraftOrder: Identifiable, Hashable, Codable {
         } else {
             next.toppings.append(topping)
         }
-        if let coupon = next.appliedCoupon, !coupon.isApplicable(to: next) {
-            next.appliedCoupon = nil
-        }
-        return next
+        return next.normalizedCoupon()
+    }
+
+    func with(currySauce: CurrySauceOption) -> DraftOrder {
+        var next = self
+        next.currySauce = currySauce
+        return next.normalizedCoupon()
     }
 
     func with(spiceLevel: Int) -> DraftOrder {
         var next = self
         next.spiceLevel = spiceLevel
-        return next
+        return next.normalizedCoupon()
     }
 
     func with(riceGrams: Int) -> DraftOrder {
         var next = self
         next.riceGrams = riceGrams
-        return next
+        return next.normalizedCoupon()
+    }
+
+    func with(sauceAmount: SauceAmountOption) -> DraftOrder {
+        var next = self
+        next.sauceAmount = sauceAmount
+        return next.normalizedCoupon()
     }
 
     func applying(coupon: Coupon?) -> DraftOrder {
@@ -138,6 +272,13 @@ struct DraftOrder: Identifiable, Hashable, Codable {
     }
 
     func sanitizedForFavorite() -> DraftOrder {
+        var next = self
+        next.appliedCoupon = nil
+        return next
+    }
+
+    private func normalizedCoupon() -> DraftOrder {
+        guard let appliedCoupon, !appliedCoupon.isApplicable(to: self) else { return self }
         var next = self
         next.appliedCoupon = nil
         return next

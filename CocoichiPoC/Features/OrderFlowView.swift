@@ -1,11 +1,87 @@
 import SwiftUI
 
+private enum CustomizationStep: Int, CaseIterable, Identifiable {
+    case currySauce
+    case rice
+    case spice
+    case sauceAmount
+    case toppings
+    case review
+
+    var id: Int { rawValue }
+
+    var title: String {
+        switch self {
+        case .currySauce:
+            return "カレーソース"
+        case .rice:
+            return "ライス量"
+        case .spice:
+            return "辛さ"
+        case .sauceAmount:
+            return "ソース量"
+        case .toppings:
+            return "追加トッピング"
+        case .review:
+            return "最終確認"
+        }
+    }
+
+    var shortTitle: String {
+        switch self {
+        case .currySauce:
+            return "ソース"
+        case .rice:
+            return "ライス"
+        case .spice:
+            return "辛さ"
+        case .sauceAmount:
+            return "量"
+        case .toppings:
+            return "トッピング"
+        case .review:
+            return "確認"
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .currySauce:
+            return "ベースの味わいを先に決めて、以後の調整を迷いにくくします。"
+        case .rice:
+            return "片手で決めやすい定番量を先頭に並べます。"
+        case .spice:
+            return "変化はすぐ価格とサマリーへ反映されます。"
+        case .sauceAmount:
+            return "最後の食べ心地を左右するので、ここで微調整します。"
+        case .toppings:
+            return "おすすめを先に見せつつ、追加はすぐ取り消せます。"
+        case .review:
+            return "今の構成を確認したら、そのまま Review へ進めます。"
+        }
+    }
+
+    var actionTitle: String {
+        self == .review ? "Review Order" : "Next"
+    }
+
+    var next: CustomizationStep? {
+        CustomizationStep(rawValue: rawValue + 1)
+    }
+
+    var previous: CustomizationStep? {
+        CustomizationStep(rawValue: rawValue - 1)
+    }
+}
+
 struct CurryDetailView: View {
     @EnvironmentObject private var navigator: AppNavigator
     @EnvironmentObject private var orderStore: OrderStore
 
+    @State private var currentStep: CustomizationStep = .currySauce
+
     private let riceOptions = [200, 300, 400, 500]
-    private let spiceOptions = [1, 2, 3, 4]
+    private let spiceOptions = [1, 2, 3, 4, 5]
     private let toppingColumns = [GridItem(.flexible()), GridItem(.flexible())]
 
     var body: some View {
@@ -14,62 +90,43 @@ struct CurryDetailView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: POCSpacing.l) {
                         HeroBanner(
-                            eyebrow: "Customize",
+                            eyebrow: "Step \(currentStep.rawValue + 1) / \(CustomizationStep.allCases.count)",
                             title: draft.menuItem.name,
-                            subtitle: draft.menuItem.subtitle,
+                            subtitle: "\(currentStep.title)を決める · \(draft.total.yenText)",
                             accent: draft.menuItem.accentColors
                         )
 
                         DraftSnapshotCard(draft: draft, showsCoupon: false)
 
-                        SectionHeader("Spice")
-                        chipRow(values: spiceOptions, selected: draft.spiceLevel) { level in
-                            orderStore.setSpiceLevel(level)
-                        }
-
-                        SectionHeader("Rice")
-                        chipRow(values: riceOptions, selected: draft.riceGrams, unit: "g") { grams in
-                            orderStore.setRiceGrams(grams)
-                        }
-
-                        SectionHeader("Toppings", subtitle: "価格とサマリーに即時反映")
-
-                        LazyVGrid(columns: toppingColumns, spacing: POCSpacing.s) {
-                            ForEach(orderStore.toppings) { topping in
-                                let isSelected = draft.toppings.contains(topping)
-                                Button {
-                                    orderStore.toggleTopping(topping)
-                                } label: {
-                                    VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                        Text(topping.name)
-                                            .font(.headline.weight(.semibold))
-                                            .foregroundStyle(POCColor.textPrimary)
-                                        Text("+\(topping.price.yenText)")
-                                            .font(.subheadline)
-                                            .foregroundStyle(POCColor.textSecondary)
-                                        Spacer()
-                                        Text(isSelected ? "Added" : "Add")
-                                            .font(.caption.weight(.semibold))
-                                            .foregroundStyle(isSelected ? Color.white : POCColor.curry)
-                                            .padding(.horizontal, POCSpacing.xs)
-                                            .padding(.vertical, 6)
-                                            .background(
-                                                Capsule().fill(isSelected ? topping.accentColor : POCColor.background)
-                                            )
-                                    }
-                                    .frame(maxWidth: .infinity, minHeight: 132, alignment: .leading)
-                                    .padding(POCSpacing.m)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                                            .fill(isSelected ? topping.accentColor.opacity(0.2) : POCColor.elevated)
-                                    )
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                                            .stroke(isSelected ? topping.accentColor : POCColor.line, lineWidth: 1)
-                                    )
-                                }
-                                .buttonStyle(.plain)
+                        CustomizationStepper(currentStep: currentStep) { step in
+                            withAnimation(.snappy(duration: 0.28)) {
+                                currentStep = step
                             }
+                        }
+
+                        VStack(alignment: .leading, spacing: POCSpacing.s) {
+                            HStack(alignment: .center, spacing: POCSpacing.s) {
+                                VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                                    Text(currentStep.title)
+                                        .font(.title3.weight(.semibold))
+                                        .foregroundStyle(POCColor.textPrimary)
+                                    Text(currentStep.subtitle)
+                                        .font(.subheadline)
+                                        .foregroundStyle(POCColor.textSecondary)
+                                }
+                                if let previousStep = currentStep.previous {
+                                    Spacer()
+                                    Button("Back") {
+                                        withAnimation(.snappy(duration: 0.28)) {
+                                            currentStep = previousStep
+                                        }
+                                    }
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(POCColor.curry)
+                                }
+                            }
+
+                            stepContent(for: draft)
                         }
                     }
                     .padding(POCSpacing.l)
@@ -79,14 +136,23 @@ struct CurryDetailView: View {
                         SecondaryCTAButton(title: "Save Combo", systemImage: "star") {
                             navigator.showSheet(.saveFavorite)
                         }
-                        PrimaryCTAButton(title: "Review \(draft.total.yenText)", systemImage: "arrow.right") {
-                            navigator.push(.orderReview)
+                        PrimaryCTAButton(title: "\(currentStep.actionTitle) \(draft.total.yenText)", systemImage: currentStep == .review ? "cart" : "arrow.right") {
+                            if let nextStep = currentStep.next {
+                                withAnimation(.snappy(duration: 0.28)) {
+                                    currentStep = nextStep
+                                }
+                            } else {
+                                navigator.push(.orderReview)
+                            }
                         }
                     }
                     .padding(.horizontal, POCSpacing.l)
                     .padding(.top, POCSpacing.s)
                     .padding(.bottom, POCSpacing.s)
                     .background(.ultraThinMaterial)
+                }
+                .task(id: draft.id) {
+                    currentStep = .currySauce
                 }
             } else {
                 EmptyStateCard(title: "選択中の商品がありません", message: "メニュー一覧から商品を選んでください。")
@@ -107,6 +173,288 @@ struct CurryDetailView: View {
                     }
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func stepContent(for draft: DraftOrder) -> some View {
+        switch currentStep {
+        case .currySauce:
+            VStack(spacing: POCSpacing.s) {
+                ForEach(CurrySauceOption.allCases, id: \.self) { sauce in
+                    SelectionCard(
+                        title: sauce.rawValue,
+                        subtitle: sauce.subtitle,
+                        value: sauce.priceDelta == 0 ? "追加料金なし" : "+\(sauce.priceDelta.yenText)",
+                        isSelected: draft.currySauce == sauce,
+                        accent: sauce.accentColor
+                    ) {
+                        orderStore.setCurrySauce(sauce)
+                    }
+                }
+            }
+        case .rice:
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                chipRow(values: riceOptions, selected: draft.riceGrams, unit: "g") { grams in
+                    orderStore.setRiceGrams(grams)
+                }
+                EmptyStateCard(
+                    title: "Rice Hint",
+                    message: draft.riceGrams >= 400 ? "がっつり寄りの構成です。最後のトッピング量も見ながら調整できます。" : "標準寄りの量です。後の辛さやトッピングを足しても重くなりすぎません。"
+                )
+            }
+        case .spice:
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                chipRow(values: spiceOptions, selected: draft.spiceLevel) { level in
+                    orderStore.setSpiceLevel(level)
+                }
+                EmptyStateCard(
+                    title: "Spice Balance",
+                    message: draft.spiceLevel >= 4 ? "辛さを前に出す設定です。ソース量を多めにすると最後まで辛さが残ります。" : "食べやすさを保った設定です。トッピングの味も残りやすくなります。"
+                )
+            }
+        case .sauceAmount:
+            VStack(spacing: POCSpacing.s) {
+                ForEach(SauceAmountOption.allCases, id: \.self) { amount in
+                    SelectionCard(
+                        title: amount.rawValue,
+                        subtitle: amount.subtitle,
+                        value: amount.priceDelta == 0 ? "追加料金なし" : "+\(amount.priceDelta.yenText)",
+                        isSelected: draft.sauceAmount == amount,
+                        accent: amount.accentColor
+                    ) {
+                        orderStore.setSauceAmount(amount)
+                    }
+                }
+            }
+        case .toppings:
+            VStack(alignment: .leading, spacing: POCSpacing.m) {
+                if !draft.toppings.isEmpty {
+                    VStack(alignment: .leading, spacing: POCSpacing.s) {
+                        Text("Selected Toppings")
+                            .font(.headline.weight(.semibold))
+                        FlexibleChipGroup(items: draft.toppings) { topping in
+                            orderStore.toggleTopping(topping)
+                        }
+                    }
+                }
+
+                if !recommendedToppings(for: draft).isEmpty {
+                    VStack(alignment: .leading, spacing: POCSpacing.s) {
+                        Text("Recommended")
+                            .font(.headline.weight(.semibold))
+                        toppingGrid(recommendedToppings(for: draft), draft: draft)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: POCSpacing.s) {
+                    Text("More Toppings")
+                        .font(.headline.weight(.semibold))
+                    toppingGrid(otherToppings(for: draft), draft: draft)
+                }
+            }
+        case .review:
+            VStack(alignment: .leading, spacing: POCSpacing.m) {
+                EmptyStateCard(
+                    title: "Ready To Review",
+                    message: "店舗、構成、価格がそろいました。必要なら stepper から前の工程へ戻って微調整できます。"
+                )
+
+                VStack(alignment: .leading, spacing: POCSpacing.s) {
+                    Text("Review Highlights")
+                        .font(.headline.weight(.semibold))
+                    SummaryRow(title: "Store", value: draft.store.name)
+                    SummaryRow(title: "Pickup", value: draft.pickupWindowText)
+                    SummaryRow(title: "Sauce", value: draft.currySauce.rawValue)
+                    SummaryRow(title: "Rice", value: "\(draft.riceGrams)g")
+                    SummaryRow(title: "Spice", value: "\(draft.spiceLevel)辛")
+                    SummaryRow(title: "Sauce Amount", value: draft.sauceAmount.rawValue)
+                    SummaryRow(title: "Toppings", value: draft.toppings.isEmpty ? "なし" : draft.toppings.map(\.name).joined(separator: " / "))
+                    SummaryRow(title: "Subtotal", value: draft.subtotal.yenText)
+                }
+                .padding(POCSpacing.m)
+                .pocCard(fill: POCColor.elevatedStrong)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func toppingGrid(_ toppings: [Topping], draft: DraftOrder) -> some View {
+        LazyVGrid(columns: toppingColumns, spacing: POCSpacing.s) {
+            ForEach(toppings) { topping in
+                let isSelected = draft.toppings.contains(topping)
+                Button {
+                    orderStore.toggleTopping(topping)
+                } label: {
+                    VStack(alignment: .leading, spacing: POCSpacing.s) {
+                        Text(topping.name)
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(POCColor.textPrimary)
+                        Text("+\(topping.price.yenText)")
+                            .font(.subheadline)
+                            .foregroundStyle(POCColor.textSecondary)
+                        Spacer()
+                        Text(isSelected ? "Added" : "Add")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(isSelected ? Color.white : POCColor.curry)
+                            .padding(.horizontal, POCSpacing.xs)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule().fill(isSelected ? topping.accentColor : POCColor.background)
+                            )
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 132, alignment: .leading)
+                    .padding(POCSpacing.m)
+                    .background(
+                        RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                            .fill(isSelected ? topping.accentColor.opacity(0.2) : POCColor.elevated)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                            .stroke(isSelected ? topping.accentColor : POCColor.line, lineWidth: 1)
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private func recommendedToppings(for draft: DraftOrder) -> [Topping] {
+        let recommendedIDs = Set(draft.menuItem.recommendedToppingIDs)
+        return orderStore.toppings.filter { recommendedIDs.contains($0.id) }
+    }
+
+    private func otherToppings(for draft: DraftOrder) -> [Topping] {
+        let recommendedIDs = Set(draft.menuItem.recommendedToppingIDs)
+        return orderStore.toppings.filter { !recommendedIDs.contains($0.id) }
+    }
+}
+
+private struct CustomizationStepper: View {
+    let currentStep: CustomizationStep
+    let onSelect: (CustomizationStep) -> Void
+
+    var body: some View {
+        HStack(spacing: POCSpacing.xs) {
+            ForEach(CustomizationStep.allCases) { step in
+                Button {
+                    onSelect(step)
+                } label: {
+                    VStack(spacing: POCSpacing.xs) {
+                        Text("\(step.rawValue + 1)")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(step == currentStep ? Color.white : POCColor.textPrimary)
+                            .frame(width: 28, height: 28)
+                            .background(
+                                Circle()
+                                    .fill(step == currentStep ? POCColor.curry : POCColor.elevatedStrong)
+                            )
+                        Text(step.shortTitle)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(step == currentStep ? POCColor.curry : POCColor.textTertiary)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, POCSpacing.xs)
+                    .background(
+                        RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                            .fill(step == currentStep ? POCColor.elevatedStrong : POCColor.elevated.opacity(0.75))
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+}
+
+private struct SelectionCard: View {
+    let title: String
+    let subtitle: String
+    let value: String
+    let isSelected: Bool
+    let accent: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(alignment: .top, spacing: POCSpacing.m) {
+                VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                    Text(title)
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+                    Text(subtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(POCColor.textSecondary)
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: POCSpacing.xs) {
+                    Text(value)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(isSelected ? accent : POCColor.textSecondary)
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.title3)
+                        .foregroundStyle(isSelected ? accent : POCColor.textTertiary)
+                }
+            }
+            .padding(POCSpacing.m)
+            .background(
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .fill(isSelected ? accent.opacity(0.14) : POCColor.elevated)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .stroke(isSelected ? accent : POCColor.line, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct FlexibleChipGroup: View {
+    let items: [Topping]
+    let onRemove: (Topping) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.xs) {
+            ForEach(chunked(items, size: 2), id: \.self) { row in
+                HStack(spacing: POCSpacing.xs) {
+                    ForEach(row) { topping in
+                        Button {
+                            onRemove(topping)
+                        } label: {
+                            HStack(spacing: POCSpacing.xs) {
+                                Text(topping.name)
+                                Image(systemName: "xmark")
+                                    .font(.caption.weight(.bold))
+                            }
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(POCColor.textPrimary)
+                            .padding(.horizontal, POCSpacing.s)
+                            .padding(.vertical, POCSpacing.xs)
+                            .background(
+                                Capsule()
+                                    .fill(topping.accentColor.opacity(0.18))
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(topping.accentColor.opacity(0.5), lineWidth: 1)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+            }
+        }
+    }
+
+    private func chunked(_ toppings: [Topping], size: Int) -> [[Topping]] {
+        stride(from: 0, to: toppings.count, by: size).map { index in
+            Array(toppings[index..<min(index + size, toppings.count)])
         }
     }
 }
@@ -451,8 +799,10 @@ struct DraftSnapshotCard: View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
             SectionHeader("Current Order")
             SummaryRow(title: "Base", value: draft.menuItem.name)
+            SummaryRow(title: "Sauce", value: draft.currySauce.rawValue)
             SummaryRow(title: "Spice", value: "\(draft.spiceLevel)辛")
             SummaryRow(title: "Rice", value: "\(draft.riceGrams)g")
+            SummaryRow(title: "Sauce Amount", value: draft.sauceAmount.rawValue)
             SummaryRow(title: "Topping", value: draft.toppings.isEmpty ? "なし" : draft.toppings.map(\.name).joined(separator: " / "))
             if showsCoupon {
                 SummaryRow(title: "Coupon", value: draft.appliedCoupon?.title ?? "-")

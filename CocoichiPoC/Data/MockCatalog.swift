@@ -126,8 +126,10 @@ enum MockCatalog {
                 draft: DraftOrder(
                     store: shibuya,
                     menuItem: loinCutlet,
+                    currySauce: .rich,
                     spiceLevel: 3,
                     riceGrams: 400,
+                    sauceAmount: .extra,
                     toppings: [cheese, spinach],
                     appliedCoupon: nil
                 ),
@@ -139,8 +141,10 @@ enum MockCatalog {
                 draft: DraftOrder(
                     store: shibuya,
                     menuItem: butterChicken,
+                    currySauce: .butter,
                     spiceLevel: 2,
                     riceGrams: 300,
+                    sauceAmount: .regular,
                     toppings: [cheese],
                     appliedCoupon: nil
                 ),
