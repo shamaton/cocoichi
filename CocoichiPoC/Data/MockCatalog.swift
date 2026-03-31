@@ -206,14 +206,78 @@ private enum CurryMenuMasterLoader {
 
     private static func makeID(for name: String, index: Int) -> String {
         switch name {
+        case "THE牛カレー":
+            return "the-gyu-curry"
+        case "手仕込ささみカツ(2本)カレー":
+            return "handmade-chicken-tender-cutlet-curry"
+        case "桜えびとあさりの春野菜カレー":
+            return "sakura-shrimp-asari-spring-vegetable-curry"
         case "ロースカツカレー":
             return "loin-cutlet-curry"
         case "ポークカレー":
             return "pork-curry"
+        case "甘口ポークカレー":
+            return "mild-pork-curry"
+        case "チキンにこみカレー":
+            return "stewed-chicken-curry"
+        case "フライドチキン(5個)カレー":
+            return "fried-chicken-curry"
+        case "ハンバーグ(2個)カレー":
+            return "hamburger-curry"
+        case "豚しゃぶカレー":
+            return "pork-shabu-curry"
+        case "メンチカツカレー":
+            return "minced-cutlet-curry"
+        case "ソーセージ(4本)カレー":
+            return "sausage-curry"
+        case "チキンカツカレー":
+            return "chicken-cutlet-curry"
         case "パリパリチキンカレー":
             return "crispy-chicken-curry"
         case "ビーフカレー":
             return "beef-curry"
+        case "手仕込とんかつカレー":
+            return "handmade-tonkatsu-curry"
+        case "牛すじ煮込みカレー":
+            return "stewed-beef-tendon-curry"
+        case "プチエビフライカレー":
+            return "petite-shrimp-fry-curry"
+        case "フィッシュフライ(2本)カレー":
+            return "fish-fry-curry"
+        case "たっぷりあさりカレー":
+            return "asari-clam-curry"
+        case "イカカレー":
+            return "squid-curry"
+        case "エビにこみカレー":
+            return "stewed-shrimp-curry"
+        case "エビあさりカレー":
+            return "shrimp-asari-curry"
+        case "海の幸カレー":
+            return "seafood-curry"
+        case "なす(6個)カレー":
+            return "eggplant-curry"
+        case "ほうれん草カレー":
+            return "spinach-curry"
+        case "やさいカレー":
+            return "vegetable-curry"
+        case "とろ～りたまフライカレー":
+            return "runny-egg-fry-curry"
+        case "ココイチベジカレー":
+            return "cocoichi-vegetarian-curry"
+        case "オムカレー":
+            return "omelet-curry"
+        case "低糖質カレー":
+            return "low-carb-curry"
+        case "納豆カレー":
+            return "natto-curry"
+        case "スクランブルエッグカレー":
+            return "scrambled-egg-curry"
+        case "チーズカレー":
+            return "cheese-curry"
+        case "クリームコロッケ(カニ入り）(2個)カレー":
+            return "crab-cream-croquette-curry"
+        case "きのこカレー":
+            return "mushroom-curry"
         default:
             let base = name
                 .lowercased()
@@ -288,26 +352,119 @@ private enum CurryMenuMasterLoader {
 
     private static let fallbackYAML = """
     期間限定:
-      - name: 炭火焼きチキンカレー
-        price: 990
-        comment: 香ばしさを先に感じる今だけの一皿
+      - name: THE牛カレー
+        price: 1120
+        comment: 牛の旨みを強く打ち出した数量限定の一皿
+      - name: 手仕込ささみカツ(2本)カレー
+        price: 1082
+        comment: 手仕込のささみカツで食べごたえを足せる限定メニュー
+      - name: 桜えびとあさりの春野菜カレー
+        price: 920
+        comment: 春らしい具材を重ねて軽やかに楽しめる限定カレー
 
     肉類のカレー:
       - name: ポークカレー
-        price: 720
-        comment: 軽く始めたい日の定番
+        price: 588
+        comment: 迷った時に戻れるベーシックな一皿
+      - name: 甘口ポークカレー
+        price: 588
+        comment: 辛さを抑えてやさしく楽しめる定番
+      - name: ビーフカレー
+        price: 722
+        comment: コクをしっかり味わいたい日に向く
+      - name: チキンにこみカレー
+        price: 850
+        comment: やわらかなチキンをソースになじませた一皿
+      - name: フライドチキン(5個)カレー
+        price: 865
+        comment: 食べごたえのあるフライドチキンが主役
+      - name: ハンバーグ(2個)カレー
+        price: 888
+        comment: ハンバーグをしっかり楽しめる満足感重視
+      - name: 豚しゃぶカレー
+        price: 893
+        comment: 軽やかな豚しゃぶで食べ進めやすい
+      - name: メンチカツカレー
+        price: 884
+        comment: 旨みのあるメンチカツで気分を変えられる
+      - name: ソーセージ(4本)カレー
+        price: 904
+        comment: ソーセージの塩気でリズムよく食べられる
+      - name: チキンカツカレー
+        price: 904
+        comment: 王道の揚げもの気分に応えるバランス型
+      - name: パリパリチキンカレー
+        price: 904
+        comment: 香ばしい食感を前面に楽しめる人気メニュー
       - name: ロースカツカレー
-        price: 980
-        comment: サクサク食感の王道
+        price: 908
+        comment: サクッとした王道の満足感がある定番
+      - name: 手仕込とんかつカレー
+        price: 1084
+        comment: 手仕込ならではの厚みをしっかり味わえる
+      - name: 牛すじ煮込みカレー
+        price: 1030
+        comment: 煮込みの旨みを深く感じたい時に向く
 
     魚介類のカレー:
-      - name: えびあさりカレー
-        price: 960
-        comment: 魚介の旨みを軽やかに味わう
+      - name: プチエビフライカレー
+        price: 748
+        comment: 小ぶりなエビフライで軽快に食べ進められる
+      - name: フィッシュフライ(2本)カレー
+        price: 780
+        comment: 白身フライの食感で満足感を足せる
+      - name: たっぷりあさりカレー
+        price: 780
+        comment: あさりの旨みを前面に感じられる一皿
+      - name: イカカレー
+        price: 828
+        comment: イカの食感で海鮮らしさをしっかり楽しめる
+      - name: エビにこみカレー
+        price: 828
+        comment: エビの旨みをソースになじませて味わえる
+      - name: エビあさりカレー
+        price: 804
+        comment: エビとあさりをまとめて楽しめる定番の魚介系
+      - name: 海の幸カレー
+        price: 924
+        comment: 魚介をしっかり入れて満足感を高めた一皿
 
     野菜類・その他のカレー:
+      - name: なす(6個)カレー
+        price: 751
+        comment: なすのやわらかさで軽やかに食べ進められる
+      - name: ほうれん草カレー
+        price: 817
+        comment: ほうれん草の風味を素直に感じられる一皿
       - name: やさいカレー
-        price: 840
-        comment: 野菜の甘みをしっかり感じる
+        price: 835
+        comment: 野菜をしっかり楽しみたい時の定番
+      - name: とろ～りたまフライカレー
+        price: 769
+        comment: とろけるたまごのコクでやさしくまとまる
+      - name: ココイチベジカレー
+        price: 621
+        comment: 動物性原材料を使わず軽やかに楽しめる
+      - name: オムカレー
+        price: 709
+        comment: たまごのまろやかさで食べやすく仕上がる
+      - name: 低糖質カレー
+        price: 660
+        comment: 糖質を抑えつつカレー気分を満たせる
+      - name: 納豆カレー
+        price: 740
+        comment: 納豆の風味で好みをはっきり出せる一皿
+      - name: スクランブルエッグカレー
+        price: 788
+        comment: ふんわりたまごでソースをやさしく受け止める
+      - name: チーズカレー
+        price: 828
+        comment: まろやかさをしっかり足したい時の定番
+      - name: クリームコロッケ(カニ入り）(2個)カレー
+        price: 808
+        comment: クリーミーなコロッケで濃厚さを重ねられる
+      - name: きのこカレー
+        price: 808
+        comment: きのこの香りで落ち着いた味わいに寄せられる
     """
 }
