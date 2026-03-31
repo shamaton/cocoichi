@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct MenuDiscoveryView: View {
     @EnvironmentObject private var navigator: AppNavigator
@@ -6,7 +7,7 @@ struct MenuDiscoveryView: View {
 
     @State private var searchText = ""
     @State private var selectedTag: MenuTag?
-    @State private var expandedGroups: Set<CurryMenuGroup> = [.limitedTime]
+    @State private var expandedGroups: Set<CurryMenuGroup> = [.limitedTime, .meat]
 
     var body: some View {
         ScrollView {
@@ -276,8 +277,8 @@ private struct MenuItemArtwork: View {
 
     var body: some View {
         Group {
-            if let imageResourceName = item.imageResourceName {
-                Image(imageResourceName)
+            if let uiImage = menuImage {
+                Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
             } else {
@@ -300,6 +301,15 @@ private struct MenuItemArtwork: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(Color.white.opacity(0.32), lineWidth: 1)
         )
+    }
+
+    private var menuImage: UIImage? {
+        guard let imagePath = item.imagePath else { return nil }
+        let resourcePath = imagePath as NSString
+        let resourceName = resourcePath.deletingPathExtension
+        let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else { return nil }
+        return UIImage(contentsOfFile: url.path)
     }
 }
 

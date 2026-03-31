@@ -49,6 +49,7 @@ struct MenuItem: Identifiable, Hashable, Codable {
     let basePrice: Int
     let tags: [MenuTag]
     let searchKeywords: [String]
+    let imagePath: String?
     let recommendedToppingIDs: [String]
     let accentHexes: [UInt]
 
@@ -60,6 +61,7 @@ struct MenuItem: Identifiable, Hashable, Codable {
         case basePrice
         case tags
         case searchKeywords
+        case imagePath
         case recommendedToppingIDs
         case accentHexes
     }
@@ -72,6 +74,7 @@ struct MenuItem: Identifiable, Hashable, Codable {
         basePrice: Int,
         tags: [MenuTag],
         searchKeywords: [String],
+        imagePath: String? = nil,
         recommendedToppingIDs: [String],
         accentHexes: [UInt]
     ) {
@@ -82,6 +85,7 @@ struct MenuItem: Identifiable, Hashable, Codable {
         self.basePrice = basePrice
         self.tags = tags
         self.searchKeywords = searchKeywords
+        self.imagePath = imagePath
         self.recommendedToppingIDs = recommendedToppingIDs
         self.accentHexes = accentHexes
     }
@@ -95,6 +99,7 @@ struct MenuItem: Identifiable, Hashable, Codable {
         basePrice = try container.decode(Int.self, forKey: .basePrice)
         tags = try container.decodeIfPresent([MenuTag].self, forKey: .tags) ?? []
         searchKeywords = try container.decodeIfPresent([String].self, forKey: .searchKeywords) ?? []
+        imagePath = try container.decodeIfPresent(String.self, forKey: .imagePath)
         recommendedToppingIDs = try container.decodeIfPresent([String].self, forKey: .recommendedToppingIDs) ?? []
         accentHexes = try container.decodeIfPresent([UInt].self, forKey: .accentHexes) ?? group.accentHexes
     }
@@ -103,14 +108,6 @@ struct MenuItem: Identifiable, Hashable, Codable {
         accentHexes.map { Color(hex: $0) }
     }
 
-    var imageResourceName: String? {
-        switch id {
-        case "pork-curry", "mild-pork-curry":
-            return "pork-curry"
-        default:
-            return nil
-        }
-    }
 }
 
 struct Topping: Identifiable, Hashable, Codable {

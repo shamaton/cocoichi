@@ -108,6 +108,7 @@ private struct CurryMenuMasterEntry {
     let name: String
     let price: Int
     let comment: String
+    let imagePath: String?
 }
 
 private enum CurryMenuMasterLoader {
@@ -121,6 +122,7 @@ private enum CurryMenuMasterLoader {
                 basePrice: entry.price,
                 tags: makeTags(for: entry),
                 searchKeywords: makeKeywords(for: entry),
+                imagePath: entry.imagePath,
                 recommendedToppingIDs: makeRecommendedToppings(for: entry),
                 accentHexes: entry.group.accentHexes
             )
@@ -141,6 +143,7 @@ private enum CurryMenuMasterLoader {
         var currentName: String?
         var currentPrice: Int?
         var currentComment: String?
+        var currentImagePath: String?
 
         func flushCurrentItem() {
             guard
@@ -154,12 +157,14 @@ private enum CurryMenuMasterLoader {
                     group: group,
                     name: name,
                     price: price,
-                    comment: comment
+                    comment: comment,
+                    imagePath: currentImagePath
                 )
             )
             currentName = nil
             currentPrice = nil
             currentComment = nil
+            currentImagePath = nil
         }
 
         for rawLine in source.components(separatedBy: .newlines) {
@@ -190,6 +195,8 @@ private enum CurryMenuMasterLoader {
                 currentPrice = Int(parseValue(from: trimmed))
             } else if trimmed.hasPrefix("comment:") {
                 currentComment = parseValue(from: trimmed)
+            } else if trimmed.hasPrefix("imagePath:") {
+                currentImagePath = parseValue(from: trimmed)
             }
         }
 

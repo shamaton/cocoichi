@@ -19,6 +19,19 @@
 		A0000000000000000000000A /* OrderFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000A /* OrderFlowView.swift */; };
 		A0000000000000000000000B /* curry-menu-master.yaml in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000C /* curry-menu-master.yaml */; };
 		A0000000000000000000000C /* pork-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000D /* pork-curry.png */; };
+		A0000000000000000000000D /* beef-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000E /* beef-curry.png */; };
+		A0000000000000000000000E /* chicken-cutlet-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000F /* chicken-cutlet-curry.png */; };
+		A0000000000000000000000F /* chicken-simmer-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000010 /* chicken-simmer-curry.png */; };
+		A00000000000000000000010 /* crunchy-chicken-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000011 /* crunchy-chicken-curry.png */; };
+		A00000000000000000000011 /* fried-chicken-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000012 /* fried-chicken-curry.png */; };
+		A00000000000000000000012 /* gyu-suji-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000013 /* gyu-suji-curry.png */; };
+		A00000000000000000000013 /* hamburg-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000014 /* hamburg-curry.png */; };
+		A00000000000000000000014 /* handmade-pork-cutlet-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000015 /* handmade-pork-cutlet-curry.png */; };
+		A00000000000000000000015 /* mench-cutlet-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000016 /* mench-cutlet-curry.png */; };
+		A00000000000000000000016 /* pork-curry-sweet.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000017 /* pork-curry-sweet.png */; };
+		A00000000000000000000017 /* pork-cutlet-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000018 /* pork-cutlet-curry.png */; };
+		A00000000000000000000018 /* pork-slice-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000019 /* pork-slice-curry.png */; };
+		A00000000000000000000019 /* sausage-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000001A /* sausage-curry.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +47,19 @@
 		B0000000000000000000000A /* OrderFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderFlowView.swift; sourceTree = "<group>"; };
 		B0000000000000000000000C /* curry-menu-master.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = "curry-menu-master.yaml"; sourceTree = "<group>"; };
 		B0000000000000000000000D /* pork-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-curry.png"; sourceTree = "<group>"; };
+		B0000000000000000000000E /* beef-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "beef-curry.png"; sourceTree = "<group>"; };
+		B0000000000000000000000F /* chicken-cutlet-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "chicken-cutlet-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000010 /* chicken-simmer-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "chicken-simmer-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000011 /* crunchy-chicken-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "crunchy-chicken-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000012 /* fried-chicken-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fried-chicken-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000013 /* gyu-suji-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "gyu-suji-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000014 /* hamburg-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "hamburg-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000015 /* handmade-pork-cutlet-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "handmade-pork-cutlet-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000016 /* mench-cutlet-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mench-cutlet-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000017 /* pork-curry-sweet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-curry-sweet.png"; sourceTree = "<group>"; };
+		B00000000000000000000018 /* pork-cutlet-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-cutlet-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000019 /* pork-slice-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-slice-curry.png"; sourceTree = "<group>"; };
+		B0000000000000000000001A /* sausage-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sausage-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000000B /* CocoichiPoC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoichiPoC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -142,7 +168,20 @@
 		C0000000000000000000000B /* MenuImages */ = {
 			isa = PBXGroup;
 			children = (
+				B0000000000000000000000E /* beef-curry.png */,
+				B0000000000000000000000F /* chicken-cutlet-curry.png */,
+				B00000000000000000000010 /* chicken-simmer-curry.png */,
+				B00000000000000000000011 /* crunchy-chicken-curry.png */,
+				B00000000000000000000012 /* fried-chicken-curry.png */,
+				B00000000000000000000013 /* gyu-suji-curry.png */,
+				B00000000000000000000014 /* hamburg-curry.png */,
+				B00000000000000000000015 /* handmade-pork-cutlet-curry.png */,
+				B00000000000000000000016 /* mench-cutlet-curry.png */,
+				B00000000000000000000017 /* pork-curry-sweet.png */,
 				B0000000000000000000000D /* pork-curry.png */,
+				B00000000000000000000018 /* pork-cutlet-curry.png */,
+				B00000000000000000000019 /* pork-slice-curry.png */,
+				B0000000000000000000001A /* sausage-curry.png */,
 			);
 			path = MenuImages;
 			sourceTree = "<group>";
@@ -205,7 +244,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0000000000000000000000D /* beef-curry.png in Resources */,
+				A0000000000000000000000E /* chicken-cutlet-curry.png in Resources */,
+				A0000000000000000000000F /* chicken-simmer-curry.png in Resources */,
+				A00000000000000000000010 /* crunchy-chicken-curry.png in Resources */,
+				A00000000000000000000011 /* fried-chicken-curry.png in Resources */,
+				A00000000000000000000012 /* gyu-suji-curry.png in Resources */,
+				A00000000000000000000013 /* hamburg-curry.png in Resources */,
+				A00000000000000000000014 /* handmade-pork-cutlet-curry.png in Resources */,
+				A00000000000000000000015 /* mench-cutlet-curry.png in Resources */,
+				A00000000000000000000016 /* pork-curry-sweet.png in Resources */,
 				A0000000000000000000000C /* pork-curry.png in Resources */,
+				A00000000000000000000017 /* pork-cutlet-curry.png in Resources */,
+				A00000000000000000000018 /* pork-slice-curry.png in Resources */,
+				A00000000000000000000019 /* sausage-curry.png in Resources */,
 				A0000000000000000000000B /* curry-menu-master.yaml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

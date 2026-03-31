@@ -13,45 +13,59 @@
   - name: ポークカレー
     price: 588
     comment: 迷った時に戻れるベーシックな一皿
+    imagePath: pork-curry.png
   - name: 甘口ポークカレー
     price: 588
     comment: 辛さを抑えてやさしく楽しめる定番
+    imagePath: pork-curry-sweet.png
   - name: ビーフカレー
     price: 722
     comment: コクをしっかり味わいたい日に向く
+    imagePath: beef-curry.png
   - name: チキンにこみカレー
     price: 850
     comment: やわらかなチキンをソースになじませた一皿
+    imagePath: chicken-simmer-curry.png
   - name: フライドチキン(5個)カレー
     price: 865
     comment: 食べごたえのあるフライドチキンが主役
+    imagePath: fried-chicken-curry.png
   - name: ハンバーグ(2個)カレー
     price: 888
     comment: ハンバーグをしっかり楽しめる満足感重視
+    imagePath: hamburg-curry.png
   - name: 豚しゃぶカレー
     price: 893
     comment: 軽やかな豚しゃぶで食べ進めやすい
+    imagePath: pork-slice-curry.png
   - name: メンチカツカレー
     price: 884
     comment: 旨みのあるメンチカツで気分を変えられる
+    imagePath: mench-cutlet-curry.png
   - name: ソーセージ(4本)カレー
     price: 904
     comment: ソーセージの塩気でリズムよく食べられる
+    imagePath: sausage-curry.png
   - name: チキンカツカレー
     price: 904
     comment: 王道の揚げもの気分に応えるバランス型
+    imagePath: chicken-cutlet-curry.png
   - name: パリパリチキンカレー
     price: 904
     comment: 香ばしい食感を前面に楽しめる人気メニュー
+    imagePath: crunchy-chicken-curry.png
   - name: ロースカツカレー
     price: 908
     comment: サクッとした王道の満足感がある定番
+    imagePath: pork-cutlet-curry.png
   - name: 手仕込とんかつカレー
     price: 1084
     comment: 手仕込ならではの厚みをしっかり味わえる
+    imagePath: handmade-pork-cutlet-curry.png
   - name: 牛すじ煮込みカレー
     price: 1030
     comment: 煮込みの旨みを深く感じたい時に向く
+    imagePath: gyu-suji-curry.png
 
 魚介類のカレー:
   - name: プチエビフライカレー
