@@ -102,6 +102,15 @@ struct MenuItem: Identifiable, Hashable, Codable {
     var accentColors: [Color] {
         accentHexes.map { Color(hex: $0) }
     }
+
+    var imageResourceName: String? {
+        switch id {
+        case "pork-curry", "mild-pork-curry":
+            return "pork-curry"
+        default:
+            return nil
+        }
+    }
 }
 
 struct Topping: Identifiable, Hashable, Codable {

@@ -18,6 +18,7 @@
 		A00000000000000000000009 /* MenuDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000009 /* MenuDiscoveryView.swift */; };
 		A0000000000000000000000A /* OrderFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000A /* OrderFlowView.swift */; };
 		A0000000000000000000000B /* curry-menu-master.yaml in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000C /* curry-menu-master.yaml */; };
+		A0000000000000000000000C /* pork-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000D /* pork-curry.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		B00000000000000000000009 /* MenuDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuDiscoveryView.swift; sourceTree = "<group>"; };
 		B0000000000000000000000A /* OrderFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderFlowView.swift; sourceTree = "<group>"; };
 		B0000000000000000000000C /* curry-menu-master.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = "curry-menu-master.yaml"; sourceTree = "<group>"; };
+		B0000000000000000000000D /* pork-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000000B /* CocoichiPoC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoichiPoC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -71,6 +73,7 @@
 				C00000000000000000000007 /* Data */,
 				C00000000000000000000008 /* State */,
 				C00000000000000000000009 /* Features */,
+				C0000000000000000000000A /* Resources */,
 			);
 			path = CocoichiPoC;
 			sourceTree = "<group>";
@@ -126,6 +129,22 @@
 				B0000000000000000000000A /* OrderFlowView.swift */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		C0000000000000000000000A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C0000000000000000000000B /* MenuImages */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		C0000000000000000000000B /* MenuImages */ = {
+			isa = PBXGroup;
+			children = (
+				B0000000000000000000000D /* pork-curry.png */,
+			);
+			path = MenuImages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -186,6 +205,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0000000000000000000000C /* pork-curry.png in Resources */,
 				A0000000000000000000000B /* curry-menu-master.yaml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

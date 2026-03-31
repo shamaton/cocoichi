@@ -218,6 +218,8 @@ private struct CurryMenuGroupSection: View {
                             onSelect(item)
                         } label: {
                             HStack(spacing: POCSpacing.m) {
+                                MenuItemArtwork(item: item)
+
                                 VStack(alignment: .leading, spacing: POCSpacing.s) {
                                     Text(item.name)
                                         .font(.headline.weight(.semibold))
@@ -266,6 +268,38 @@ private struct CurryMenuGroupSection: View {
                 .padding(.top, POCSpacing.xs)
             }
         }
+    }
+}
+
+private struct MenuItemArtwork: View {
+    let item: MenuItem
+
+    var body: some View {
+        Group {
+            if let imageResourceName = item.imageResourceName {
+                Image(imageResourceName)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                LinearGradient(
+                    colors: [item.accentColors.first ?? POCColor.cheese, POCColor.elevatedStrong],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .overlay(alignment: .bottomLeading) {
+                    Image(systemName: "fork.knife.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.white.opacity(0.92))
+                        .padding(POCSpacing.s)
+                }
+            }
+        }
+        .frame(width: 104, height: 88)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(Color.white.opacity(0.32), lineWidth: 1)
+        )
     }
 }
 
