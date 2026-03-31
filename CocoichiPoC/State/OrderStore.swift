@@ -7,7 +7,9 @@ final class OrderStore: ObservableObject {
     @Published private(set) var toppings = MockCatalog.toppings
     @Published private(set) var coupons = MockCatalog.coupons
     @Published var selectedStore: Store?
+    @Published var cartItems: [CartLineItem] = []
     @Published var draftOrder: DraftOrder?
+    @Published var appliedCoupon: Coupon?
     @Published var favoriteCombos: [FavoriteCombo]
     @Published var completedOrder: CompletedOrder?
     // S5 初回到達時だけクーポン sheet を自動表示し、その後は明示操作に戻すためのフラグ。
@@ -20,17 +22,52 @@ final class OrderStore: ObservableObject {
     }
 
     var availableCoupons: [Coupon] {
-        guard let draftOrder else { return [] }
-        return coupons.filter { $0.isApplicable(to: draftOrder) }
+        guard !reviewDrafts.isEmpty else { return [] }
+        return coupons
+            .filter { $0.isApplicable(to: reviewDrafts) }
+            .sorted { $0.discount(for: reviewDrafts) > $1.discount(for: reviewDrafts) }
     }
 
     var unavailableCoupons: [Coupon] {
-        guard let draftOrder else { return coupons }
-        return coupons.filter { !$0.isApplicable(to: draftOrder) }
+        guard !reviewDrafts.isEmpty else { return coupons }
+        return coupons.filter { !$0.isApplicable(to: reviewDrafts) }
     }
 
     var featuredFavorite: FavoriteCombo? {
         favoriteCombos.sorted(by: { $0.lastUsedAt > $1.lastUsedAt }).first
+    }
+
+    var reviewSubtotal: Int {
+        reviewDrafts.map(\.subtotal).reduce(0, +)
+    }
+
+    var reviewDiscount: Int {
+        appliedCoupon?.discount(for: reviewDrafts) ?? 0
+    }
+
+    var reviewTotal: Int {
+        max(reviewSubtotal - reviewDiscount, 0)
+    }
+
+    func previewTotal(afterApplying coupon: Coupon) -> Int {
+        max(reviewSubtotal - coupon.discount(for: reviewDrafts), 0)
+    }
+
+    var reviewStore: Store? {
+        selectedStore ?? draftOrder?.store ?? cartItems.first?.draft.store
+    }
+
+    var hasReviewItems: Bool {
+        !cartItems.isEmpty || draftOrder != nil
+    }
+
+    var pendingReviewLineItem: CartLineItem? {
+        guard let draftOrder else { return nil }
+        return CartLineItem(id: draftOrder.id, draft: draftOrder)
+    }
+
+    private var reviewDrafts: [DraftOrder] {
+        cartItems.map(\.draft) + (draftOrder.map { [$0] } ?? [])
     }
 
     func selectStore(_ store: Store) {
@@ -42,7 +79,9 @@ final class OrderStore: ObservableObject {
 
     func clearStoreSelection() {
         selectedStore = nil
+        cartItems = []
         draftOrder = nil
+        appliedCoupon = nil
         completedOrder = nil
         hasPresentedCouponSuggestion = false
     }
@@ -60,7 +99,9 @@ final class OrderStore: ObservableObject {
             appliedCoupon: nil
         )
         completedOrder = nil
-        hasPresentedCouponSuggestion = false
+        if cartItems.isEmpty {
+            hasPresentedCouponSuggestion = false
+        }
     }
 
     func resumeFavorite(_ favorite: FavoriteCombo) {
@@ -68,43 +109,39 @@ final class OrderStore: ObservableObject {
         // 保存済み構成は再編集前提なので、クーポンは持ち越さず注文内容だけ再開する。
         draftOrder = favorite.draft.sanitizedForFavorite()
         completedOrder = nil
-        hasPresentedCouponSuggestion = false
+        if cartItems.isEmpty {
+            hasPresentedCouponSuggestion = false
+        }
         markFavoriteUsed(favorite.id)
     }
 
     func setSpiceLevel(_ level: Int) {
-        guard let draftOrder else { return }
-        self.draftOrder = draftOrder.with(spiceLevel: level)
+        updateDraft { $0.with(spiceLevel: level) }
     }
 
     func setCurrySauce(_ sauce: CurrySauceOption) {
-        guard let draftOrder else { return }
-        self.draftOrder = draftOrder.with(currySauce: sauce)
+        updateDraft { $0.with(currySauce: sauce) }
     }
 
     func setRiceGrams(_ grams: Int) {
-        guard let draftOrder else { return }
-        self.draftOrder = draftOrder.with(riceGrams: grams)
+        updateDraft { $0.with(riceGrams: grams) }
     }
 
     func setSauceAmount(_ amount: SauceAmountOption) {
-        guard let draftOrder else { return }
-        self.draftOrder = draftOrder.with(sauceAmount: amount)
+        updateDraft { $0.with(sauceAmount: amount) }
     }
 
     func toggleTopping(_ topping: Topping) {
-        guard let draftOrder else { return }
-        self.draftOrder = draftOrder.toggling(topping: topping)
+        updateDraft { $0.toggling(topping: topping) }
     }
 
     func applyCoupon(_ coupon: Coupon) {
-        guard let draftOrder, coupon.isApplicable(to: draftOrder) else { return }
-        self.draftOrder = draftOrder.applying(coupon: coupon)
+        guard coupon.isApplicable(to: reviewDrafts) else { return }
+        appliedCoupon = coupon
     }
 
     func removeCoupon() {
-        guard let draftOrder else { return }
-        self.draftOrder = draftOrder.applying(coupon: nil)
+        appliedCoupon = nil
     }
 
     func saveCurrentFavorite(named name: String) {
@@ -119,11 +156,19 @@ final class OrderStore: ObservableObject {
         persistFavorites()
     }
 
-    func placeOrder() {
+    func moveCurrentDraftToCart() {
         guard let draftOrder else { return }
+        cartItems.append(CartLineItem(draft: draftOrder.sanitizedForFavorite()))
+        self.draftOrder = nil
+        normalizeAppliedCoupon()
+    }
+
+    func placeOrder() {
+        let finalizedItems = cartItems + (draftOrder.map { [CartLineItem(draft: $0.sanitizedForFavorite())] } ?? [])
+        guard let store = reviewStore, !finalizedItems.isEmpty else { return }
         let placedAt = Date()
-        let pickupStart = Calendar.current.date(byAdding: .minute, value: draftOrder.store.pickupLeadTimeMin, to: placedAt) ?? placedAt
-        let pickupEnd = Calendar.current.date(byAdding: .minute, value: draftOrder.store.pickupLeadTimeMax, to: placedAt) ?? pickupStart
+        let pickupStart = Calendar.current.date(byAdding: .minute, value: store.pickupLeadTimeMin, to: placedAt) ?? placedAt
+        let pickupEnd = Calendar.current.date(byAdding: .minute, value: store.pickupLeadTimeMax, to: placedAt) ?? pickupStart
 
         // PoC では API を持たないため、完了画面に必要な受取情報をローカルで確定させる。
         completedOrder = CompletedOrder(
@@ -132,13 +177,17 @@ final class OrderStore: ObservableObject {
             placedAt: placedAt,
             pickupStart: pickupStart,
             pickupEnd: pickupEnd,
-            draft: draftOrder
+            store: store,
+            cartItems: finalizedItems,
+            appliedCoupon: appliedCoupon
         )
     }
 
     func resetForNextOrder(keepingStore: Bool) {
         let store = selectedStore
+        cartItems = []
         draftOrder = nil
+        appliedCoupon = nil
         completedOrder = nil
         hasPresentedCouponSuggestion = false
 
@@ -154,6 +203,25 @@ final class OrderStore: ObservableObject {
         guard let index = favoriteCombos.firstIndex(where: { $0.id == id }) else { return }
         favoriteCombos[index].lastUsedAt = .now
         persistFavorites()
+    }
+
+    private func updateDraft(_ transform: (DraftOrder) -> DraftOrder) {
+        guard let draftOrder else { return }
+        self.draftOrder = transform(draftOrder)
+        normalizeAppliedCoupon()
+    }
+
+    private func normalizeAppliedCoupon() {
+        guard let appliedCoupon, !reviewDrafts.isEmpty else {
+            if reviewDrafts.isEmpty {
+                self.appliedCoupon = nil
+            }
+            return
+        }
+
+        if !appliedCoupon.isApplicable(to: reviewDrafts) {
+            self.appliedCoupon = nil
+        }
     }
 
     private func persistFavorites() {

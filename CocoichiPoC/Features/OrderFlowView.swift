@@ -530,30 +530,51 @@ struct OrderReviewView: View {
 
     var body: some View {
         Group {
-            if let draft = orderStore.draftOrder {
+            if orderStore.hasReviewItems {
                 ScrollView {
                     VStack(alignment: .leading, spacing: POCSpacing.l) {
                         SectionHeader("Pickup", subtitle: "受取店舗と受取目安を最後に確認します。")
 
-                        VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SummaryRow(title: draft.store.name, value: draft.pickupWindowText)
-                            Button("Change store") {
-                                orderStore.resetForNextOrder(keepingStore: false)
-                                navigator.resetToStoreSelect()
+                        if let store = orderStore.reviewStore {
+                            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                                SummaryRow(title: store.name, value: store.pickupLeadTimeText)
+                                Button("Change store") {
+                                    orderStore.resetForNextOrder(keepingStore: false)
+                                    navigator.resetToStoreSelect()
+                                }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(POCColor.curry)
                             }
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(POCColor.curry)
+                            .padding(POCSpacing.m)
+                            .pocCard(fill: POCColor.elevated)
                         }
-                        .padding(POCSpacing.m)
-                        .pocCard(fill: POCColor.elevated)
 
-                        DraftSnapshotCard(draft: draft, showsCoupon: true)
+                        ReviewCartCard(
+                            cartItems: orderStore.cartItems,
+                            pendingItem: orderStore.pendingReviewLineItem
+                        )
 
-                        if !orderStore.availableCoupons.isEmpty {
+                        if let appliedCoupon = orderStore.appliedCoupon {
+                            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                                SectionHeader("Applied Coupon")
+                                Text(appliedCoupon.title)
+                                    .font(.headline.weight(.semibold))
+                                Text(appliedCoupon.summary)
+                                    .font(.subheadline)
+                                    .foregroundStyle(POCColor.textSecondary)
+                                Button("Remove") {
+                                    orderStore.removeCoupon()
+                                }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(POCColor.curry)
+                            }
+                            .padding(POCSpacing.m)
+                            .pocCard(fill: POCColor.elevatedStrong)
+                        } else if let suggestedCoupon = orderStore.availableCoupons.first {
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
                                 Text("この注文に使えるクーポンがあります")
                                     .font(.headline.weight(.semibold))
-                                Text(orderStore.availableCoupons[0].title)
+                                Text(suggestedCoupon.title)
                                     .font(.subheadline)
                                     .foregroundStyle(POCColor.textSecondary)
                                 Button("View Coupon") {
@@ -567,10 +588,25 @@ struct OrderReviewView: View {
                         }
 
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
+                            SectionHeader("Add More", subtitle: "1皿目を保ったまま、2皿目や追加メニューを探しに戻れます。")
+
+                            HStack(spacing: POCSpacing.s) {
+                                SecondaryCTAButton(title: "2皿目のカレー", systemImage: "plus.circle") {
+                                    orderStore.moveCurrentDraftToCart()
+                                    navigator.popToMenuDiscovery()
+                                }
+                                SecondaryCTAButton(title: "サイドメニュー追加", systemImage: "takeoutbag.and.cup.and.straw") {
+                                    orderStore.moveCurrentDraftToCart()
+                                    navigator.popToMenuDiscovery()
+                                }
+                            }
+                        }
+
+                        VStack(alignment: .leading, spacing: POCSpacing.s) {
                             SectionHeader("Price Summary")
-                            SummaryRow(title: "Subtotal", value: draft.subtotal.yenText)
-                            SummaryRow(title: "Coupon", value: draft.discount == 0 ? "-" : "-\(draft.discount.yenText)")
-                            SummaryRow(title: "Total", value: draft.total.yenText)
+                            SummaryRow(title: "Subtotal", value: orderStore.reviewSubtotal.yenText)
+                            SummaryRow(title: "Coupon", value: orderStore.reviewDiscount == 0 ? "-" : "-\(orderStore.reviewDiscount.yenText)")
+                            SummaryRow(title: "Total", value: orderStore.reviewTotal.yenText)
                         }
                         .padding(POCSpacing.m)
                         .pocCard(fill: POCColor.elevatedStrong)
@@ -587,7 +623,7 @@ struct OrderReviewView: View {
                         SecondaryCTAButton(title: "Save Combo", systemImage: "star") {
                             navigator.showSheet(.saveFavorite)
                         }
-                        PrimaryCTAButton(title: "Place Order \(draft.total.yenText)", systemImage: "checkmark") {
+                        PrimaryCTAButton(title: "Place Order \(orderStore.reviewTotal.yenText)", systemImage: "checkmark", isDisabled: !orderStore.hasReviewItems) {
                             orderStore.placeOrder()
                             navigator.push(.orderComplete)
                         }
@@ -637,14 +673,14 @@ struct OrderCompleteView: View {
 
                     VStack(alignment: .leading, spacing: POCSpacing.s) {
                         SectionHeader("Pickup Info")
-                        SummaryRow(title: "Store", value: completedOrder.draft.store.name)
+                        SummaryRow(title: "Store", value: completedOrder.store.name)
                         SummaryRow(title: "Time", value: completedOrder.pickupWindowText)
                         SummaryRow(title: "Ref", value: completedOrder.referenceID)
                     }
                     .padding(POCSpacing.m)
                     .pocCard(fill: POCColor.elevated)
 
-                    DraftSnapshotCard(draft: completedOrder.draft, showsCoupon: true)
+                    CompletedOrderCard(order: completedOrder)
 
                     EmptyStateCard(
                         title: "Next",
@@ -686,7 +722,7 @@ struct CouponSuggestionSheet: View {
                 VStack(alignment: .leading, spacing: POCSpacing.l) {
                     SectionHeader("Grab a Saving", subtitle: "この注文で使える候補だけを先に出します。")
 
-                    if let draft = orderStore.draftOrder, let best = orderStore.availableCoupons.first {
+                    if let best = orderStore.availableCoupons.first {
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
                             Text("Best Match")
                                 .font(.caption.weight(.semibold))
@@ -696,7 +732,7 @@ struct CouponSuggestionSheet: View {
                             Text(best.summary)
                                 .font(.subheadline)
                                 .foregroundStyle(POCColor.textSecondary)
-                            Text("この注文なら \(draft.subtotal.yenText) -> \(max(draft.subtotal - best.discount(for: draft), 0).yenText)")
+                            Text("この注文なら \(orderStore.reviewSubtotal.yenText) -> \(orderStore.previewTotal(afterApplying: best).yenText)")
                                 .font(.subheadline.weight(.semibold))
                             PrimaryCTAButton(title: "Apply This Coupon", systemImage: "tag") {
                                 orderStore.applyCoupon(best)
@@ -808,6 +844,88 @@ struct DraftSnapshotCard: View {
                 SummaryRow(title: "Coupon", value: draft.appliedCoupon?.title ?? "-")
             }
             SummaryRow(title: "Total", value: draft.total.yenText)
+        }
+        .padding(POCSpacing.m)
+        .pocCard(fill: POCColor.elevated)
+    }
+}
+
+private struct ReviewCartCard: View {
+    let cartItems: [CartLineItem]
+    let pendingItem: CartLineItem?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            SectionHeader("Your Order")
+
+            ForEach(Array(cartItems.enumerated()), id: \.element.id) { index, item in
+                CartLineSummaryCard(
+                    title: "\(index + 1)皿目",
+                    draft: item.draft,
+                    badgeText: "カート追加済み"
+                )
+            }
+
+            if let pendingItem {
+                CartLineSummaryCard(
+                    title: cartItems.isEmpty ? "この注文" : "追加中の1皿",
+                    draft: pendingItem.draft,
+                    badgeText: "まだ調整に戻れます"
+                )
+            }
+        }
+        .padding(POCSpacing.m)
+        .pocCard(fill: POCColor.elevated)
+    }
+}
+
+private struct CartLineSummaryCard: View {
+    let title: String
+    let draft: DraftOrder
+    let badgeText: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.xs) {
+            HStack {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Text(badgeText)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(POCColor.curry)
+            }
+
+            Text(draft.menuItem.name)
+                .font(.headline.weight(.semibold))
+            Text("\(draft.spiceLevel)辛 / \(draft.riceGrams)g / \(draft.sauceAmount.rawValue)")
+                .font(.subheadline)
+                .foregroundStyle(POCColor.textSecondary)
+            Text(draft.toppings.isEmpty ? "トッピングなし" : draft.toppings.map(\.name).joined(separator: " / "))
+                .font(.subheadline)
+                .foregroundStyle(POCColor.textSecondary)
+            SummaryRow(title: "Line Total", value: draft.subtotal.yenText)
+        }
+        .padding(POCSpacing.m)
+        .background(
+            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                .fill(POCColor.elevatedStrong)
+        )
+    }
+}
+
+private struct CompletedOrderCard: View {
+    let order: CompletedOrder
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            SectionHeader("Your Order")
+            ForEach(Array(order.cartItems.enumerated()), id: \.element.id) { index, item in
+                SummaryRow(title: "\(index + 1)皿目", value: item.draft.menuItem.name)
+                SummaryRow(title: "内容", value: "\(item.draft.spiceLevel)辛 / \(item.draft.riceGrams)g / \(item.draft.toppings.isEmpty ? "トッピングなし" : item.draft.toppings.map(\.name).joined(separator: " / "))")
+                SummaryRow(title: "小計", value: item.subtotal.yenText)
+            }
+            SummaryRow(title: "Coupon", value: order.appliedCoupon?.title ?? "-")
+            SummaryRow(title: "Total", value: order.total.yenText)
         }
         .padding(POCSpacing.m)
         .pocCard(fill: POCColor.elevated)

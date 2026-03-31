@@ -137,18 +137,28 @@ struct Coupon: Identifiable, Hashable, Codable {
     let eligibility: CouponEligibility
 
     func isApplicable(to order: DraftOrder) -> Bool {
+        isApplicable(to: [order])
+    }
+
+    func isApplicable(to drafts: [DraftOrder]) -> Bool {
         switch eligibility {
         case let .topping(toppingID):
-            return order.toppings.contains(where: { $0.id == toppingID })
+            return drafts.contains(where: { draft in
+                draft.toppings.contains(where: { $0.id == toppingID })
+            })
         case let .minimumSubtotal(amount):
-            return order.subtotal >= amount
+            return drafts.map(\.subtotal).reduce(0, +) >= amount
         case let .menu(menuID):
-            return order.menuItem.id == menuID
+            return drafts.contains(where: { $0.menuItem.id == menuID })
         }
     }
 
     func discount(for order: DraftOrder) -> Int {
-        min(discountYen, order.subtotal)
+        discount(for: [order])
+    }
+
+    func discount(for drafts: [DraftOrder]) -> Int {
+        min(discountYen, drafts.map(\.subtotal).reduce(0, +))
     }
 }
 
@@ -298,13 +308,43 @@ struct FavoriteCombo: Identifiable, Hashable, Codable {
     }
 }
 
+struct CartLineItem: Identifiable, Hashable, Codable {
+    let id: UUID
+    var draft: DraftOrder
+    let addedAt: Date
+
+    init(id: UUID = UUID(), draft: DraftOrder, addedAt: Date = .now) {
+        self.id = id
+        self.draft = draft
+        self.addedAt = addedAt
+    }
+
+    var subtotal: Int {
+        draft.subtotal
+    }
+}
+
 struct CompletedOrder: Identifiable, Hashable, Codable {
     let id: UUID
     let referenceID: String
     let placedAt: Date
     let pickupStart: Date
     let pickupEnd: Date
-    let draft: DraftOrder
+    let store: Store
+    let cartItems: [CartLineItem]
+    let appliedCoupon: Coupon?
+
+    var subtotal: Int {
+        cartItems.map(\.subtotal).reduce(0, +)
+    }
+
+    var discount: Int {
+        appliedCoupon?.discount(for: cartItems.map(\.draft)) ?? 0
+    }
+
+    var total: Int {
+        max(subtotal - discount, 0)
+    }
 
     var pickupWindowText: String {
         let formatter = DateFormatter()
