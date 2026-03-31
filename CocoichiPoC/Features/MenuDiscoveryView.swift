@@ -6,6 +6,7 @@ struct MenuDiscoveryView: View {
 
     @State private var searchText = ""
     @State private var selectedTag: MenuTag?
+    @State private var expandedGroups: Set<CurryMenuGroup> = [.limitedTime]
 
     var body: some View {
         ScrollView {
@@ -76,13 +77,145 @@ struct MenuDiscoveryView: View {
                     .buttonStyle(.plain)
                 }
 
-                SectionHeader("Menu List", subtitle: filteredMenuItems.count == orderStore.menuItems.count ? "人気と定番を混ぜて並べています" : "検索条件に合うメニュー")
+                SectionHeader(
+                    "Menu List",
+                    subtitle: searchText.isEmpty ? "カレーの種類ごとにたたみながら選べます" : "検索条件に合うメニュー"
+                )
 
                 LazyVStack(spacing: POCSpacing.m) {
-                    ForEach(filteredMenuItems) { item in
+                    if groupedSections.isEmpty {
+                        EmptyStateCard(
+                            title: "該当するカレーがありません",
+                            message: "検索語やフィルタを変えると別のグループが見つかります。"
+                        )
+                    } else {
+                        ForEach(groupedSections) { section in
+                            CurryMenuGroupSection(
+                                section: section,
+                                isExpanded: isExpanded(section.group),
+                                toggle: {
+                                    toggle(section.group)
+                                },
+                                onSelect: { item in
+                                    orderStore.beginOrder(with: item)
+                                    navigator.push(.curryDetail)
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+            .padding(POCSpacing.l)
+        }
+        .safeAreaInset(edge: .bottom) {
+            HStack(spacing: POCSpacing.s) {
+                SecondaryCTAButton(title: "Saved Combos", systemImage: "clock") {
+                    navigator.push(.savedCombos)
+                }
+                SecondaryCTAButton(title: "Browse by Mood", systemImage: "sparkles") {
+                    selectedTag = .recommended
+                }
+            }
+            .padding(.horizontal, POCSpacing.l)
+            .padding(.top, POCSpacing.s)
+            .padding(.bottom, POCSpacing.s)
+            .background(.ultraThinMaterial)
+        }
+        .navigationTitle("Menu Discovery")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var filteredMenuItems: [MenuItem] {
+        orderStore.menuItems.filter { item in
+            let matchesTag = selectedTag.map { item.tags.contains($0) } ?? true
+            let matchesSearch: Bool
+            if searchText.isEmpty {
+                matchesSearch = true
+            } else {
+                let query = searchText.lowercased()
+                let searchSpace = ([item.name, item.subtitle, item.group.rawValue] + item.searchKeywords + item.tags.map(\.rawValue))
+                    .joined(separator: " ")
+                    .lowercased()
+                matchesSearch = searchSpace.contains(query)
+            }
+            return matchesTag && matchesSearch
+        }
+    }
+
+    private var groupedSections: [GroupedMenuSection] {
+        CurryMenuGroup.allCases.compactMap { group in
+            let items = filteredMenuItems.filter { $0.group == group }
+            guard !items.isEmpty else { return nil }
+            return GroupedMenuSection(group: group, items: items)
+        }
+    }
+
+    private func isExpanded(_ group: CurryMenuGroup) -> Bool {
+        searchText.isEmpty ? expandedGroups.contains(group) : true
+    }
+
+    private func toggle(_ group: CurryMenuGroup) {
+        if expandedGroups.contains(group) {
+            expandedGroups.remove(group)
+        } else {
+            expandedGroups.insert(group)
+        }
+    }
+}
+
+private struct GroupedMenuSection: Identifiable {
+    let group: CurryMenuGroup
+    let items: [MenuItem]
+
+    var id: CurryMenuGroup { group }
+}
+
+private struct CurryMenuGroupSection: View {
+    let section: GroupedMenuSection
+    let isExpanded: Bool
+    let toggle: () -> Void
+    let onSelect: (MenuItem) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            Button(action: toggle) {
+                HStack(spacing: POCSpacing.s) {
+                    VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                        Text(section.group.rawValue)
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(POCColor.textPrimary)
+                        Text("\(section.items.count)品")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(POCColor.textTertiary)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: isExpanded ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(POCColor.curry)
+                }
+                .padding(POCSpacing.m)
+                .background(
+                    LinearGradient(
+                        colors: [section.groupColor.opacity(0.22), POCColor.elevated],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    in: RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                        .stroke(POCColor.line, lineWidth: 1)
+                )
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                VStack(spacing: POCSpacing.s) {
+                    ForEach(section.items) { item in
                         Button {
-                            orderStore.beginOrder(with: item)
-                            navigator.push(.curryDetail)
+                            onSelect(item)
                         } label: {
                             HStack(spacing: POCSpacing.m) {
                                 VStack(alignment: .leading, spacing: POCSpacing.s) {
@@ -130,39 +263,14 @@ struct MenuDiscoveryView: View {
                         .buttonStyle(.plain)
                     }
                 }
+                .padding(.top, POCSpacing.xs)
             }
-            .padding(POCSpacing.l)
         }
-        .safeAreaInset(edge: .bottom) {
-            HStack(spacing: POCSpacing.s) {
-                SecondaryCTAButton(title: "Saved Combos", systemImage: "clock") {
-                    navigator.push(.savedCombos)
-                }
-                SecondaryCTAButton(title: "Browse by Mood", systemImage: "sparkles") {
-                    selectedTag = .recommended
-                }
-            }
-            .padding(.horizontal, POCSpacing.l)
-            .padding(.top, POCSpacing.s)
-            .padding(.bottom, POCSpacing.s)
-            .background(.ultraThinMaterial)
-        }
-        .navigationTitle("Menu Discovery")
-        .navigationBarTitleDisplayMode(.inline)
     }
+}
 
-    private var filteredMenuItems: [MenuItem] {
-        orderStore.menuItems.filter { item in
-            let matchesTag = selectedTag.map { item.tags.contains($0) } ?? true
-            let matchesSearch: Bool
-            if searchText.isEmpty {
-                matchesSearch = true
-            } else {
-                let query = searchText.lowercased()
-                let searchSpace = ([item.name, item.subtitle] + item.searchKeywords + item.tags.map(\.rawValue)).joined(separator: " ").lowercased()
-                matchesSearch = searchSpace.contains(query)
-            }
-            return matchesTag && matchesSearch
-        }
+private extension GroupedMenuSection {
+    var groupColor: Color {
+        Color(hex: group.accentHexes.first ?? 0x8B4A1F)
     }
 }

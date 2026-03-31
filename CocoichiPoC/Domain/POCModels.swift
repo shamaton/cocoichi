@@ -8,6 +8,26 @@ enum MenuTag: String, CaseIterable, Codable, Hashable {
     case spicy = "辛さ"
 }
 
+enum CurryMenuGroup: String, CaseIterable, Codable, Hashable {
+    case limitedTime = "期間限定"
+    case meat = "肉類のカレー"
+    case seafood = "魚介類のカレー"
+    case vegetableAndOther = "野菜類・その他のカレー"
+
+    var accentHexes: [UInt] {
+        switch self {
+        case .limitedTime:
+            return [0xB84E2F, 0xE5B94E]
+        case .meat:
+            return [0x8B4A1F, 0xB8752C]
+        case .seafood:
+            return [0x5E7D3B, 0x8DA9C4]
+        case .vegetableAndOther:
+            return [0x5E7D3B, 0xF2D7A6]
+        }
+    }
+}
+
 struct Store: Identifiable, Hashable, Codable {
     let id: String
     let name: String
@@ -24,12 +44,60 @@ struct Store: Identifiable, Hashable, Codable {
 struct MenuItem: Identifiable, Hashable, Codable {
     let id: String
     let name: String
+    let group: CurryMenuGroup
     let subtitle: String
     let basePrice: Int
     let tags: [MenuTag]
     let searchKeywords: [String]
     let recommendedToppingIDs: [String]
     let accentHexes: [UInt]
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case group
+        case subtitle
+        case basePrice
+        case tags
+        case searchKeywords
+        case recommendedToppingIDs
+        case accentHexes
+    }
+
+    init(
+        id: String,
+        name: String,
+        group: CurryMenuGroup,
+        subtitle: String,
+        basePrice: Int,
+        tags: [MenuTag],
+        searchKeywords: [String],
+        recommendedToppingIDs: [String],
+        accentHexes: [UInt]
+    ) {
+        self.id = id
+        self.name = name
+        self.group = group
+        self.subtitle = subtitle
+        self.basePrice = basePrice
+        self.tags = tags
+        self.searchKeywords = searchKeywords
+        self.recommendedToppingIDs = recommendedToppingIDs
+        self.accentHexes = accentHexes
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        group = try container.decodeIfPresent(CurryMenuGroup.self, forKey: .group) ?? .meat
+        subtitle = try container.decode(String.self, forKey: .subtitle)
+        basePrice = try container.decode(Int.self, forKey: .basePrice)
+        tags = try container.decodeIfPresent([MenuTag].self, forKey: .tags) ?? []
+        searchKeywords = try container.decodeIfPresent([String].self, forKey: .searchKeywords) ?? []
+        recommendedToppingIDs = try container.decodeIfPresent([String].self, forKey: .recommendedToppingIDs) ?? []
+        accentHexes = try container.decodeIfPresent([UInt].self, forKey: .accentHexes) ?? group.accentHexes
+    }
 
     var accentColors: [Color] {
         accentHexes.map { Color(hex: $0) }

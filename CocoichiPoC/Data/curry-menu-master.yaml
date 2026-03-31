@@ -1,0 +1,37 @@
+期間限定:
+  - name: 炭火焼きチキンカレー
+    price: 990
+    comment: 香ばしさを先に感じる今だけの一皿
+  - name: スパイスカレー THE 海老スープ
+    price: 1080
+    comment: 海老の旨みを立てた春の限定メニュー
+
+肉類のカレー:
+  - name: ポークカレー
+    price: 720
+    comment: 軽く始めたい日の定番
+  - name: ロースカツカレー
+    price: 980
+    comment: サクサク食感の王道
+  - name: パリパリチキンカレー
+    price: 930
+    comment: 食感重視の人気メニュー
+  - name: ビーフカレー
+    price: 890
+    comment: 辛さを楽しむならこれ
+
+魚介類のカレー:
+  - name: えびあさりカレー
+    price: 960
+    comment: 魚介の旨みを軽やかに味わう
+  - name: フィッシュフライカレー
+    price: 940
+    comment: サクッとした白身フライで気分を変える
+
+野菜類・その他のカレー:
+  - name: やさいカレー
+    price: 840
+    comment: 野菜の甘みをしっかり感じる
+  - name: チーズカレー
+    price: 880
+    comment: まろやかにまとめたい時の定番
