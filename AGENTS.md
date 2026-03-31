@@ -116,6 +116,19 @@ Use these docs for:
 - task ordering and dependencies
 - milestone acceptance criteria
 
+### If you are running the review gate
+
+Read:
+
+- `docs/subagent-review-workflow-2026-03-31.md`
+
+Use this doc for:
+
+- the default review-gate flow for this repo
+- reviewer subagent prompt templates
+- large-diff splitting rules
+- required JSON output contract
+
 ### If you are trying to understand why this PoC exists
 
 Read:
@@ -227,9 +240,10 @@ Read in order:
 ## Tooling Notes
 
 - In this repo, nested sandboxing can break `codex exec --sandbox read-only` with `sandbox-exec: sandbox_apply: Operation not permitted`.
-- The only approved outer-sandbox bypass for this review flow is running `scripts/run-codex-review.sh` itself with elevated outer permissions while keeping the inner Codex sandbox as `read-only`.
-- Do not broaden that bypass to other commands. If elevated execution is not available, record the review as skipped instead of retrying with a wider unsandboxed command.
-- Prefer `scripts/run-codex-review.sh` so the repo uses `codex exec --sandbox read-only --ephemeral` consistently.
+- Do not use `codex exec`-based review as the default review gate in this repo.
+- Prefer the subagent-based review flow documented in `docs/subagent-review-workflow-2026-03-31.md`.
+- Do not use `/review` as a gate by itself. Use a reviewer subagent with an explicit JSON output contract instead.
+- `scripts/run-codex-review.sh` is legacy-only. Keep it only for reference or exceptional manual use, not as the standard path.
 - Before a review that uses `diff_range: HEAD`, check `git status --short` for untracked files. If a new file must be reviewed before commit, stage it first or use `git add -N` so it is visible to the diff-based review flow.
 
 ## When Adding New Docs
