@@ -7,11 +7,10 @@ struct MenuDiscoveryView: View {
 
     @State private var searchText = ""
     @State private var selectedTag: MenuTag?
-    @State private var expandedGroups: Set<CurryMenuGroup> = [.limitedTime, .meat]
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: POCSpacing.l) {
+            LazyVStack(alignment: .leading, spacing: POCSpacing.l, pinnedViews: [.sectionHeaders]) {
                 if let store = orderStore.selectedStore {
                     StoreContextCard(store: store) {
                         orderStore.resetForNextOrder(keepingStore: false)
@@ -47,66 +46,82 @@ struct MenuDiscoveryView: View {
                     }
                 }
 
-                SectionHeader("For You", subtitle: "Saved Combos から今の気分につながる提案")
+                if searchText.isEmpty, let favorite = orderStore.featuredFavorite {
+                    VStack(alignment: .leading, spacing: POCSpacing.s) {
+                        SectionHeader("For You", subtitle: "Saved Combos から今の気分につながる提案")
 
-                if let favorite = orderStore.featuredFavorite {
-                    Button {
-                        orderStore.resumeFavorite(favorite)
-                        navigator.push(.curryDetail)
-                    } label: {
-                        VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            Text("いつものに近い")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(POCColor.textTertiary)
-                            Text(favorite.name)
-                                .font(.headline.weight(.semibold))
-                            Text(favorite.draft.menuItem.name)
-                                .font(.subheadline)
-                                .foregroundStyle(POCColor.textSecondary)
-                            HStack {
-                                Text("from Saved Combos")
-                                    .font(.caption)
+                        Button {
+                            orderStore.resumeFavorite(favorite)
+                            navigator.push(.curryDetail)
+                        } label: {
+                            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                                Text("いつものに近い")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(POCColor.textTertiary)
+                                Text(favorite.name)
+                                    .font(.headline.weight(.semibold))
+                                Text(favorite.draft.menuItem.name)
+                                    .font(.subheadline)
                                     .foregroundStyle(POCColor.textSecondary)
-                                Spacer()
-                                Image(systemName: "arrow.right")
-                                    .foregroundStyle(POCColor.curry)
+                                HStack {
+                                    Text("from Saved Combos")
+                                        .font(.caption)
+                                        .foregroundStyle(POCColor.textSecondary)
+                                    Spacer()
+                                    Image(systemName: "arrow.right")
+                                        .foregroundStyle(POCColor.curry)
+                                }
                             }
+                            .padding(POCSpacing.m)
+                            .pocCard(fill: POCColor.elevatedStrong)
                         }
-                        .padding(POCSpacing.m)
-                        .pocCard(fill: POCColor.elevatedStrong)
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
 
-                SectionHeader(
-                    "Menu List",
-                    subtitle: searchText.isEmpty ? "カレーの種類ごとにたたみながら選べます" : "検索条件に合うメニュー"
-                )
+                if searchText.isEmpty, !popularItems.isEmpty {
+                    VStack(alignment: .leading, spacing: POCSpacing.s) {
+                        SectionHeader("Popular Today", subtitle: "写真から気分で選べるおすすめ")
 
-                LazyVStack(spacing: POCSpacing.m) {
-                    if groupedSections.isEmpty {
-                        EmptyStateCard(
-                            title: "該当するカレーがありません",
-                            message: "検索語やフィルタを変えると別のグループが見つかります。"
-                        )
-                    } else {
-                        ForEach(groupedSections) { section in
-                            CurryMenuGroupSection(
-                                section: section,
-                                isExpanded: isExpanded(section.group),
-                                toggle: {
-                                    toggle(section.group)
-                                },
-                                onSelect: { item in
+                        LazyVGrid(columns: popularColumns, spacing: POCSpacing.s) {
+                            ForEach(popularItems) { item in
+                                PopularMenuCard(item: item) {
                                     orderStore.beginOrder(with: item)
                                     navigator.push(.curryDetail)
                                 }
+                            }
+                        }
+                    }
+                }
+
+                if groupedSections.isEmpty {
+                    EmptyStateCard(
+                        title: "該当するカレーがありません",
+                        message: "検索語やフィルタを変えると別のグループが見つかります。"
+                    )
+                } else {
+                    ForEach(groupedSections) { section in
+                        Section {
+                            VStack(spacing: POCSpacing.s) {
+                                ForEach(section.items) { item in
+                                    CompactMenuRow(item: item) {
+                                        orderStore.beginOrder(with: item)
+                                        navigator.push(.curryDetail)
+                                    }
+                                }
+                            }
+                        } header: {
+                            StickyGroupHeader(
+                                title: section.group.rawValue,
+                                itemCount: section.items.count
                             )
                         }
                     }
                 }
             }
-            .padding(POCSpacing.l)
+            .padding(.horizontal, POCSpacing.l)
+            .padding(.top, POCSpacing.l)
+            .padding(.bottom, POCSpacing.l)
         }
         .safeAreaInset(edge: .bottom) {
             HStack(spacing: POCSpacing.s) {
@@ -151,16 +166,18 @@ struct MenuDiscoveryView: View {
         }
     }
 
-    private func isExpanded(_ group: CurryMenuGroup) -> Bool {
-        searchText.isEmpty ? expandedGroups.contains(group) : true
+    private var popularItems: [MenuItem] {
+        let featured = filteredMenuItems.filter { item in
+            item.tags.contains(.recommended) || item.tags.contains(.staple)
+        }
+        return Array(featured.prefix(4))
     }
 
-    private func toggle(_ group: CurryMenuGroup) {
-        if expandedGroups.contains(group) {
-            expandedGroups.remove(group)
-        } else {
-            expandedGroups.insert(group)
-        }
+    private var popularColumns: [GridItem] {
+        [
+            GridItem(.flexible(), spacing: POCSpacing.s),
+            GridItem(.flexible(), spacing: POCSpacing.s),
+        ]
     }
 }
 
@@ -171,111 +188,107 @@ private struct GroupedMenuSection: Identifiable {
     var id: CurryMenuGroup { group }
 }
 
-private struct CurryMenuGroupSection: View {
-    let section: GroupedMenuSection
-    let isExpanded: Bool
-    let toggle: () -> Void
-    let onSelect: (MenuItem) -> Void
+private struct StickyGroupHeader: View {
+    let title: String
+    let itemCount: Int
 
     var body: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
-            Button(action: toggle) {
-                HStack(spacing: POCSpacing.s) {
-                    VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                        Text(section.group.rawValue)
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(POCColor.textPrimary)
-                        Text("\(section.items.count)品")
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(POCColor.textTertiary)
-                    }
+        HStack(alignment: .lastTextBaseline) {
+            Text(title)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(POCColor.textPrimary)
 
-                    Spacer()
+            Spacer()
 
-                    Image(systemName: isExpanded ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(POCColor.curry)
-                }
-                .padding(POCSpacing.m)
-                .background(
-                    LinearGradient(
-                        colors: [section.groupColor.opacity(0.22), POCColor.elevated],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    in: RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                        .stroke(POCColor.line, lineWidth: 1)
-                )
-            }
-            .buttonStyle(.plain)
-
-            if isExpanded {
-                VStack(spacing: POCSpacing.s) {
-                    ForEach(section.items) { item in
-                        Button {
-                            onSelect(item)
-                        } label: {
-                            HStack(spacing: POCSpacing.m) {
-                                MenuItemArtwork(item: item)
-
-                                VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                    Text(item.name)
-                                        .font(.headline.weight(.semibold))
-                                        .foregroundStyle(POCColor.textPrimary)
-                                    Text(item.subtitle)
-                                        .font(.subheadline)
-                                        .foregroundStyle(POCColor.textSecondary)
-
-                                    HStack(spacing: POCSpacing.xs) {
-                                        ForEach(item.tags, id: \.self) { tag in
-                                            Text(tag.rawValue)
-                                                .font(.caption.weight(.medium))
-                                                .padding(.horizontal, POCSpacing.xs)
-                                                .padding(.vertical, 6)
-                                                .background(POCColor.background, in: Capsule())
-                                        }
-                                    }
-                                }
-
-                                Spacer()
-
-                                VStack(alignment: .trailing, spacing: POCSpacing.s) {
-                                    PriceLabel(amount: item.basePrice, isDiscount: false)
-                                    Image(systemName: "chevron.right")
-                                        .font(.footnote.weight(.bold))
-                                        .foregroundStyle(POCColor.curry)
-                                }
-                            }
-                            .padding(POCSpacing.m)
-                            .background(
-                                LinearGradient(
-                                    colors: [item.accentColors.first ?? POCColor.elevated, POCColor.elevated],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                in: RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                                    .stroke(POCColor.line, lineWidth: 1)
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .padding(.top, POCSpacing.xs)
-            }
+            Text("\(itemCount)品")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(POCColor.textTertiary)
         }
+        .padding(.horizontal, POCSpacing.m)
+        .padding(.vertical, POCSpacing.s)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .fill(POCColor.background.opacity(0.96))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .stroke(POCColor.line, lineWidth: 1)
+        )
     }
 }
 
-private struct MenuItemArtwork: View {
+private struct PopularMenuCard: View {
+    let item: MenuItem
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                FeaturedMenuArtwork(item: item)
+
+                Text(item.name)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                PriceLabel(amount: item.basePrice, isDiscount: false)
+            }
+            .padding(POCSpacing.s)
+            .pocCard(fill: POCColor.elevated)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct CompactMenuRow: View {
+    let item: MenuItem
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: POCSpacing.m) {
+                MenuItemArtwork(item: item)
+
+                Text(item.name)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                PriceLabel(amount: item.basePrice, isDiscount: false)
+                    .fixedSize()
+            }
+            .padding(POCSpacing.s)
+            .background(
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .fill(POCColor.elevated)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .stroke(POCColor.line, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct FeaturedMenuArtwork: View {
     let item: MenuItem
 
     var body: some View {
+        artwork
+            .frame(maxWidth: .infinity)
+            .frame(height: 132)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(Color.white.opacity(0.32), lineWidth: 1)
+            )
+    }
+
+    private var artwork: some View {
         Group {
             if let uiImage = menuImage {
                 Image(uiImage: uiImage)
@@ -295,15 +308,13 @@ private struct MenuItemArtwork: View {
                 }
             }
         }
-        .frame(width: 104, height: 88)
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Color.white.opacity(0.32), lineWidth: 1)
-        )
     }
 
     private var menuImage: UIImage? {
+        loadMenuImage()
+    }
+
+    private func loadMenuImage() -> UIImage? {
         guard let imagePath = item.imagePath else { return nil }
         let resourcePath = imagePath as NSString
         let resourceName = resourcePath.deletingPathExtension
@@ -313,8 +324,51 @@ private struct MenuItemArtwork: View {
     }
 }
 
-private extension GroupedMenuSection {
-    var groupColor: Color {
-        Color(hex: group.accentHexes.first ?? 0x8B4A1F)
+private struct MenuItemArtwork: View {
+    let item: MenuItem
+
+    var body: some View {
+        artwork
+            .frame(width: 118, height: 88)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(Color.white.opacity(0.32), lineWidth: 1)
+            )
+    }
+
+    private var artwork: some View {
+        Group {
+            if let uiImage = menuImage {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                LinearGradient(
+                    colors: [item.accentColors.first ?? POCColor.cheese, POCColor.elevatedStrong],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .overlay(alignment: .bottomLeading) {
+                    Image(systemName: "fork.knife.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.white.opacity(0.92))
+                        .padding(POCSpacing.s)
+                }
+            }
+        }
+    }
+
+    private var menuImage: UIImage? {
+        loadMenuImage()
+    }
+
+    private func loadMenuImage() -> UIImage? {
+        guard let imagePath = item.imagePath else { return nil }
+        let resourcePath = imagePath as NSString
+        let resourceName = resourcePath.deletingPathExtension
+        let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else { return nil }
+        return UIImage(contentsOfFile: url.path)
     }
 }
