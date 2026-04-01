@@ -34,8 +34,8 @@
 		A00000000000000000000019 /* sausage-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000001A /* sausage-curry.png */; };
 		A0000000000000000000001B /* cheese-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000001B /* cheese-curry.png */; };
 		A0000000000000000000001C /* cocoichi-vegi-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000001C /* cocoichi-vegi-curry.png */; };
-		A0000000000000000000001D /* cram-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000001D /* cram-curry.png */; };
-		A0000000000000000000001E /* cream-croket-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000001E /* cream-croket-curry.png */; };
+		A0000000000000000000001D /* clam-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000001D /* clam-curry.png */; };
+		A0000000000000000000001E /* cream-croquette-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000001E /* cream-croquette-curry.png */; };
 		A0000000000000000000001F /* eggplant-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000001F /* eggplant-curry.png */; };
 		A00000000000000000000020 /* fried-egg-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000020 /* fried-egg-curry.png */; };
 		A00000000000000000000021 /* fried-fish-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000021 /* fried-fish-curry.png */; };
@@ -44,16 +44,16 @@
 		A00000000000000000000024 /* low-carb-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000024 /* low-carb-curry.png */; };
 		A00000000000000000000025 /* mushroom-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000025 /* mushroom-curry.png */; };
 		A00000000000000000000026 /* natto-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000026 /* natto-curry.png */; };
-		A00000000000000000000027 /* omulet-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000027 /* omulet-curry.png */; };
+		A00000000000000000000027 /* omelet-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000027 /* omelet-curry.png */; };
 		A00000000000000000000028 /* petit-fried-shrimp-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000028 /* petit-fried-shrimp-curry.png */; };
-		A00000000000000000000029 /* scrumble-egg-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000029 /* scrumble-egg-curry.png */; };
-		A0000000000000000000002A /* sea-hapiness-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002A /* sea-hapiness-curry.png */; };
+		A00000000000000000000029 /* scramble-egg-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000029 /* scramble-egg-curry.png */; };
+		A0000000000000000000002A /* sea-happiness-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002A /* sea-happiness-curry.png */; };
 		A0000000000000000000002B /* shrimp-asari-spring-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002B /* shrimp-asari-spring-curry.png */; };
-		A0000000000000000000002C /* simmerd-shrimp-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002C /* simmerd-shrimp-curry.png */; };
-		A0000000000000000000002D /* simmered-shrimp-cram-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002D /* simmered-shrimp-cram-curry.png */; };
+		A0000000000000000000002C /* simmered-shrimp-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002C /* simmered-shrimp-curry.png */; };
+		A0000000000000000000002D /* simmered-shrimp-clam-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002D /* simmered-shrimp-clam-curry.png */; };
 		A0000000000000000000002E /* spinach-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002E /* spinach-curry.png */; };
 		A0000000000000000000002F /* the-gyu-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002F /* the-gyu-curry.png */; };
-		A00000000000000000000030 /* vegitable-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000030 /* vegitable-curry.png */; };
+		A00000000000000000000030 /* vegetable-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000030 /* vegetable-curry.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -84,8 +84,8 @@
 		B0000000000000000000001A /* sausage-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sausage-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000001B /* cheese-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cheese-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000001C /* cocoichi-vegi-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cocoichi-vegi-curry.png"; sourceTree = "<group>"; };
-		B0000000000000000000001D /* cram-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cram-curry.png"; sourceTree = "<group>"; };
-		B0000000000000000000001E /* cream-croket-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cream-croket-curry.png"; sourceTree = "<group>"; };
+		B0000000000000000000001D /* clam-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "clam-curry.png"; sourceTree = "<group>"; };
+		B0000000000000000000001E /* cream-croquette-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cream-croquette-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000001F /* eggplant-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "eggplant-curry.png"; sourceTree = "<group>"; };
 		B00000000000000000000020 /* fried-egg-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fried-egg-curry.png"; sourceTree = "<group>"; };
 		B00000000000000000000021 /* fried-fish-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "fried-fish-curry.png"; sourceTree = "<group>"; };
@@ -94,16 +94,16 @@
 		B00000000000000000000024 /* low-carb-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "low-carb-curry.png"; sourceTree = "<group>"; };
 		B00000000000000000000025 /* mushroom-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mushroom-curry.png"; sourceTree = "<group>"; };
 		B00000000000000000000026 /* natto-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "natto-curry.png"; sourceTree = "<group>"; };
-		B00000000000000000000027 /* omulet-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "omulet-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000027 /* omelet-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "omelet-curry.png"; sourceTree = "<group>"; };
 		B00000000000000000000028 /* petit-fried-shrimp-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "petit-fried-shrimp-curry.png"; sourceTree = "<group>"; };
-		B00000000000000000000029 /* scrumble-egg-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "scrumble-egg-curry.png"; sourceTree = "<group>"; };
-		B0000000000000000000002A /* sea-hapiness-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sea-hapiness-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000029 /* scramble-egg-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "scramble-egg-curry.png"; sourceTree = "<group>"; };
+		B0000000000000000000002A /* sea-happiness-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sea-happiness-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000002B /* shrimp-asari-spring-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "shrimp-asari-spring-curry.png"; sourceTree = "<group>"; };
-		B0000000000000000000002C /* simmerd-shrimp-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "simmerd-shrimp-curry.png"; sourceTree = "<group>"; };
-		B0000000000000000000002D /* simmered-shrimp-cram-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "simmered-shrimp-cram-curry.png"; sourceTree = "<group>"; };
+		B0000000000000000000002C /* simmered-shrimp-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "simmered-shrimp-curry.png"; sourceTree = "<group>"; };
+		B0000000000000000000002D /* simmered-shrimp-clam-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "simmered-shrimp-clam-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000002E /* spinach-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "spinach-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000002F /* the-gyu-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "the-gyu-curry.png"; sourceTree = "<group>"; };
-		B00000000000000000000030 /* vegitable-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "vegitable-curry.png"; sourceTree = "<group>"; };
+		B00000000000000000000030 /* vegetable-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "vegetable-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000000B /* CocoichiPoC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoichiPoC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -217,8 +217,8 @@
 				B0000000000000000000000F /* chicken-cutlet-curry.png */,
 				B00000000000000000000010 /* chicken-simmer-curry.png */,
 				B0000000000000000000001C /* cocoichi-vegi-curry.png */,
-				B0000000000000000000001D /* cram-curry.png */,
-				B0000000000000000000001E /* cream-croket-curry.png */,
+				B0000000000000000000001D /* clam-curry.png */,
+				B0000000000000000000001E /* cream-croquette-curry.png */,
 				B00000000000000000000011 /* crunchy-chicken-curry.png */,
 				B0000000000000000000001F /* eggplant-curry.png */,
 				B00000000000000000000012 /* fried-chicken-curry.png */,
@@ -233,21 +233,21 @@
 				B00000000000000000000016 /* mench-cutlet-curry.png */,
 				B00000000000000000000025 /* mushroom-curry.png */,
 				B00000000000000000000026 /* natto-curry.png */,
-				B00000000000000000000027 /* omulet-curry.png */,
+				B00000000000000000000027 /* omelet-curry.png */,
 				B00000000000000000000028 /* petit-fried-shrimp-curry.png */,
 				B00000000000000000000017 /* pork-curry-sweet.png */,
 				B0000000000000000000000D /* pork-curry.png */,
 				B00000000000000000000018 /* pork-cutlet-curry.png */,
 				B00000000000000000000019 /* pork-slice-curry.png */,
 				B0000000000000000000001A /* sausage-curry.png */,
-				B00000000000000000000029 /* scrumble-egg-curry.png */,
-				B0000000000000000000002A /* sea-hapiness-curry.png */,
+				B00000000000000000000029 /* scramble-egg-curry.png */,
+				B0000000000000000000002A /* sea-happiness-curry.png */,
 				B0000000000000000000002B /* shrimp-asari-spring-curry.png */,
-				B0000000000000000000002C /* simmerd-shrimp-curry.png */,
-				B0000000000000000000002D /* simmered-shrimp-cram-curry.png */,
+				B0000000000000000000002C /* simmered-shrimp-curry.png */,
+				B0000000000000000000002D /* simmered-shrimp-clam-curry.png */,
 				B0000000000000000000002E /* spinach-curry.png */,
 				B0000000000000000000002F /* the-gyu-curry.png */,
-				B00000000000000000000030 /* vegitable-curry.png */,
+				B00000000000000000000030 /* vegetable-curry.png */,
 			);
 			path = MenuImages;
 			sourceTree = "<group>";
@@ -315,8 +315,8 @@
 				A0000000000000000000000E /* chicken-cutlet-curry.png in Resources */,
 				A0000000000000000000000F /* chicken-simmer-curry.png in Resources */,
 				A0000000000000000000001C /* cocoichi-vegi-curry.png in Resources */,
-				A0000000000000000000001D /* cram-curry.png in Resources */,
-				A0000000000000000000001E /* cream-croket-curry.png in Resources */,
+				A0000000000000000000001D /* clam-curry.png in Resources */,
+				A0000000000000000000001E /* cream-croquette-curry.png in Resources */,
 				A00000000000000000000010 /* crunchy-chicken-curry.png in Resources */,
 				A0000000000000000000001F /* eggplant-curry.png in Resources */,
 				A00000000000000000000011 /* fried-chicken-curry.png in Resources */,
@@ -331,21 +331,21 @@
 				A00000000000000000000015 /* mench-cutlet-curry.png in Resources */,
 				A00000000000000000000025 /* mushroom-curry.png in Resources */,
 				A00000000000000000000026 /* natto-curry.png in Resources */,
-				A00000000000000000000027 /* omulet-curry.png in Resources */,
+				A00000000000000000000027 /* omelet-curry.png in Resources */,
 				A00000000000000000000028 /* petit-fried-shrimp-curry.png in Resources */,
 				A00000000000000000000016 /* pork-curry-sweet.png in Resources */,
 				A0000000000000000000000C /* pork-curry.png in Resources */,
 				A00000000000000000000017 /* pork-cutlet-curry.png in Resources */,
 				A00000000000000000000018 /* pork-slice-curry.png in Resources */,
 				A00000000000000000000019 /* sausage-curry.png in Resources */,
-				A00000000000000000000029 /* scrumble-egg-curry.png in Resources */,
-				A0000000000000000000002A /* sea-hapiness-curry.png in Resources */,
+				A00000000000000000000029 /* scramble-egg-curry.png in Resources */,
+				A0000000000000000000002A /* sea-happiness-curry.png in Resources */,
 				A0000000000000000000002B /* shrimp-asari-spring-curry.png in Resources */,
-				A0000000000000000000002C /* simmerd-shrimp-curry.png in Resources */,
-				A0000000000000000000002D /* simmered-shrimp-cram-curry.png in Resources */,
+				A0000000000000000000002C /* simmered-shrimp-curry.png in Resources */,
+				A0000000000000000000002D /* simmered-shrimp-clam-curry.png in Resources */,
 				A0000000000000000000002E /* spinach-curry.png in Resources */,
 				A0000000000000000000002F /* the-gyu-curry.png in Resources */,
-				A00000000000000000000030 /* vegitable-curry.png in Resources */,
+				A00000000000000000000030 /* vegetable-curry.png in Resources */,
 				A0000000000000000000000B /* curry-menu-master.yaml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

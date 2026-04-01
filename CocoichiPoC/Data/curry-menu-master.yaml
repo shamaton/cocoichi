@@ -82,7 +82,7 @@
   - name: たっぷりあさりカレー
     price: 780
     comment: あさりの旨みを前面に感じられる一皿
-    imagePath: cram-curry.png
+    imagePath: clam-curry.png
   - name: イカカレー
     price: 828
     comment: イカの食感で海鮮らしさをしっかり楽しめる
@@ -90,15 +90,15 @@
   - name: エビにこみカレー
     price: 828
     comment: エビの旨みをソースになじませて味わえる
-    imagePath: simmerd-shrimp-curry.png
+    imagePath: simmered-shrimp-curry.png
   - name: エビあさりカレー
     price: 804
     comment: エビとあさりをまとめて楽しめる定番の魚介系
-    imagePath: simmered-shrimp-cram-curry.png
+    imagePath: simmered-shrimp-clam-curry.png
   - name: 海の幸カレー
     price: 924
     comment: 魚介をしっかり入れて満足感を高めた一皿
-    imagePath: sea-hapiness-curry.png
+    imagePath: sea-happiness-curry.png
 
 野菜類・その他のカレー:
   - name: なす(6個)カレー
@@ -112,7 +112,7 @@
   - name: やさいカレー
     price: 835
     comment: 野菜をしっかり楽しみたい時の定番
-    imagePath: vegitable-curry.png
+    imagePath: vegetable-curry.png
   - name: とろ～りたまフライカレー
     price: 769
     comment: とろけるたまごのコクでやさしくまとまる
@@ -124,7 +124,7 @@
   - name: オムカレー
     price: 709
     comment: たまごのまろやかさで食べやすく仕上がる
-    imagePath: omulet-curry.png
+    imagePath: omelet-curry.png
   - name: 低糖質カレー
     price: 660
     comment: 糖質を抑えつつカレー気分を満たせる
@@ -136,7 +136,7 @@
   - name: スクランブルエッグカレー
     price: 788
     comment: ふんわりたまごでソースをやさしく受け止める
-    imagePath: scrumble-egg-curry.png
+    imagePath: scramble-egg-curry.png
   - name: チーズカレー
     price: 828
     comment: まろやかさをしっかり足したい時の定番
@@ -144,7 +144,7 @@
   - name: クリームコロッケ(カニ入り）(2個)カレー
     price: 808
     comment: クリーミーなコロッケで濃厚さを重ねられる
-    imagePath: cream-croket-curry.png
+    imagePath: cream-croquette-curry.png
   - name: きのこカレー
     price: 808
     comment: きのこの香りで落ち着いた味わいに寄せられる
