@@ -230,7 +230,7 @@ private struct PopularMenuCard: View {
                 Text(item.name)
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(POCColor.textPrimary)
-                    .lineLimit(2)
+                    .lineLimit(2, reservesSpace: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 PriceLabel(amount: item.basePrice, isDiscount: false)
