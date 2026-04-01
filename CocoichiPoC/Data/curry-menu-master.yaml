@@ -2,12 +2,15 @@
   - name: THE牛カレー
     price: 1120
     comment: 牛の旨みを強く打ち出した数量限定の一皿
+    imagePath: the-gyu-curry.png
   - name: 手仕込ささみカツ(2本)カレー
     price: 1082
     comment: 手仕込のささみカツで食べごたえを足せる限定メニュー
+    imagePath: handmade-chicken-cutlet-curry.png
   - name: 桜えびとあさりの春野菜カレー
     price: 920
     comment: 春らしい具材を重ねて軽やかに楽しめる限定カレー
+    imagePath: shrimp-asari-spring-curry.png
 
 肉類のカレー:
   - name: ポークカレー
@@ -71,59 +74,78 @@
   - name: プチエビフライカレー
     price: 748
     comment: 小ぶりなエビフライで軽快に食べ進められる
+    imagePath: petit-fried-shrimp-curry.png
   - name: フィッシュフライ(2本)カレー
     price: 780
     comment: 白身フライの食感で満足感を足せる
+    imagePath: fried-fish-curry.png
   - name: たっぷりあさりカレー
     price: 780
     comment: あさりの旨みを前面に感じられる一皿
+    imagePath: cram-curry.png
   - name: イカカレー
     price: 828
     comment: イカの食感で海鮮らしさをしっかり楽しめる
+    imagePath: fried-squid-curry.png
   - name: エビにこみカレー
     price: 828
     comment: エビの旨みをソースになじませて味わえる
+    imagePath: simmerd-shrimp-curry.png
   - name: エビあさりカレー
     price: 804
     comment: エビとあさりをまとめて楽しめる定番の魚介系
+    imagePath: simmered-shrimp-cram-curry.png
   - name: 海の幸カレー
     price: 924
     comment: 魚介をしっかり入れて満足感を高めた一皿
+    imagePath: sea-hapiness-curry.png
 
 野菜類・その他のカレー:
   - name: なす(6個)カレー
     price: 751
     comment: なすのやわらかさで軽やかに食べ進められる
+    imagePath: eggplant-curry.png
   - name: ほうれん草カレー
     price: 817
     comment: ほうれん草の風味を素直に感じられる一皿
+    imagePath: spinach-curry.png
   - name: やさいカレー
     price: 835
     comment: 野菜をしっかり楽しみたい時の定番
+    imagePath: vegitable-curry.png
   - name: とろ～りたまフライカレー
     price: 769
     comment: とろけるたまごのコクでやさしくまとまる
+    imagePath: fried-egg-curry.png
   - name: ココイチベジカレー
     price: 621
     comment: 動物性原材料を使わず軽やかに楽しめる
+    imagePath: cocoichi-vegi-curry.png
   - name: オムカレー
     price: 709
     comment: たまごのまろやかさで食べやすく仕上がる
+    imagePath: omulet-curry.png
   - name: 低糖質カレー
     price: 660
     comment: 糖質を抑えつつカレー気分を満たせる
+    imagePath: low-carb-curry.png
   - name: 納豆カレー
     price: 740
     comment: 納豆の風味で好みをはっきり出せる一皿
+    imagePath: natto-curry.png
   - name: スクランブルエッグカレー
     price: 788
     comment: ふんわりたまごでソースをやさしく受け止める
+    imagePath: scrumble-egg-curry.png
   - name: チーズカレー
     price: 828
     comment: まろやかさをしっかり足したい時の定番
+    imagePath: cheese-curry.png
   - name: クリームコロッケ(カニ入り）(2個)カレー
     price: 808
     comment: クリーミーなコロッケで濃厚さを重ねられる
+    imagePath: cream-croket-curry.png
   - name: きのこカレー
     price: 808
     comment: きのこの香りで落ち着いた味わいに寄せられる
+    imagePath: mushroom-curry.png
