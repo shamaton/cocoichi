@@ -9,136 +9,143 @@ struct MenuDiscoveryView: View {
     @State private var selectedTag: MenuTag?
 
     var body: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: POCSpacing.l, pinnedViews: [.sectionHeaders]) {
-                if let store = orderStore.selectedStore {
-                    StoreContextCard(store: store) {
-                        orderStore.resetForNextOrder(keepingStore: false)
-                        navigator.resetToStoreSelect()
-                    }
-                }
+        GeometryReader { proxy in
+            let contentWidth = availableContentWidth(in: proxy)
 
-                VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    Text("今日は何にする？")
-                        .font(.largeTitle.weight(.bold))
-
-                    TextField("Search menu, topping, keyword", text: $searchText)
-                        .textInputAutocapitalization(.never)
-                        .padding(.horizontal, POCSpacing.m)
-                        .padding(.vertical, 14)
-                        .background(
-                            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                                .fill(POCColor.elevated)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                                .stroke(POCColor.line, lineWidth: 1)
-                        )
-
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: POCSpacing.xs) {
-                            ForEach(MenuTag.allCases, id: \.self) { tag in
-                                FilterChip(title: tag.rawValue, isSelected: selectedTag == tag) {
-                                    selectedTag = selectedTag == tag ? nil : tag
-                                }
-                            }
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: POCSpacing.l, pinnedViews: [.sectionHeaders]) {
+                    if let store = orderStore.selectedStore {
+                        StoreContextCard(store: store) {
+                            orderStore.resetForNextOrder(keepingStore: false)
+                            navigator.resetToStoreSelect()
                         }
                     }
-                }
 
-                if searchText.isEmpty, let favorite = orderStore.featuredFavorite {
                     VStack(alignment: .leading, spacing: POCSpacing.s) {
-                        SectionHeader("For You", subtitle: "Saved Combos から今の気分につながる提案")
+                        Text("今日は何にする？")
+                            .font(.largeTitle.weight(.bold))
 
-                        Button {
-                            orderStore.resumeFavorite(favorite)
-                            navigator.push(.curryDetail)
-                        } label: {
-                            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                Text("いつものに近い")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(POCColor.textTertiary)
-                                Text(favorite.name)
-                                    .font(.headline.weight(.semibold))
-                                Text(favorite.draft.menuItem.name)
-                                    .font(.subheadline)
-                                    .foregroundStyle(POCColor.textSecondary)
-                                HStack {
-                                    Text("from Saved Combos")
-                                        .font(.caption)
-                                        .foregroundStyle(POCColor.textSecondary)
-                                    Spacer()
-                                    Image(systemName: "arrow.right")
-                                        .foregroundStyle(POCColor.curry)
-                                }
-                            }
-                            .padding(POCSpacing.m)
-                            .pocCard(fill: POCColor.elevatedStrong)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
+                        TextField("Search menu, topping, keyword", text: $searchText)
+                            .textInputAutocapitalization(.never)
+                            .padding(.horizontal, POCSpacing.m)
+                            .padding(.vertical, 14)
+                            .background(
+                                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                                    .fill(POCColor.elevated)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                                    .stroke(POCColor.line, lineWidth: 1)
+                            )
 
-                if searchText.isEmpty, !popularItems.isEmpty {
-                    VStack(alignment: .leading, spacing: POCSpacing.s) {
-                        SectionHeader("Popular Today", subtitle: "写真から気分で選べるおすすめ")
-
-                        LazyVGrid(columns: popularColumns, spacing: POCSpacing.s) {
-                            ForEach(popularItems) { item in
-                                PopularMenuCard(item: item) {
-                                    orderStore.beginOrder(with: item)
-                                    navigator.push(.curryDetail)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if groupedSections.isEmpty {
-                    EmptyStateCard(
-                        title: "該当するカレーがありません",
-                        message: "検索語やフィルタを変えると別のグループが見つかります。"
-                    )
-                } else {
-                    ForEach(groupedSections) { section in
-                        Section {
-                            VStack(spacing: POCSpacing.s) {
-                                ForEach(section.items) { item in
-                                    CompactMenuRow(item: item) {
-                                        orderStore.beginOrder(with: item)
-                                        navigator.push(.curryDetail)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: POCSpacing.xs) {
+                                ForEach(MenuTag.allCases, id: \.self) { tag in
+                                    FilterChip(title: tag.rawValue, isSelected: selectedTag == tag) {
+                                        selectedTag = selectedTag == tag ? nil : tag
                                     }
                                 }
                             }
-                        } header: {
-                            StickyGroupHeader(
-                                title: section.group.rawValue,
-                                itemCount: section.items.count
-                            )
+                        }
+                    }
+
+                    if searchText.isEmpty, let favorite = orderStore.featuredFavorite {
+                        VStack(alignment: .leading, spacing: POCSpacing.s) {
+                            SectionHeader("For You", subtitle: "Saved Combos から今の気分につながる提案")
+
+                            Button {
+                                orderStore.resumeFavorite(favorite)
+                                navigator.push(.curryDetail)
+                            } label: {
+                                VStack(alignment: .leading, spacing: POCSpacing.s) {
+                                    Text("いつものに近い")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(POCColor.textTertiary)
+                                    Text(favorite.name)
+                                        .font(.headline.weight(.semibold))
+                                    Text(favorite.draft.menuItem.name)
+                                        .font(.subheadline)
+                                        .foregroundStyle(POCColor.textSecondary)
+                                    HStack {
+                                        Text("from Saved Combos")
+                                            .font(.caption)
+                                            .foregroundStyle(POCColor.textSecondary)
+                                        Spacer()
+                                        Image(systemName: "arrow.right")
+                                            .foregroundStyle(POCColor.curry)
+                                    }
+                                }
+                                .padding(POCSpacing.m)
+                                .pocCard(fill: POCColor.elevatedStrong)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+
+                    if searchText.isEmpty, !popularItems.isEmpty {
+                        VStack(alignment: .leading, spacing: POCSpacing.s) {
+                            SectionHeader("Popular Today", subtitle: "写真から気分で選べるおすすめ")
+
+                            PopularMenuGrid(items: popularItems, contentWidth: contentWidth) { item in
+                                orderStore.beginOrder(with: item)
+                                navigator.push(.curryDetail)
+                            }
+                        }
+                    }
+
+                    if groupedSections.isEmpty {
+                        EmptyStateCard(
+                            title: "該当するカレーがありません",
+                            message: "検索語やフィルタを変えると別のグループが見つかります。"
+                        )
+                    } else {
+                        ForEach(groupedSections) { section in
+                            Section {
+                                VStack(spacing: POCSpacing.s) {
+                                    ForEach(section.items) { item in
+                                        CompactMenuRow(item: item) {
+                                            orderStore.beginOrder(with: item)
+                                            navigator.push(.curryDetail)
+                                        }
+                                    }
+                                }
+                            } header: {
+                                StickyGroupHeader(
+                                    title: section.group.rawValue,
+                                    itemCount: section.items.count
+                                )
+                                .frame(width: contentWidth, alignment: .leading)
+                            }
                         }
                     }
                 }
+                .frame(width: contentWidth, alignment: .leading)
+                .padding(.horizontal, POCSpacing.l)
+                .padding(.top, POCSpacing.l)
+                .padding(.bottom, POCSpacing.l)
             }
-            .padding(.horizontal, POCSpacing.l)
-            .padding(.top, POCSpacing.l)
-            .padding(.bottom, POCSpacing.l)
-        }
-        .safeAreaInset(edge: .bottom) {
-            HStack(spacing: POCSpacing.s) {
-                SecondaryCTAButton(title: "Saved Combos", systemImage: "clock") {
-                    navigator.push(.savedCombos)
+            .safeAreaInset(edge: .bottom) {
+                HStack(spacing: POCSpacing.s) {
+                    SecondaryCTAButton(title: "Saved Combos", systemImage: "clock") {
+                        navigator.push(.savedCombos)
+                    }
+                    SecondaryCTAButton(title: "Browse by Mood", systemImage: "sparkles") {
+                        selectedTag = .recommended
+                    }
                 }
-                SecondaryCTAButton(title: "Browse by Mood", systemImage: "sparkles") {
-                    selectedTag = .recommended
-                }
+                .padding(.horizontal, POCSpacing.l)
+                .padding(.top, POCSpacing.s)
+                .padding(.bottom, POCSpacing.s)
+                .background(.ultraThinMaterial)
             }
-            .padding(.horizontal, POCSpacing.l)
-            .padding(.top, POCSpacing.s)
-            .padding(.bottom, POCSpacing.s)
-            .background(.ultraThinMaterial)
+            .navigationTitle("Menu Discovery")
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .navigationTitle("Menu Discovery")
-        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func availableContentWidth(in proxy: GeometryProxy) -> CGFloat {
+        let horizontalInsets = proxy.safeAreaInsets.leading + proxy.safeAreaInsets.trailing
+        return max(0, proxy.size.width - horizontalInsets - (POCSpacing.l * 2))
     }
 
     private var filteredMenuItems: [MenuItem] {
@@ -171,13 +178,6 @@ struct MenuDiscoveryView: View {
             item.tags.contains(.recommended) || item.tags.contains(.staple)
         }
         return Array(featured.prefix(4))
-    }
-
-    private var popularColumns: [GridItem] {
-        [
-            GridItem(.flexible(), spacing: POCSpacing.s),
-            GridItem(.flexible(), spacing: POCSpacing.s),
-        ]
     }
 }
 
@@ -224,8 +224,8 @@ private struct PopularMenuCard: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                FeaturedMenuArtwork(item: item)
+            VStack(alignment: .leading, spacing: PopularMenuLayout.contentSpacing) {
+                FeaturedMenuArtwork(item: item, height: PopularMenuLayout.imageHeight)
 
                 Text(item.name)
                     .font(.headline.weight(.semibold))
@@ -235,10 +235,58 @@ private struct PopularMenuCard: View {
 
                 PriceLabel(amount: item.basePrice, isDiscount: false)
             }
-            .padding(POCSpacing.s)
+            .padding(PopularMenuLayout.cardPadding)
             .pocCard(fill: POCColor.elevated)
+            .frame(maxWidth: .infinity, minHeight: PopularMenuLayout.cardHeight, maxHeight: PopularMenuLayout.cardHeight, alignment: .topLeading)
         }
         .buttonStyle(.plain)
+    }
+}
+
+private enum PopularMenuLayout {
+    static let columnSpacing: CGFloat = POCSpacing.l
+    static let rowSpacing: CGFloat = POCSpacing.xs
+    static let cardPadding: CGFloat = POCSpacing.xs
+    static let contentSpacing: CGFloat = POCSpacing.xs
+    static let imageHeight: CGFloat = 112
+    static let cardHeight: CGFloat = 220
+}
+
+private struct PopularMenuGrid: View {
+    let items: [MenuItem]
+    let contentWidth: CGFloat
+    let onSelect: (MenuItem) -> Void
+
+    var body: some View {
+        LazyVGrid(columns: columns, spacing: PopularMenuLayout.rowSpacing) {
+            ForEach(items) { item in
+                PopularMenuCard(item: item) {
+                    onSelect(item)
+                }
+            }
+        }
+        .frame(width: contentWidth, height: gridHeight, alignment: .leading)
+    }
+
+    private var cardWidth: CGFloat {
+        floor((contentWidth - PopularMenuLayout.columnSpacing) / 2)
+    }
+
+    private var columns: [GridItem] {
+        [
+            GridItem(.fixed(cardWidth), spacing: PopularMenuLayout.columnSpacing),
+            GridItem(.fixed(cardWidth), spacing: PopularMenuLayout.columnSpacing),
+        ]
+    }
+
+    private var rowCount: Int {
+        (items.count + 1) / 2
+    }
+
+    private var gridHeight: CGFloat {
+        let rows = CGFloat(rowCount)
+        let spacing = CGFloat(max(0, rowCount - 1)) * PopularMenuLayout.rowSpacing
+        return rows * PopularMenuLayout.cardHeight + spacing
     }
 }
 
@@ -276,11 +324,12 @@ private struct CompactMenuRow: View {
 
 private struct FeaturedMenuArtwork: View {
     let item: MenuItem
+    var height: CGFloat = 132
 
     var body: some View {
         artwork
             .frame(maxWidth: .infinity)
-            .frame(height: 132)
+            .frame(height: height)
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
