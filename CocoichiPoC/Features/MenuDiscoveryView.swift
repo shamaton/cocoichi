@@ -297,18 +297,31 @@ private struct CompactMenuRow: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: POCSpacing.m) {
-                MenuItemArtwork(item: item)
+                MenuItemArtwork(
+                    item: item,
+                    width: CompactMenuLayout.imageWidth,
+                    height: CompactMenuLayout.imageHeight
+                )
 
-                Text(item.name)
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(POCColor.textPrimary)
-                    .lineLimit(2)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(alignment: .leading, spacing: CompactMenuLayout.contentSpacing) {
+                    Text(item.name)
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+                        .lineLimit(2)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                PriceLabel(amount: item.basePrice, isDiscount: false)
-                    .fixedSize()
+                    Spacer(minLength: 0)
+
+                    HStack {
+                        Spacer()
+                        PriceLabel(amount: item.basePrice, isDiscount: false)
+                            .fixedSize()
+                    }
+                }
+                .frame(maxWidth: .infinity, minHeight: CompactMenuLayout.imageHeight, alignment: .topLeading)
             }
-            .padding(POCSpacing.s)
+            .padding(.horizontal, CompactMenuLayout.horizontalPadding)
+            .padding(.vertical, CompactMenuLayout.verticalPadding)
             .background(
                 RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                     .fill(POCColor.elevated)
@@ -320,6 +333,14 @@ private struct CompactMenuRow: View {
         }
         .buttonStyle(.plain)
     }
+}
+
+private enum CompactMenuLayout {
+    static let imageWidth: CGFloat = 108
+    static let imageHeight: CGFloat = 74
+    static let contentSpacing: CGFloat = POCSpacing.xs
+    static let horizontalPadding: CGFloat = POCSpacing.s
+    static let verticalPadding: CGFloat = POCSpacing.xs
 }
 
 private struct FeaturedMenuArtwork: View {
@@ -375,10 +396,12 @@ private struct FeaturedMenuArtwork: View {
 
 private struct MenuItemArtwork: View {
     let item: MenuItem
+    var width: CGFloat = 118
+    var height: CGFloat = 88
 
     var body: some View {
         artwork
-            .frame(width: 118, height: 88)
+            .frame(width: width, height: height)
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
