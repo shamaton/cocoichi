@@ -64,6 +64,19 @@ enum CurryMenuGroup: String, CaseIterable, Codable, Hashable {
             )
         }
     }
+
+    var genreImagePath: String {
+        switch self {
+        case .limitedTime:
+            return "curry-kikan.png"
+        case .meat:
+            return "curry-meats.png"
+        case .seafood:
+            return "curry-seafoods.png"
+        case .vegetableAndOther:
+            return "curry-vegetables.png"
+        }
+    }
 }
 
 struct Store: Identifiable, Hashable, Codable {

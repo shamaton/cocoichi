@@ -51,9 +51,13 @@
 		A0000000000000000000002B /* shrimp-asari-spring-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002B /* shrimp-asari-spring-curry.png */; };
 		A0000000000000000000002C /* simmered-shrimp-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002C /* simmered-shrimp-curry.png */; };
 		A0000000000000000000002D /* simmered-shrimp-clam-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002D /* simmered-shrimp-clam-curry.png */; };
-		A0000000000000000000002E /* spinach-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002E /* spinach-curry.png */; };
-		A0000000000000000000002F /* the-gyu-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002F /* the-gyu-curry.png */; };
-		A00000000000000000000030 /* vegetable-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000030 /* vegetable-curry.png */; };
+			A0000000000000000000002E /* spinach-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002E /* spinach-curry.png */; };
+			A0000000000000000000002F /* the-gyu-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000002F /* the-gyu-curry.png */; };
+			A00000000000000000000030 /* vegetable-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000030 /* vegetable-curry.png */; };
+			A00000000000000000000031 /* curry-kikan.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000031 /* curry-kikan.png */; };
+			A00000000000000000000032 /* curry-meats.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000032 /* curry-meats.png */; };
+			A00000000000000000000033 /* curry-seafoods.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000033 /* curry-seafoods.png */; };
+			A00000000000000000000034 /* curry-vegetables.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000034 /* curry-vegetables.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -101,10 +105,14 @@
 		B0000000000000000000002B /* shrimp-asari-spring-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "shrimp-asari-spring-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000002C /* simmered-shrimp-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "simmered-shrimp-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000002D /* simmered-shrimp-clam-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "simmered-shrimp-clam-curry.png"; sourceTree = "<group>"; };
-		B0000000000000000000002E /* spinach-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "spinach-curry.png"; sourceTree = "<group>"; };
-		B0000000000000000000002F /* the-gyu-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "the-gyu-curry.png"; sourceTree = "<group>"; };
-		B00000000000000000000030 /* vegetable-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "vegetable-curry.png"; sourceTree = "<group>"; };
-		B0000000000000000000000B /* CocoichiPoC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoichiPoC.app; sourceTree = BUILT_PRODUCTS_DIR; };
+			B0000000000000000000002E /* spinach-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "spinach-curry.png"; sourceTree = "<group>"; };
+			B0000000000000000000002F /* the-gyu-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "the-gyu-curry.png"; sourceTree = "<group>"; };
+			B00000000000000000000030 /* vegetable-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "vegetable-curry.png"; sourceTree = "<group>"; };
+			B00000000000000000000031 /* curry-kikan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "curry-kikan.png"; sourceTree = "<group>"; };
+			B00000000000000000000032 /* curry-meats.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "curry-meats.png"; sourceTree = "<group>"; };
+			B00000000000000000000033 /* curry-seafoods.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "curry-seafoods.png"; sourceTree = "<group>"; };
+			B00000000000000000000034 /* curry-vegetables.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "curry-vegetables.png"; sourceTree = "<group>"; };
+			B0000000000000000000000B /* CocoichiPoC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoichiPoC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -201,17 +209,18 @@
 			path = Features;
 			sourceTree = "<group>";
 		};
-		C0000000000000000000000A /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				C0000000000000000000000B /* MenuImages */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		C0000000000000000000000B /* MenuImages */ = {
-			isa = PBXGroup;
-			children = (
+			C0000000000000000000000A /* Resources */ = {
+				isa = PBXGroup;
+				children = (
+					C0000000000000000000000C /* CurryGenreImages */,
+					C0000000000000000000000B /* MenuImages */,
+				);
+				path = Resources;
+				sourceTree = "<group>";
+			};
+			C0000000000000000000000B /* MenuImages */ = {
+				isa = PBXGroup;
+				children = (
 				B0000000000000000000000E /* beef-curry.png */,
 				B0000000000000000000001B /* cheese-curry.png */,
 				B0000000000000000000000F /* chicken-cutlet-curry.png */,
@@ -249,9 +258,20 @@
 				B0000000000000000000002F /* the-gyu-curry.png */,
 				B00000000000000000000030 /* vegetable-curry.png */,
 			);
-			path = MenuImages;
-			sourceTree = "<group>";
-		};
+				path = MenuImages;
+				sourceTree = "<group>";
+			};
+			C0000000000000000000000C /* CurryGenreImages */ = {
+				isa = PBXGroup;
+				children = (
+					B00000000000000000000031 /* curry-kikan.png */,
+					B00000000000000000000032 /* curry-meats.png */,
+					B00000000000000000000033 /* curry-seafoods.png */,
+					B00000000000000000000034 /* curry-vegetables.png */,
+				);
+				path = CurryGenreImages;
+				sourceTree = "<group>";
+			};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -343,11 +363,15 @@
 				A0000000000000000000002B /* shrimp-asari-spring-curry.png in Resources */,
 				A0000000000000000000002C /* simmered-shrimp-curry.png in Resources */,
 				A0000000000000000000002D /* simmered-shrimp-clam-curry.png in Resources */,
-				A0000000000000000000002E /* spinach-curry.png in Resources */,
-				A0000000000000000000002F /* the-gyu-curry.png in Resources */,
-				A00000000000000000000030 /* vegetable-curry.png in Resources */,
-				A0000000000000000000000B /* curry-menu-master.yaml in Resources */,
-			);
+					A0000000000000000000002E /* spinach-curry.png in Resources */,
+					A0000000000000000000002F /* the-gyu-curry.png in Resources */,
+					A00000000000000000000030 /* vegetable-curry.png in Resources */,
+					A00000000000000000000031 /* curry-kikan.png in Resources */,
+					A00000000000000000000032 /* curry-meats.png in Resources */,
+					A00000000000000000000033 /* curry-seafoods.png in Resources */,
+					A00000000000000000000034 /* curry-vegetables.png in Resources */,
+					A0000000000000000000000B /* curry-menu-master.yaml in Resources */,
+				);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */

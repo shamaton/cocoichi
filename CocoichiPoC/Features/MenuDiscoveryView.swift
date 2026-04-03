@@ -208,22 +208,58 @@ private struct StickyGroupHeader: View {
     let group: CurryMenuGroup
 
     var body: some View {
-        HStack(alignment: .lastTextBaseline) {
-            Text(title)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(POCColor.textPrimary)
-        }
-        .padding(.horizontal, POCSpacing.m)
-        .padding(.vertical, POCSpacing.s)
-        .frame(maxWidth: .infinity)
-        .background(
+        ZStack(alignment: .leading) {
             RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                 .fill(group.discoveryCardBackground)
-        )
+            HStack(spacing: POCSpacing.s) {
+                Group {
+                    if let uiImage = genreImage {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                    } else {
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(Color.white.opacity(0.28))
+                            .overlay {
+                                Image(systemName: "fork.knife.circle.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.white.opacity(0.92))
+                            }
+                    }
+                }
+                .frame(width: 52, height: 52)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(Color.white.opacity(0.28), lineWidth: 1)
+                )
+
+                Text(title)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .lineLimit(1)
+
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, POCSpacing.m)
+            .padding(.vertical, POCSpacing.s)
+        }
+        .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
         .overlay(
             RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                 .stroke(POCColor.line, lineWidth: 1)
         )
+    }
+
+    private var genreImage: UIImage? {
+        let resourcePath = group.genreImagePath as NSString
+        let resourceName = resourcePath.deletingPathExtension
+        let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
+        if let bundledImage = UIImage(named: resourceName) {
+            return bundledImage
+        }
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else { return nil }
+        return UIImage(contentsOfFile: url.path)
     }
 }
 
