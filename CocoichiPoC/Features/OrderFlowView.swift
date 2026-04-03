@@ -557,9 +557,9 @@ struct OrderReviewView: View {
                         if let appliedCoupon = orderStore.appliedCoupon {
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
                                 SectionHeader("Applied Coupon")
-                                Text(appliedCoupon.title)
+                                Text(appliedCoupon.displayTitle)
                                     .font(.headline.weight(.semibold))
-                                Text(appliedCoupon.summary)
+                                Text(appliedCoupon.displaySummary)
                                     .font(.subheadline)
                                     .foregroundStyle(POCColor.textSecondary)
                                 Button("Remove") {
@@ -574,7 +574,7 @@ struct OrderReviewView: View {
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
                                 Text("この注文に使えるクーポンがあります")
                                     .font(.headline.weight(.semibold))
-                                Text(suggestedCoupon.title)
+                                Text(suggestedCoupon.displayTitle)
                                     .font(.subheadline)
                                     .foregroundStyle(POCColor.textSecondary)
                                 Button("View Coupon") {
@@ -727,9 +727,9 @@ struct CouponSuggestionSheet: View {
                             Text("Best Match")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(POCColor.textTertiary)
-                            Text(best.title)
+                            Text(best.displayTitle)
                                 .font(.headline.weight(.semibold))
-                            Text(best.summary)
+                            Text(best.displaySummary)
                                 .font(.subheadline)
                                 .foregroundStyle(POCColor.textSecondary)
                             Text("この注文なら \(orderStore.reviewSubtotal.yenText) -> \(orderStore.previewTotal(afterApplying: best).yenText)")
@@ -748,7 +748,7 @@ struct CouponSuggestionSheet: View {
                             SectionHeader("More Options")
                             ForEach(orderStore.unavailableCoupons) { coupon in
                                 VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                                    Text(coupon.title)
+                                    Text(coupon.displayTitle)
                                         .font(.subheadline.weight(.semibold))
                                     Text("今回は適用外")
                                         .font(.caption)
@@ -841,7 +841,7 @@ struct DraftSnapshotCard: View {
             SummaryRow(title: "Sauce Amount", value: draft.sauceAmount.rawValue)
             SummaryRow(title: "Topping", value: draft.toppings.isEmpty ? "なし" : draft.toppings.map(\.name).joined(separator: " / "))
             if showsCoupon {
-                SummaryRow(title: "Coupon", value: draft.appliedCoupon?.title ?? "-")
+                SummaryRow(title: "Coupon", value: draft.appliedCoupon?.displayTitle ?? "-")
             }
             SummaryRow(title: "Total", value: draft.total.yenText)
         }
@@ -924,8 +924,11 @@ private struct CompletedOrderCard: View {
                 SummaryRow(title: "内容", value: "\(item.draft.spiceLevel)辛 / \(item.draft.riceGrams)g / \(item.draft.toppings.isEmpty ? "トッピングなし" : item.draft.toppings.map(\.name).joined(separator: " / "))")
                 SummaryRow(title: "小計", value: item.subtotal.yenText)
             }
-            SummaryRow(title: "Coupon", value: order.appliedCoupon?.title ?? "-")
+            SummaryRow(title: "Coupon", value: order.appliedCoupon?.displayTitle ?? "-")
             SummaryRow(title: "Total", value: order.total.yenText)
+            Text("レシートでは税区分の違いが分かる形で表示されますが、PoC では店内飲食とテイクアウトを同額で扱います。")
+                .font(.caption)
+                .foregroundStyle(POCColor.textTertiary)
         }
         .padding(POCSpacing.m)
         .pocCard(fill: POCColor.elevated)

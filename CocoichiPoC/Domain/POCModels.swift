@@ -1,6 +1,15 @@
 import Foundation
 import SwiftUI
 
+enum Pricing {
+    static let virtualPriceMarkupRate = 0.08
+
+    static func virtualDisplayedPrice(for actualPrice: Int) -> Int {
+        let scaledPrice = Double(actualPrice) * (1 + virtualPriceMarkupRate)
+        return Int((scaledPrice / 10).rounded(.up) * 10)
+    }
+}
+
 enum MenuTag: String, CaseIterable, Codable, Hashable {
     case staple = "定番"
     case recommended = "おすすめ"
@@ -75,6 +84,7 @@ struct MenuItem: Identifiable, Hashable, Codable {
     let name: String
     let group: CurryMenuGroup
     let subtitle: String
+    let actualBasePrice: Int
     let basePrice: Int
     let tags: [MenuTag]
     let searchKeywords: [String]
@@ -87,6 +97,7 @@ struct MenuItem: Identifiable, Hashable, Codable {
         case name
         case group
         case subtitle
+        case actualBasePrice
         case basePrice
         case tags
         case searchKeywords
@@ -100,6 +111,7 @@ struct MenuItem: Identifiable, Hashable, Codable {
         name: String,
         group: CurryMenuGroup,
         subtitle: String,
+        actualBasePrice: Int,
         basePrice: Int,
         tags: [MenuTag],
         searchKeywords: [String],
@@ -111,6 +123,7 @@ struct MenuItem: Identifiable, Hashable, Codable {
         self.name = name
         self.group = group
         self.subtitle = subtitle
+        self.actualBasePrice = actualBasePrice
         self.basePrice = basePrice
         self.tags = tags
         self.searchKeywords = searchKeywords
@@ -125,7 +138,10 @@ struct MenuItem: Identifiable, Hashable, Codable {
         name = try container.decode(String.self, forKey: .name)
         group = try container.decodeIfPresent(CurryMenuGroup.self, forKey: .group) ?? .meat
         subtitle = try container.decode(String.self, forKey: .subtitle)
-        basePrice = try container.decode(Int.self, forKey: .basePrice)
+        let storedBasePrice = try container.decode(Int.self, forKey: .basePrice)
+        let decodedActualBasePrice = try container.decodeIfPresent(Int.self, forKey: .actualBasePrice)
+        actualBasePrice = decodedActualBasePrice ?? storedBasePrice
+        basePrice = decodedActualBasePrice == nil ? Pricing.virtualDisplayedPrice(for: storedBasePrice) : storedBasePrice
         tags = try container.decodeIfPresent([MenuTag].self, forKey: .tags) ?? []
         searchKeywords = try container.decodeIfPresent([String].self, forKey: .searchKeywords) ?? []
         imagePath = try container.decodeIfPresent(String.self, forKey: .imagePath)
@@ -238,6 +254,32 @@ struct Coupon: Identifiable, Hashable, Codable {
     let summary: String
     let discountYen: Int
     let eligibility: CouponEligibility
+
+    var displayTitle: String {
+        switch eligibility {
+        case .topping("spinach"):
+            return "ほうれん草トッピング \(discountYen.yenText)引き"
+        case .menu("loin-cutlet-curry"):
+            return "ロースカツカレー \(discountYen.yenText)引き"
+        case .minimumSubtotal:
+            return "注文金額 \(discountYen.yenText)引き"
+        default:
+            return title
+        }
+    }
+
+    var displaySummary: String {
+        switch eligibility {
+        case .topping("spinach"):
+            return "対象: ほうれん草トッピングを含む注文"
+        case .menu("loin-cutlet-curry"):
+            return "対象: ロースカツカレーの注文"
+        case let .minimumSubtotal(amount):
+            return "対象: 小計 \(amount.yenText)以上の注文"
+        default:
+            return summary
+        }
+    }
 
     func isApplicable(to order: DraftOrder) -> Bool {
         isApplicable(to: [order])

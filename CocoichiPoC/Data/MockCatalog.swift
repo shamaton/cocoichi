@@ -106,7 +106,8 @@ enum MockCatalog {
 private struct CurryMenuMasterEntry {
     let group: CurryMenuGroup
     let name: String
-    let price: Int
+    let actualPrice: Int
+    let virtualPrice: Int
     let comment: String
     let imagePath: String?
 }
@@ -119,7 +120,8 @@ private enum CurryMenuMasterLoader {
                 name: entry.name,
                 group: entry.group,
                 subtitle: entry.comment,
-                basePrice: entry.price,
+                actualBasePrice: entry.actualPrice,
+                basePrice: entry.virtualPrice,
                 tags: makeTags(for: entry),
                 searchKeywords: makeKeywords(for: entry),
                 imagePath: entry.imagePath,
@@ -142,6 +144,7 @@ private enum CurryMenuMasterLoader {
         var currentGroup: CurryMenuGroup?
         var currentName: String?
         var currentPrice: Int?
+        var currentVirtualPrice: Int?
         var currentComment: String?
         var currentImagePath: String?
 
@@ -156,13 +159,15 @@ private enum CurryMenuMasterLoader {
                 CurryMenuMasterEntry(
                     group: group,
                     name: name,
-                    price: price,
+                    actualPrice: price,
+                    virtualPrice: currentVirtualPrice ?? Pricing.virtualDisplayedPrice(for: price),
                     comment: comment,
                     imagePath: currentImagePath
                 )
             )
             currentName = nil
             currentPrice = nil
+            currentVirtualPrice = nil
             currentComment = nil
             currentImagePath = nil
         }
@@ -193,6 +198,8 @@ private enum CurryMenuMasterLoader {
                 currentName = parseValue(from: trimmed)
             } else if trimmed.hasPrefix("price:") {
                 currentPrice = Int(parseValue(from: trimmed))
+            } else if trimmed.hasPrefix("virtualPrice:") {
+                currentVirtualPrice = Int(parseValue(from: trimmed))
             } else if trimmed.hasPrefix("comment:") {
                 currentComment = parseValue(from: trimmed)
             } else if trimmed.hasPrefix("imagePath:") {

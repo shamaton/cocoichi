@@ -1,151 +1,187 @@
 期間限定:
   - name: THE牛カレー
     price: 1120
+    virtualPrice: 1210
     comment: 牛の旨みを強く打ち出した数量限定の一皿
     imagePath: the-gyu-curry.png
   - name: 手仕込ささみカツ(2本)カレー
     price: 1082
+    virtualPrice: 1170
     comment: 手仕込のささみカツで食べごたえを足せる限定メニュー
     imagePath: handmade-chicken-cutlet-curry.png
   - name: 桜えびとあさりの春野菜カレー
     price: 920
+    virtualPrice: 1000
     comment: 春らしい具材を重ねて軽やかに楽しめる限定カレー
     imagePath: shrimp-asari-spring-curry.png
 
 肉類のカレー:
   - name: ポークカレー
     price: 588
+    virtualPrice: 640
     comment: 迷った時に戻れるベーシックな一皿
     imagePath: pork-curry.png
   - name: 甘口ポークカレー
     price: 588
+    virtualPrice: 640
     comment: 辛さを抑えてやさしく楽しめる定番
     imagePath: pork-curry-sweet.png
   - name: ビーフカレー
     price: 722
+    virtualPrice: 780
     comment: コクをしっかり味わいたい日に向く
     imagePath: beef-curry.png
   - name: チキンにこみカレー
     price: 850
+    virtualPrice: 920
     comment: やわらかなチキンをソースになじませた一皿
     imagePath: chicken-simmer-curry.png
   - name: フライドチキン(5個)カレー
     price: 865
+    virtualPrice: 940
     comment: 食べごたえのあるフライドチキンが主役
     imagePath: fried-chicken-curry.png
   - name: ハンバーグ(2個)カレー
     price: 888
+    virtualPrice: 960
     comment: ハンバーグをしっかり楽しめる満足感重視
     imagePath: hamburg-curry.png
   - name: 豚しゃぶカレー
     price: 893
+    virtualPrice: 970
     comment: 軽やかな豚しゃぶで食べ進めやすい
     imagePath: pork-slice-curry.png
   - name: メンチカツカレー
     price: 884
+    virtualPrice: 960
     comment: 旨みのあるメンチカツで気分を変えられる
     imagePath: mench-cutlet-curry.png
   - name: ソーセージ(4本)カレー
     price: 904
+    virtualPrice: 980
     comment: ソーセージの塩気でリズムよく食べられる
     imagePath: sausage-curry.png
   - name: チキンカツカレー
     price: 904
+    virtualPrice: 980
     comment: 王道の揚げもの気分に応えるバランス型
     imagePath: chicken-cutlet-curry.png
   - name: パリパリチキンカレー
     price: 904
+    virtualPrice: 980
     comment: 香ばしい食感を前面に楽しめる人気メニュー
     imagePath: crunchy-chicken-curry.png
   - name: ロースカツカレー
     price: 908
+    virtualPrice: 990
     comment: サクッとした王道の満足感がある定番
     imagePath: pork-cutlet-curry.png
   - name: 手仕込とんかつカレー
     price: 1084
+    virtualPrice: 1180
     comment: 手仕込ならではの厚みをしっかり味わえる
     imagePath: handmade-pork-cutlet-curry.png
   - name: 牛すじ煮込みカレー
     price: 1030
+    virtualPrice: 1120
     comment: 煮込みの旨みを深く感じたい時に向く
     imagePath: gyu-suji-curry.png
 
 魚介類のカレー:
   - name: プチエビフライカレー
     price: 748
+    virtualPrice: 810
     comment: 小ぶりなエビフライで軽快に食べ進められる
     imagePath: petit-fried-shrimp-curry.png
   - name: フィッシュフライ(2本)カレー
     price: 780
+    virtualPrice: 850
     comment: 白身フライの食感で満足感を足せる
     imagePath: fried-fish-curry.png
   - name: たっぷりあさりカレー
     price: 780
+    virtualPrice: 850
     comment: あさりの旨みを前面に感じられる一皿
     imagePath: clam-curry.png
   - name: イカカレー
     price: 828
+    virtualPrice: 900
     comment: イカの食感で海鮮らしさをしっかり楽しめる
     imagePath: fried-squid-curry.png
   - name: エビにこみカレー
     price: 828
+    virtualPrice: 900
     comment: エビの旨みをソースになじませて味わえる
     imagePath: simmered-shrimp-curry.png
   - name: エビあさりカレー
     price: 804
+    virtualPrice: 870
     comment: エビとあさりをまとめて楽しめる定番の魚介系
     imagePath: simmered-shrimp-clam-curry.png
   - name: 海の幸カレー
     price: 924
+    virtualPrice: 1000
     comment: 魚介をしっかり入れて満足感を高めた一皿
     imagePath: sea-happiness-curry.png
 
 野菜類・その他のカレー:
   - name: なす(6個)カレー
     price: 751
+    virtualPrice: 820
     comment: なすのやわらかさで軽やかに食べ進められる
     imagePath: eggplant-curry.png
   - name: ほうれん草カレー
     price: 817
+    virtualPrice: 890
     comment: ほうれん草の風味を素直に感じられる一皿
     imagePath: spinach-curry.png
   - name: やさいカレー
     price: 835
+    virtualPrice: 910
     comment: 野菜をしっかり楽しみたい時の定番
     imagePath: vegetable-curry.png
   - name: とろ～りたまフライカレー
     price: 769
+    virtualPrice: 840
     comment: とろけるたまごのコクでやさしくまとまる
     imagePath: fried-egg-curry.png
   - name: ココイチベジカレー
     price: 621
+    virtualPrice: 680
     comment: 動物性原材料を使わず軽やかに楽しめる
     imagePath: cocoichi-vegi-curry.png
   - name: オムカレー
     price: 709
+    virtualPrice: 770
     comment: たまごのまろやかさで食べやすく仕上がる
     imagePath: omelet-curry.png
   - name: 低糖質カレー
     price: 660
+    virtualPrice: 720
     comment: 糖質を抑えつつカレー気分を満たせる
     imagePath: low-carb-curry.png
   - name: 納豆カレー
     price: 740
+    virtualPrice: 800
     comment: 納豆の風味で好みをはっきり出せる一皿
     imagePath: natto-curry.png
   - name: スクランブルエッグカレー
     price: 788
+    virtualPrice: 860
     comment: ふんわりたまごでソースをやさしく受け止める
     imagePath: scramble-egg-curry.png
   - name: チーズカレー
     price: 828
+    virtualPrice: 900
     comment: まろやかさをしっかり足したい時の定番
     imagePath: cheese-curry.png
   - name: クリームコロッケ(カニ入り）(2個)カレー
     price: 808
+    virtualPrice: 880
     comment: クリーミーなコロッケで濃厚さを重ねられる
     imagePath: cream-croquette-curry.png
   - name: きのこカレー
     price: 808
+    virtualPrice: 880
     comment: きのこの香りで落ち着いた味わいに寄せられる
     imagePath: mushroom-curry.png
