@@ -218,19 +218,19 @@ private struct StickyGroupHeader: View {
                             .resizable()
                             .scaledToFill()
                     } else {
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .fill(Color.white.opacity(0.28))
                             .overlay {
                                 Image(systemName: "fork.knife.circle.fill")
-                                    .font(.title3)
+                                    .font(.headline)
                                     .foregroundStyle(.white.opacity(0.92))
                             }
                     }
                 }
-                .frame(width: 52, height: 52)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .frame(width: 40, height: 40)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(Color.white.opacity(0.28), lineWidth: 1)
                 )
 
@@ -242,9 +242,9 @@ private struct StickyGroupHeader: View {
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, POCSpacing.m)
-            .padding(.vertical, POCSpacing.s)
+            .padding(.vertical, POCSpacing.xs)
         }
-        .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
         .overlay(
             RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                 .stroke(POCColor.line, lineWidth: 1)
