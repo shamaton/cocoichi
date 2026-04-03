@@ -243,6 +243,7 @@ private struct PopularMenuCard: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 PriceLabel(amount: item.basePrice, isDiscount: false)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .padding(PopularMenuLayout.cardPadding)
             .pocCard(fill: item.group.discoveryCardBackground)
