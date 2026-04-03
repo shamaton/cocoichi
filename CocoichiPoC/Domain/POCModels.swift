@@ -26,6 +26,35 @@ enum CurryMenuGroup: String, CaseIterable, Codable, Hashable {
             return [0x5E7D3B, 0xF2D7A6]
         }
     }
+
+    var discoveryCardBackground: LinearGradient {
+        switch self {
+        case .limitedTime:
+            return LinearGradient(
+                colors: [Color(hex: 0xF7D8CC), Color(hex: 0xF5E6AF)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .meat:
+            return LinearGradient(
+                colors: [Color(hex: 0xF8ECDD), Color(hex: 0xF2E2CF)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .seafood:
+            return LinearGradient(
+                colors: [Color(hex: 0xEEF5F8), Color(hex: 0xE4EEF7)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .vegetableAndOther:
+            return LinearGradient(
+                colors: [Color(hex: 0xEEF4E6), Color(hex: 0xF4EFD9)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+    }
 }
 
 struct Store: Identifiable, Hashable, Codable {

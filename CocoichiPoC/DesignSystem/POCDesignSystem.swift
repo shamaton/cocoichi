@@ -65,7 +65,11 @@ extension View {
         modifier(POCBackground())
     }
 
-    func pocCard(fill: Color = POCColor.elevated) -> some View {
+    func pocCard() -> some View {
+        pocCard(fill: POCColor.elevated)
+    }
+
+    func pocCard<S: ShapeStyle>(fill: S) -> some View {
         background(fill, in: RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)

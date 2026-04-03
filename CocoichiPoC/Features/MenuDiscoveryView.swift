@@ -112,7 +112,7 @@ struct MenuDiscoveryView: View {
                             } header: {
                                 StickyGroupHeader(
                                     title: section.group.rawValue,
-                                    itemCount: section.items.count
+                                    group: section.group
                                 )
                                 .frame(width: contentWidth, alignment: .leading)
                             }
@@ -190,26 +190,20 @@ private struct GroupedMenuSection: Identifiable {
 
 private struct StickyGroupHeader: View {
     let title: String
-    let itemCount: Int
+    let group: CurryMenuGroup
 
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
             Text(title)
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(POCColor.textPrimary)
-
-            Spacer()
-
-            Text("\(itemCount)品")
-                .font(.caption.weight(.medium))
-                .foregroundStyle(POCColor.textTertiary)
         }
         .padding(.horizontal, POCSpacing.m)
         .padding(.vertical, POCSpacing.s)
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                .fill(POCColor.background.opacity(0.96))
+                .fill(group.discoveryCardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
@@ -236,7 +230,7 @@ private struct PopularMenuCard: View {
                 PriceLabel(amount: item.basePrice, isDiscount: false)
             }
             .padding(PopularMenuLayout.cardPadding)
-            .pocCard(fill: POCColor.elevated)
+            .pocCard(fill: item.group.discoveryCardBackground)
             .frame(maxWidth: .infinity, minHeight: PopularMenuLayout.cardHeight, maxHeight: PopularMenuLayout.cardHeight, alignment: .topLeading)
         }
         .buttonStyle(.plain)
@@ -324,7 +318,7 @@ private struct CompactMenuRow: View {
             .padding(.vertical, CompactMenuLayout.verticalPadding)
             .background(
                 RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                    .fill(POCColor.elevated)
+                    .fill(item.group.discoveryCardBackground)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
