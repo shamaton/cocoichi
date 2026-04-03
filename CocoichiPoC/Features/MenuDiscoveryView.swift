@@ -174,10 +174,25 @@ struct MenuDiscoveryView: View {
     }
 
     private var popularItems: [MenuItem] {
+        let curatedIDs = [
+            "the-gyu-curry",
+            "sakura-shrimp-asari-spring-vegetable-curry",
+            "loin-cutlet-curry",
+            "cheese-curry",
+        ]
+        let filteredByID = Dictionary(uniqueKeysWithValues: filteredMenuItems.map { ($0.id, $0) })
+        let curatedItems = curatedIDs.compactMap { filteredByID[$0] }
+        guard curatedItems.count < 4 else {
+            return curatedItems
+        }
+
         let featured = filteredMenuItems.filter { item in
             item.tags.contains(.recommended) || item.tags.contains(.staple)
         }
-        return Array(featured.prefix(4))
+        let curatedIDSet = Set(curatedIDs)
+        let fallbackItems = featured.filter { !curatedIDSet.contains($0.id) }
+
+        return Array((curatedItems + fallbackItems).prefix(4))
     }
 }
 
