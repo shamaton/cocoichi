@@ -50,6 +50,7 @@ struct CurryDetailView: View {
 
     @State private var currentPhase: CustomizationPhase = .basics
     @State private var isSauceAmountExpanded = false
+    @State private var heroMinY: CGFloat = 0
 
     private let riceOptions = [200, 300, 400, 500]
     private let spiceOptions = [1, 2, 3, 4, 5]
@@ -60,25 +61,22 @@ struct CurryDetailView: View {
         Group {
             if let draft = orderStore.draftOrder {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: POCSpacing.l) {
+                    VStack(alignment: .leading, spacing: POCSpacing.m) {
                         CurryDetailHeroCard(draft: draft, phase: currentPhase)
+                            .background {
+                                GeometryReader { proxy in
+                                    Color.clear.preference(
+                                        key: CurryDetailHeroMinYPreferenceKey.self,
+                                        value: proxy.frame(in: .named("curryDetailScroll")).minY
+                                    )
+                                }
+                            }
 
                         CustomizationPhaseSwitcher(currentPhase: currentPhase) { phase in
                             withAnimation(.snappy(duration: 0.28)) {
                                 currentPhase = phase
                             }
                         }
-
-                        DraftSnapshotCard(
-                            draft: draft,
-                            showsCoupon: false,
-                            title: "Order Snapshot",
-                            subtitle: "店舗、価格、現在の構成をここで短く確認できます。",
-                            fillColor: POCColor.elevatedStrong,
-                            showsStore: true,
-                            showsPickup: true,
-                            emphasizesTotal: true
-                        )
 
                         VStack(alignment: .leading, spacing: POCSpacing.m) {
                             HStack(alignment: .top, spacing: POCSpacing.s) {
@@ -108,7 +106,21 @@ struct CurryDetailView: View {
                         }
                     }
                     .padding(POCSpacing.l)
+                    .padding(.bottom, POCSpacing.xl)
                 }
+                .coordinateSpace(name: "curryDetailScroll")
+                .onPreferenceChange(CurryDetailHeroMinYPreferenceKey.self) { value in
+                    heroMinY = value
+                }
+                .overlay(alignment: .top) {
+                    CompactCurryDetailHeader(draft: draft, phase: currentPhase)
+                        .padding(.horizontal, POCSpacing.l)
+                        .padding(.top, POCSpacing.xs)
+                        .opacity(showsCompactHeader ? 1 : 0)
+                        .offset(y: showsCompactHeader ? 0 : -12)
+                        .allowsHitTesting(false)
+                }
+                .animation(.snappy(duration: 0.24), value: showsCompactHeader)
                 .safeAreaInset(edge: .bottom) {
                     HStack(spacing: POCSpacing.s) {
                         SecondaryCTAButton(title: "Save Combo", systemImage: "star") {
@@ -143,6 +155,10 @@ struct CurryDetailView: View {
         }
         .navigationTitle("Customize")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var showsCompactHeader: Bool {
+        heroMinY < -96
     }
 
     @ViewBuilder
@@ -298,7 +314,7 @@ private struct CurryDetailHeroCard: View {
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             artwork
-                .frame(height: 284)
+                .frame(height: 216)
                 .clipShape(RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous))
 
             LinearGradient(
@@ -308,7 +324,7 @@ private struct CurryDetailHeroCard: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous))
 
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
+            VStack(alignment: .leading, spacing: POCSpacing.xs) {
                 Text(phase.eyebrow.uppercased())
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.white.opacity(0.84))
@@ -318,23 +334,25 @@ private struct CurryDetailHeroCard: View {
                     .foregroundStyle(Color.white.opacity(0.92))
 
                 Text(draft.menuItem.name)
-                    .font(.largeTitle.weight(.bold))
+                    .font(.title.weight(.bold))
                     .foregroundStyle(.white)
+                    .lineLimit(2)
 
                 Text(draft.menuItem.subtitle)
                     .font(.subheadline)
                     .foregroundStyle(Color.white.opacity(0.92))
+                    .lineLimit(2)
 
                 HStack(alignment: .lastTextBaseline, spacing: POCSpacing.s) {
                     Text(draft.total.yenText)
-                        .font(.title2.weight(.bold))
+                        .font(.title3.weight(.bold))
                         .foregroundStyle(.white)
                     Text(currentPriceCaption)
                         .font(.caption.weight(.medium))
                         .foregroundStyle(Color.white.opacity(0.84))
                 }
             }
-            .padding(POCSpacing.l)
+            .padding(POCSpacing.m)
         }
         .overlay(
             RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous)
@@ -374,6 +392,55 @@ private struct CurryDetailHeroCard: View {
     }
 }
 
+private struct CompactCurryDetailHeader: View {
+    let draft: DraftOrder
+    let phase: CustomizationPhase
+
+    var body: some View {
+        HStack(alignment: .center, spacing: POCSpacing.m) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(draft.menuItem.name)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .lineLimit(1)
+
+                Text("\(draft.store.name) ・ \(phase.title)")
+                    .font(.caption)
+                    .foregroundStyle(POCColor.textSecondary)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 0)
+
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(draft.total.yenText)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(POCColor.textPrimary)
+
+                Text("現在の合計")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(POCColor.textTertiary)
+            }
+        }
+        .padding(.horizontal, POCSpacing.m)
+        .padding(.vertical, POCSpacing.s)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .stroke(POCColor.line, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.06), radius: 14, x: 0, y: 8)
+    }
+}
+
+private struct CurryDetailHeroMinYPreferenceKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 private struct CustomizationPhaseSwitcher: View {
     let currentPhase: CustomizationPhase
     let onSelect: (CustomizationPhase) -> Void
@@ -388,7 +455,7 @@ private struct CustomizationPhaseSwitcher: View {
                         Text("\(phase.rawValue + 1)")
                             .font(.caption.weight(.bold))
                             .foregroundStyle(phase == currentPhase ? Color.white : POCColor.textPrimary)
-                            .frame(width: 28, height: 28)
+                            .frame(width: 24, height: 24)
                             .background(
                                 Circle()
                                     .fill(phase == currentPhase ? POCColor.curry : POCColor.elevated)
@@ -406,7 +473,7 @@ private struct CustomizationPhaseSwitcher: View {
                     }
                     .foregroundStyle(phase == currentPhase ? POCColor.textPrimary : POCColor.textSecondary)
                     .padding(.horizontal, POCSpacing.m)
-                    .padding(.vertical, POCSpacing.s)
+                    .padding(.vertical, POCSpacing.xs)
                     .background(
                         RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                             .fill(phase == currentPhase ? POCColor.elevatedStrong : POCColor.elevated)
