@@ -1,76 +1,46 @@
 import SwiftUI
+import UIKit
 
-private enum CustomizationStep: Int, CaseIterable, Identifiable {
-    case currySauce
-    case rice
-    case spice
-    case sauceAmount
+private enum CustomizationPhase: Int, CaseIterable, Identifiable {
+    case basics
     case toppings
-    case review
 
     var id: Int { rawValue }
 
     var title: String {
         switch self {
-        case .currySauce:
-            return "カレーソース"
-        case .rice:
-            return "ライス量"
-        case .spice:
-            return "辛さ"
-        case .sauceAmount:
-            return "ソース量"
-        case .toppings:
-            return "追加トッピング"
-        case .review:
-            return "最終確認"
-        }
-    }
-
-    var shortTitle: String {
-        switch self {
-        case .currySauce:
-            return "ソース"
-        case .rice:
-            return "ライス"
-        case .spice:
-            return "辛さ"
-        case .sauceAmount:
-            return "量"
+        case .basics:
+            return "基本設定"
         case .toppings:
             return "トッピング"
-        case .review:
-            return "確認"
         }
     }
 
     var subtitle: String {
         switch self {
-        case .currySauce:
-            return "ベースの味わいを先に決めて、以後の調整を迷いにくくします。"
-        case .rice:
-            return "片手で決めやすい定番量を先頭に並べます。"
-        case .spice:
-            return "変化はすぐ価格とサマリーへ反映されます。"
-        case .sauceAmount:
-            return "最後の食べ心地を左右するので、ここで微調整します。"
+        case .basics:
+            return "ソース、ライス、辛さを一画面で決めてから先へ進みます。"
         case .toppings:
-            return "おすすめを先に見せつつ、追加はすぐ取り消せます。"
-        case .review:
-            return "今の構成を確認したら、そのまま Review へ進めます。"
+            return "おすすめを先に見せつつ、追加はすぐ取り消せる状態で選びます。"
         }
     }
 
     var actionTitle: String {
-        self == .review ? "Review Order" : "Next"
+        switch self {
+        case .basics:
+            return "トッピングへ進む"
+        case .toppings:
+            return "Review Order"
+        }
     }
 
-    var next: CustomizationStep? {
-        CustomizationStep(rawValue: rawValue + 1)
-    }
-
-    var previous: CustomizationStep? {
-        CustomizationStep(rawValue: rawValue - 1)
+    var eyebrow: String {
+        switch self {
+        case .basics:
+            return "Phase 1 / 2"
+        case .toppings:
+            return "Phase 2 / 2"
+        }
     }
 }
 
@@ -78,47 +48,55 @@ struct CurryDetailView: View {
     @EnvironmentObject private var navigator: AppNavigator
     @EnvironmentObject private var orderStore: OrderStore
 
-    @State private var currentStep: CustomizationStep = .currySauce
+    @State private var currentPhase: CustomizationPhase = .basics
+    @State private var isSauceAmountExpanded = false
 
     private let riceOptions = [200, 300, 400, 500]
     private let spiceOptions = [1, 2, 3, 4, 5]
-    private let toppingColumns = [GridItem(.flexible()), GridItem(.flexible())]
+    private let toppingColumns = [GridItem(.flexible(), spacing: POCSpacing.s), GridItem(.flexible(), spacing: POCSpacing.s)]
+    private let sauceColumns = [GridItem(.flexible(), spacing: POCSpacing.s), GridItem(.flexible(), spacing: POCSpacing.s)]
 
     var body: some View {
         Group {
             if let draft = orderStore.draftOrder {
                 ScrollView {
                     VStack(alignment: .leading, spacing: POCSpacing.l) {
-                        HeroBanner(
-                            eyebrow: "Step \(currentStep.rawValue + 1) / \(CustomizationStep.allCases.count)",
-                            title: draft.menuItem.name,
-                            subtitle: "\(currentStep.title)を決める · \(draft.total.yenText)",
-                            accent: draft.menuItem.accentColors
-                        )
+                        CurryDetailHeroCard(draft: draft, phase: currentPhase)
 
-                        DraftSnapshotCard(draft: draft, showsCoupon: false)
-
-                        CustomizationStepper(currentStep: currentStep) { step in
+                        CustomizationPhaseSwitcher(currentPhase: currentPhase) { phase in
                             withAnimation(.snappy(duration: 0.28)) {
-                                currentStep = step
+                                currentPhase = phase
                             }
                         }
 
-                        VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            HStack(alignment: .center, spacing: POCSpacing.s) {
+                        DraftSnapshotCard(
+                            draft: draft,
+                            showsCoupon: false,
+                            title: "Order Snapshot",
+                            subtitle: "店舗、価格、現在の構成をここで短く確認できます。",
+                            fillColor: POCColor.elevatedStrong,
+                            showsStore: true,
+                            showsPickup: true,
+                            emphasizesTotal: true
+                        )
+
+                        VStack(alignment: .leading, spacing: POCSpacing.m) {
+                            HStack(alignment: .top, spacing: POCSpacing.s) {
                                 VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                                    Text(currentStep.title)
+                                    Text(currentPhase.title)
                                         .font(.title3.weight(.semibold))
                                         .foregroundStyle(POCColor.textPrimary)
-                                    Text(currentStep.subtitle)
+                                    Text(currentPhase.subtitle)
                                         .font(.subheadline)
                                         .foregroundStyle(POCColor.textSecondary)
                                 }
-                                if let previousStep = currentStep.previous {
-                                    Spacer()
-                                    Button("Back") {
+
+                                Spacer(minLength: 0)
+
+                                if currentPhase == .toppings {
+                                    Button("基本設定へ戻る") {
                                         withAnimation(.snappy(duration: 0.28)) {
-                                            currentStep = previousStep
+                                            currentPhase = .basics
                                         }
                                     }
                                     .font(.subheadline.weight(.semibold))
@@ -126,7 +104,7 @@ struct CurryDetailView: View {
                                 }
                             }
 
-                            stepContent(for: draft)
+                            phaseContent(for: draft)
                         }
                     }
                     .padding(POCSpacing.l)
@@ -136,10 +114,13 @@ struct CurryDetailView: View {
                         SecondaryCTAButton(title: "Save Combo", systemImage: "star") {
                             navigator.showSheet(.saveFavorite)
                         }
-                        PrimaryCTAButton(title: "\(currentStep.actionTitle) \(draft.total.yenText)", systemImage: currentStep == .review ? "cart" : "arrow.right") {
-                            if let nextStep = currentStep.next {
+                        PrimaryCTAButton(
+                            title: "\(currentPhase.actionTitle) \(draft.total.yenText)",
+                            systemImage: currentPhase == .basics ? "arrow.right" : "cart"
+                        ) {
+                            if currentPhase == .basics {
                                 withAnimation(.snappy(duration: 0.28)) {
-                                    currentStep = nextStep
+                                    currentPhase = .toppings
                                 }
                             } else {
                                 navigator.push(.orderReview)
@@ -152,7 +133,8 @@ struct CurryDetailView: View {
                     .background(.ultraThinMaterial)
                 }
                 .task(id: draft.id) {
-                    currentStep = .currySauce
+                    currentPhase = .basics
+                    isSauceAmountExpanded = false
                 }
             } else {
                 EmptyStateCard(title: "選択中の商品がありません", message: "メニュー一覧から商品を選んでください。")
@@ -164,118 +146,97 @@ struct CurryDetailView: View {
     }
 
     @ViewBuilder
-    private func chipRow(values: [Int], selected: Int, unit: String = "", action: @escaping (Int) -> Void) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: POCSpacing.xs) {
-                ForEach(values, id: \.self) { value in
-                    FilterChip(title: unit.isEmpty ? "\(value)辛" : "\(value)\(unit)", isSelected: selected == value) {
-                        action(value)
+    private func phaseContent(for draft: DraftOrder) -> some View {
+        switch currentPhase {
+        case .basics:
+            basicsContent(for: draft)
+        case .toppings:
+            toppingsContent(for: draft)
+        }
+    }
+
+    @ViewBuilder
+    private func basicsContent(for draft: DraftOrder) -> some View {
+        VStack(alignment: .leading, spacing: POCSpacing.l) {
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                SectionHeader("Select Your Sauce", subtitle: "最初に味の軸を決めると、後の調整が迷いにくくなります。")
+                LazyVGrid(columns: sauceColumns, spacing: POCSpacing.s) {
+                    ForEach(CurrySauceOption.allCases, id: \.self) { sauce in
+                        SauceFlavorCard(
+                            title: sauce.rawValue,
+                            subtitle: sauce.subtitle,
+                            value: sauce.priceDelta == 0 ? "追加料金なし" : "+\(sauce.priceDelta.yenText)",
+                            isSelected: draft.currySauce == sauce,
+                            accent: sauce.accentColor
+                        ) {
+                            orderStore.setCurrySauce(sauce)
+                        }
                     }
                 }
+            }
+
+            RicePortionCard(
+                selectedGrams: draft.riceGrams,
+                options: riceOptions,
+                onDecrease: { changeRiceSelection(by: -1, selected: draft.riceGrams) },
+                onIncrease: { changeRiceSelection(by: 1, selected: draft.riceGrams) },
+                onSelect: { grams in
+                    orderStore.setRiceGrams(grams)
+                }
+            )
+
+            SpiceLevelCard(
+                selectedLevel: draft.spiceLevel,
+                options: spiceOptions,
+                onSelect: { level in
+                    orderStore.setSpiceLevel(level)
+                }
+            )
+
+            SauceAmountDisclosureCard(
+                isExpanded: $isSauceAmountExpanded,
+                selectedAmount: draft.sauceAmount
+            ) { amount in
+                orderStore.setSauceAmount(amount)
             }
         }
     }
 
     @ViewBuilder
-    private func stepContent(for draft: DraftOrder) -> some View {
-        switch currentStep {
-        case .currySauce:
-            VStack(spacing: POCSpacing.s) {
-                ForEach(CurrySauceOption.allCases, id: \.self) { sauce in
-                    SelectionCard(
-                        title: sauce.rawValue,
-                        subtitle: sauce.subtitle,
-                        value: sauce.priceDelta == 0 ? "追加料金なし" : "+\(sauce.priceDelta.yenText)",
-                        isSelected: draft.currySauce == sauce,
-                        accent: sauce.accentColor
-                    ) {
-                        orderStore.setCurrySauce(sauce)
-                    }
-                }
-            }
-        case .rice:
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                chipRow(values: riceOptions, selected: draft.riceGrams, unit: "g") { grams in
-                    orderStore.setRiceGrams(grams)
-                }
+    private func toppingsContent(for draft: DraftOrder) -> some View {
+        VStack(alignment: .leading, spacing: POCSpacing.l) {
+            if draft.toppings.isEmpty {
                 EmptyStateCard(
-                    title: "Rice Hint",
-                    message: draft.riceGrams >= 400 ? "がっつり寄りの構成です。最後のトッピング量も見ながら調整できます。" : "標準寄りの量です。後の辛さやトッピングを足しても重くなりすぎません。"
+                    title: "トッピングなしでも進めます",
+                    message: "まずはベースの構成を保ったまま Review に進み、必要ならこの画面で追加してください。"
                 )
-            }
-        case .spice:
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                chipRow(values: spiceOptions, selected: draft.spiceLevel) { level in
-                    orderStore.setSpiceLevel(level)
-                }
-                EmptyStateCard(
-                    title: "Spice Balance",
-                    message: draft.spiceLevel >= 4 ? "辛さを前に出す設定です。ソース量を多めにすると最後まで辛さが残ります。" : "食べやすさを保った設定です。トッピングの味も残りやすくなります。"
-                )
-            }
-        case .sauceAmount:
-            VStack(spacing: POCSpacing.s) {
-                ForEach(SauceAmountOption.allCases, id: \.self) { amount in
-                    SelectionCard(
-                        title: amount.rawValue,
-                        subtitle: amount.subtitle,
-                        value: amount.priceDelta == 0 ? "追加料金なし" : "+\(amount.priceDelta.yenText)",
-                        isSelected: draft.sauceAmount == amount,
-                        accent: amount.accentColor
-                    ) {
-                        orderStore.setSauceAmount(amount)
-                    }
-                }
-            }
-        case .toppings:
-            VStack(alignment: .leading, spacing: POCSpacing.m) {
-                if !draft.toppings.isEmpty {
-                    VStack(alignment: .leading, spacing: POCSpacing.s) {
-                        Text("Selected Toppings")
-                            .font(.headline.weight(.semibold))
-                        FlexibleChipGroup(items: draft.toppings) { topping in
-                            orderStore.toggleTopping(topping)
-                        }
-                    }
-                }
-
-                if !recommendedToppings(for: draft).isEmpty {
-                    VStack(alignment: .leading, spacing: POCSpacing.s) {
-                        Text("Recommended")
-                            .font(.headline.weight(.semibold))
-                        toppingGrid(recommendedToppings(for: draft), draft: draft)
-                    }
-                }
-
+            } else {
                 VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    Text("More Toppings")
-                        .font(.headline.weight(.semibold))
-                    toppingGrid(otherToppings(for: draft), draft: draft)
+                    SectionHeader("Selected Toppings", subtitle: "外したい時はチップをタップします。")
+                    FlexibleChipGroup(items: draft.toppings) { topping in
+                        orderStore.toggleTopping(topping)
+                    }
                 }
             }
-        case .review:
-            VStack(alignment: .leading, spacing: POCSpacing.m) {
-                EmptyStateCard(
-                    title: "Ready To Review",
-                    message: "店舗、構成、価格がそろいました。必要なら stepper から前の工程へ戻って微調整できます。"
-                )
 
+            if !recommendedToppings(for: draft).isEmpty {
                 VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    Text("Review Highlights")
-                        .font(.headline.weight(.semibold))
-                    SummaryRow(title: "Store", value: draft.store.name)
-                    SummaryRow(title: "Pickup", value: draft.pickupWindowText)
-                    SummaryRow(title: "Sauce", value: draft.currySauce.rawValue)
-                    SummaryRow(title: "Rice", value: "\(draft.riceGrams)g")
-                    SummaryRow(title: "Spice", value: "\(draft.spiceLevel)辛")
-                    SummaryRow(title: "Sauce Amount", value: draft.sauceAmount.rawValue)
-                    SummaryRow(title: "Toppings", value: draft.toppings.isEmpty ? "なし" : draft.toppings.map(\.name).joined(separator: " / "))
-                    SummaryRow(title: "Subtotal", value: draft.subtotal.yenText)
+                    SectionHeader("Recommended Toppings", subtitle: "このカレーと相性の良い候補を先に並べます。")
+                    toppingGrid(recommendedToppings(for: draft), draft: draft)
                 }
-                .padding(POCSpacing.m)
-                .pocCard(fill: POCColor.elevatedStrong)
+            }
+
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                SectionHeader("More Toppings", subtitle: "定番の追加候補から広げられます。")
+                toppingGrid(otherToppings(for: draft), draft: draft)
             }
         }
+    }
+
+    private func changeRiceSelection(by delta: Int, selected: Int) {
+        guard let index = riceOptions.firstIndex(of: selected) else { return }
+        let nextIndex = min(max(index + delta, riceOptions.startIndex), riceOptions.index(before: riceOptions.endIndex))
+        orderStore.setRiceGrams(riceOptions[nextIndex])
     }
 
     @ViewBuilder
@@ -293,7 +254,7 @@ struct CurryDetailView: View {
                         Text("+\(topping.price.yenText)")
                             .font(.subheadline)
                             .foregroundStyle(POCColor.textSecondary)
-                        Spacer()
+                        Spacer(minLength: 0)
                         Text(isSelected ? "Added" : "Add")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(isSelected ? Color.white : POCColor.curry)
@@ -330,41 +291,391 @@ struct CurryDetailView: View {
     }
 }
 
-private struct CustomizationStepper: View {
-    let currentStep: CustomizationStep
-    let onSelect: (CustomizationStep) -> Void
+private struct CurryDetailHeroCard: View {
+    let draft: DraftOrder
+    let phase: CustomizationPhase
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            artwork
+                .frame(height: 284)
+                .clipShape(RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous))
+
+            LinearGradient(
+                colors: [Color.black.opacity(0.02), Color.black.opacity(0.62)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .clipShape(RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous))
+
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                Text(phase.eyebrow.uppercased())
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.white.opacity(0.84))
+
+                Text(draft.store.name)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(Color.white.opacity(0.92))
+
+                Text(draft.menuItem.name)
+                    .font(.largeTitle.weight(.bold))
+                    .foregroundStyle(.white)
+
+                Text(draft.menuItem.subtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.white.opacity(0.92))
+
+                HStack(alignment: .lastTextBaseline, spacing: POCSpacing.s) {
+                    Text(draft.total.yenText)
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(.white)
+                    Text(currentPriceCaption)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(Color.white.opacity(0.84))
+                }
+            }
+            .padding(POCSpacing.l)
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous)
+                .stroke(Color.white.opacity(0.18), lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 10)
+    }
+
+    private var currentPriceCaption: String {
+        draft.toppings.isEmpty && draft.currySauce.priceDelta == 0 && draft.sauceAmount.priceDelta == 0
+            ? "ベース価格"
+            : "選択内容を反映"
+    }
+
+    @ViewBuilder
+    private var artwork: some View {
+        if let uiImage = loadMenuImage() {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+        } else {
+            LinearGradient(
+                colors: draft.menuItem.accentColors + [POCColor.elevatedStrong],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+    }
+
+    private func loadMenuImage() -> UIImage? {
+        guard let imagePath = draft.menuItem.imagePath else { return nil }
+        let resourcePath = imagePath as NSString
+        let resourceName = resourcePath.deletingPathExtension
+        let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else { return nil }
+        return UIImage(contentsOfFile: url.path)
+    }
+}
+
+private struct CustomizationPhaseSwitcher: View {
+    let currentPhase: CustomizationPhase
+    let onSelect: (CustomizationPhase) -> Void
 
     var body: some View {
         HStack(spacing: POCSpacing.xs) {
-            ForEach(CustomizationStep.allCases) { step in
+            ForEach(CustomizationPhase.allCases) { phase in
                 Button {
-                    onSelect(step)
+                    onSelect(phase)
                 } label: {
-                    VStack(spacing: POCSpacing.xs) {
-                        Text("\(step.rawValue + 1)")
+                    HStack(spacing: POCSpacing.s) {
+                        Text("\(phase.rawValue + 1)")
                             .font(.caption.weight(.bold))
-                            .foregroundStyle(step == currentStep ? Color.white : POCColor.textPrimary)
+                            .foregroundStyle(phase == currentPhase ? Color.white : POCColor.textPrimary)
                             .frame(width: 28, height: 28)
                             .background(
                                 Circle()
-                                    .fill(step == currentStep ? POCColor.curry : POCColor.elevatedStrong)
+                                    .fill(phase == currentPhase ? POCColor.curry : POCColor.elevated)
                             )
-                        Text(step.shortTitle)
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(step == currentStep ? POCColor.curry : POCColor.textTertiary)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(2)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(phase.title)
+                                .font(.subheadline.weight(.semibold))
+                            Text(phase == .basics ? "ソース・ライス・辛さ" : "追加トッピング")
+                                .font(.caption)
+                                .foregroundStyle(phase == currentPhase ? POCColor.textPrimary.opacity(0.78) : POCColor.textTertiary)
+                        }
+
+                        Spacer(minLength: 0)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, POCSpacing.xs)
+                    .foregroundStyle(phase == currentPhase ? POCColor.textPrimary : POCColor.textSecondary)
+                    .padding(.horizontal, POCSpacing.m)
+                    .padding(.vertical, POCSpacing.s)
                     .background(
-                        RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                            .fill(step == currentStep ? POCColor.elevatedStrong : POCColor.elevated.opacity(0.75))
+                        RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                            .fill(phase == currentPhase ? POCColor.elevatedStrong : POCColor.elevated)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                            .stroke(phase == currentPhase ? POCColor.curry.opacity(0.45) : POCColor.line, lineWidth: 1)
                     )
                 }
                 .buttonStyle(.plain)
             }
         }
+    }
+}
+
+private struct SauceFlavorCard: View {
+    let title: String
+    let subtitle: String
+    let value: String
+    let isSelected: Bool
+    let accent: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                HStack(alignment: .top) {
+                    Text(title)
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+                    Spacer(minLength: 0)
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(isSelected ? accent : POCColor.textTertiary)
+                }
+
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(POCColor.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Spacer(minLength: 0)
+
+                Text(value)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(isSelected ? accent : POCColor.textSecondary)
+            }
+            .frame(maxWidth: .infinity, minHeight: 142, alignment: .leading)
+            .padding(POCSpacing.m)
+            .background(
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .fill(isSelected ? accent.opacity(0.16) : POCColor.elevated)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .stroke(isSelected ? accent : POCColor.line, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct RicePortionCard: View {
+    let selectedGrams: Int
+    let options: [Int]
+    let onDecrease: () -> Void
+    let onIncrease: () -> Void
+    let onSelect: (Int) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            SectionHeader("Rice Portion", subtitle: "標準量を軸に、片手で前後できる操作を優先します。")
+
+            VStack(alignment: .leading, spacing: POCSpacing.m) {
+                HStack {
+                    RiceAdjustButton(symbol: "minus", isDisabled: selectedGrams == options.first, action: onDecrease)
+                    Spacer()
+                    VStack(spacing: 2) {
+                        Text("\(selectedGrams)g")
+                            .font(.system(size: 34, weight: .bold, design: .rounded))
+                            .foregroundStyle(POCColor.curry)
+                        Text(riceHint)
+                            .font(.caption)
+                            .foregroundStyle(POCColor.textSecondary)
+                    }
+                    Spacer()
+                    RiceAdjustButton(symbol: "plus", isDisabled: selectedGrams == options.last, action: onIncrease)
+                }
+
+                HStack(spacing: POCSpacing.xs) {
+                    ForEach(options, id: \.self) { grams in
+                        OptionChip(
+                            title: "\(grams)g",
+                            isSelected: selectedGrams == grams,
+                            selectedFill: POCColor.cheese,
+                            selectedForeground: POCColor.textPrimary
+                        ) {
+                            onSelect(grams)
+                        }
+                    }
+                }
+            }
+            .padding(POCSpacing.m)
+            .pocCard(fill: POCColor.elevated)
+        }
+    }
+
+    private var riceHint: String {
+        selectedGrams >= 400 ? "がっつり寄りの構成です" : "標準寄りで組みやすい量です"
+    }
+}
+
+private struct SpiceLevelCard: View {
+    let selectedLevel: Int
+    let options: [Int]
+    let onSelect: (Int) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            SectionHeader("Spice Level", subtitle: "辛さは離散選択で迷いなく決められる見せ方を優先します。")
+
+            VStack(alignment: .leading, spacing: POCSpacing.m) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(selectedLevel)辛")
+                            .font(.system(size: 32, weight: .bold, design: .rounded))
+                            .foregroundStyle(POCColor.red)
+                        Text(spiceHint)
+                            .font(.caption)
+                            .foregroundStyle(POCColor.textSecondary)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: selectedLevel >= 4 ? "flame.fill" : "flame")
+                        .font(.system(size: 28, weight: .semibold))
+                        .foregroundStyle(POCColor.red)
+                }
+
+                HStack(spacing: POCSpacing.xs) {
+                    ForEach(options, id: \.self) { level in
+                        OptionChip(
+                            title: "\(level)辛",
+                            isSelected: selectedLevel == level,
+                            selectedFill: POCColor.red,
+                            selectedForeground: .white
+                        ) {
+                            onSelect(level)
+                        }
+                    }
+                }
+            }
+            .padding(POCSpacing.m)
+            .pocCard(fill: POCColor.elevated)
+        }
+    }
+
+    private var spiceHint: String {
+        selectedLevel >= 4 ? "辛さを前に出す設定です" : "食べやすさを保った設定です"
+    }
+}
+
+private struct SauceAmountDisclosureCard: View {
+    @Binding var isExpanded: Bool
+    let selectedAmount: SauceAmountOption
+    let onSelect: (SauceAmountOption) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            Button {
+                withAnimation(.snappy(duration: 0.24)) {
+                    isExpanded.toggle()
+                }
+            } label: {
+                HStack(spacing: POCSpacing.s) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("ソース量を調整")
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(POCColor.textPrimary)
+                        Text("必要な人だけが開いて微調整する補助設定です。")
+                            .font(.caption)
+                            .foregroundStyle(POCColor.textSecondary)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(selectedAmount.rawValue)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(POCColor.curry)
+                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(POCColor.textTertiary)
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                VStack(spacing: POCSpacing.s) {
+                    ForEach(SauceAmountOption.allCases, id: \.self) { amount in
+                        SelectionCard(
+                            title: amount.rawValue,
+                            subtitle: amount.subtitle,
+                            value: amount.priceDelta == 0 ? "追加料金なし" : "+\(amount.priceDelta.yenText)",
+                            isSelected: selectedAmount == amount,
+                            accent: amount.accentColor
+                        ) {
+                            onSelect(amount)
+                        }
+                    }
+                }
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .padding(POCSpacing.m)
+        .pocCard(fill: POCColor.elevated)
+    }
+}
+
+private struct OptionChip: View {
+    let title: String
+    let isSelected: Bool
+    let selectedFill: Color
+    let selectedForeground: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(isSelected ? selectedForeground : POCColor.textPrimary)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, POCSpacing.s)
+                .padding(.vertical, POCSpacing.xs)
+                .background(
+                    Capsule()
+                        .fill(isSelected ? selectedFill : POCColor.elevatedStrong)
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(isSelected ? selectedFill : POCColor.line, lineWidth: 1)
+                )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct RiceAdjustButton: View {
+    let symbol: String
+    let isDisabled: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(isDisabled ? POCColor.textTertiary : POCColor.curry)
+                .frame(width: 44, height: 44)
+                .background(
+                    Circle()
+                        .fill(POCColor.elevatedStrong)
+                )
+                .overlay(
+                    Circle()
+                        .stroke(POCColor.line, lineWidth: 1)
+                )
+        }
+        .buttonStyle(.plain)
+        .disabled(isDisabled)
     }
 }
 
@@ -830,10 +1141,27 @@ struct SaveFavoriteSheet: View {
 struct DraftSnapshotCard: View {
     let draft: DraftOrder
     let showsCoupon: Bool
+    var title = "Current Order"
+    var subtitle: String? = nil
+    var fillColor: Color = POCColor.elevated
+    var showsStore = false
+    var showsPickup = false
+    var emphasizesTotal = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Current Order")
+            HStack(alignment: .firstTextBaseline) {
+                SectionHeader(title, subtitle: subtitle)
+                if showsPickup {
+                    Spacer(minLength: 0)
+                    Text(draft.pickupWindowText)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(POCColor.curry)
+                }
+            }
+            if showsStore {
+                SummaryRow(title: "Store", value: draft.store.name)
+            }
             SummaryRow(title: "Base", value: draft.menuItem.name)
             SummaryRow(title: "Sauce", value: draft.currySauce.rawValue)
             SummaryRow(title: "Spice", value: "\(draft.spiceLevel)辛")
@@ -843,10 +1171,22 @@ struct DraftSnapshotCard: View {
             if showsCoupon {
                 SummaryRow(title: "Coupon", value: draft.appliedCoupon?.displayTitle ?? "-")
             }
-            SummaryRow(title: "Total", value: draft.total.yenText)
+            if emphasizesTotal {
+                Divider()
+                    .overlay(POCColor.line)
+
+                HStack {
+                    Text("Total")
+                        .font(.headline.weight(.semibold))
+                    Spacer()
+                    PriceLabel(amount: draft.total, isDiscount: false)
+                }
+            } else {
+                SummaryRow(title: "Total", value: draft.total.yenText)
+            }
         }
         .padding(POCSpacing.m)
-        .pocCard(fill: POCColor.elevated)
+        .pocCard(fill: fillColor)
     }
 }
 

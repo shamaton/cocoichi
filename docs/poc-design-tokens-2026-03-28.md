@@ -260,7 +260,7 @@
 | Role | Token |
 | --- | --- |
 | Hero overlay card | `surface.card.glass` |
-| Current Order card | `surface.card.default` |
+| Order Snapshot card | `surface.card.default` |
 | Selected topping | `state.selected` |
 | Spice selected | `chip.spicy.selected.background` |
 | Review CTA | `cta.primary.*` |
@@ -271,6 +271,8 @@
 | Role | Token |
 | --- | --- |
 | Pickup card | `surface.card.default` |
+| Pending draft card | `surface.card.default` |
+| Cart line item card | `surface.card.emphasis` |
 | Suggested Savings card | `surface.card.emphasis` |
 | Price Summary | `price.summary.background` |
 | Place Order CTA | `cta.primary.*` |

@@ -197,7 +197,7 @@
 | シーン | モーション |
 | --- | --- |
 | 商品カード選択 | Hero への滑らかな遷移 |
-| トッピング追加 | 合計金額と Current Order の同時反応 |
+| トッピング追加 | 合計金額と Order Snapshot の同時反応 |
 | クーポン適用 | 価格更新と sheet の収束 |
 | 完了 | success mark の短いスケールアップ |
 
@@ -242,7 +242,7 @@
 ビジュアル要素:
 
 - Hero Image を大きく見せる
-- Current Order Card は少し浮かせる
+- Order Snapshot Card は少し浮かせる
 - 選択中のトッピングや辛さは、視覚差が明確であること
 - CTAエリアは常に安心して押せる重さを持たせる
 
@@ -263,6 +263,7 @@
 
 - 余白を多めに取り、焦らせない
 - Pickup Card は安定感重視
+- pending draft は編集可能な面、cart line item は read-only の面として視覚差を持たせる
 - Price Summary は一段濃い面で分かりやすく
 - `Suggested Savings` は少し華やぐが、主役にはしない
 

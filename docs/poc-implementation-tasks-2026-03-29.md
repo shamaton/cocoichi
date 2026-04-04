@@ -26,7 +26,7 @@
 - iOS-first のネイティブ PoC として進める
 - ネットワーク通信は必須にしない
 - ローカルデータとモック状態で注文完了まで通す
-- 主導線は `S1 -> S2 -> S3(stepper) -> S5(cart/review) -> S6 -> S8`
+- 主導線は `S1 -> S2 -> S3(基本設定 -> トッピング) -> S5(cart/review) -> S6 -> S8`
 - 補助導線として `S4 Saved Combos` と `S7 Save Favorite Sheet` を入れる
 - ログイン、決済実連携、バックエンド実装、WebView は扱わない
 - 価格は `実値` と `PoC用の仮想表示価格` を分け、アプリ内では仮想表示価格を支払額として一貫使用する
@@ -39,29 +39,26 @@
 - 共通基盤を先に固め、画面実装は主導線順に積む
 - 価格、店舗、受取時間、保存済み構成、クーポン適用、カート内容はローカル状態で一貫管理する
 - メニュー YAML では `price` を実値、`virtualPrice` を PoC用の仮想表示価格として保持する
-- `S2` でベースのカレーを選び、`S3` では公式手順に近い stepper で `カレーソース -> ライス量 -> 辛さ -> ソース量 -> トッピング -> 最終確認` を進める
-- `S5` は最終確認だけでなく、`1皿目をカートに入れた後に 2皿目のカレーやサイドを追加するか判断する地点` として扱う
+- `S2` でベースのカレーを選び、`S3` では `基本設定 phase -> トッピング phase` の 2段階で進める
+- `S5` は最終確認だけでなく、`pending draft を review し、必要なら cart line item に昇格させて 2皿目やサイドを追加するか判断する地点` として扱う
 - クーポンは `読ませる` のではなく `この注文で使える` を返すローカルルールで扱う
-- 主要CTA、価格強調、選択状態、stepper の進捗表示、成功演出の見せ方は全画面で統一する
+- 主要CTA、価格強調、選択状態、phase 進捗表示、成功演出の見せ方は全画面で統一する
 
 ## 注文手順の整理
 
 具体的な表示要素は後続で詰めるが、PoC 実装では次の順番を基準にする。
 
 1. `S2 Menu Discovery` でカレーメニューを選ぶ
-2. `S3 Curry Detail / Customize` で `カレーソース` を選ぶ
-3. `S3 Curry Detail / Customize` で `ライス量` を選ぶ
-4. `S3 Curry Detail / Customize` で `辛さ` を選ぶ
-5. `S3 Curry Detail / Customize` で `ソース量` を選ぶ
-6. `S3 Curry Detail / Customize` で `追加トッピング` を選ぶ
-7. `S3 Curry Detail / Customize` で最終確認し、`カートに入れる`
-8. `S5 Order Review` で `2皿目のカレー / サイドメニュー追加` または `注文確定` に進む
+2. `S3 Curry Detail / Customize` の基本設定 phase で `カレーソース` `ライス量` `辛さ` を一画面で選ぶ
+3. `S3 Curry Detail / Customize` の基本設定 phase で `ソース量` を必要時だけ折りたたみで調整する
+4. `S3 Curry Detail / Customize` のトッピング phase で `追加トッピング` を選ぶ
+5. `S5 Order Review` で `2皿目のカレー / サイドメニュー追加` または `注文確定` に進む
 
 実装メモ:
 
-- `S3` は 1画面内で全選択肢を並べるより、stepper に沿って段階表示する
+- `S3` は `基本設定` と `トッピング` の 2 phase を持ち、基本設定 phase の中では主要調整を一画面で決められるようにする
 - `S5` は `最終確認画面` 兼 `カート確認画面` として扱う
-- step ごとの具体UIは後続で詰めるため、今は進行順と状態管理の整合を優先する
+- phase ごとの具体UIは後続で詰めるため、今は進行順と状態管理の整合を優先する
 
 ## マイルストーン
 
@@ -75,7 +72,7 @@
 
 ### M2. カスタマイズと保存
 
-`S3 Curry Detail / Customize` の stepper 進行と `S7 Save Favorite Sheet` を実装し、カート投入まで進める状態にする。
+`S3 Curry Detail / Customize` の 2 phase 進行と `S7 Save Favorite Sheet` を実装し、`Review Order` から S5 へ渡せる状態にする。
 
 ### M3. 最終確認とクーポン提案
 
@@ -93,28 +90,28 @@
 | T02 | Theme / Design Tokens | color, spacing, radius, typography, motion, haptics の foundation と semantic token を定義する | T01 | 画面実装が token 経由で色と CTA を参照できる |
 | T03 | Mock Domain Models | Store, MenuItem, CurrySauceOption, RicePortion, SpiceLevel, SauceAmountOption, Topping, CartLineItem, FavoriteCombo, Coupon, DraftOrder, CompletedOrder のモデルを作る | T01 | 主要画面に必要なローカルデータ構造が揃う |
 | T04 | Seed Data / Mock Rules | 店舗一覧、商品一覧、カレーソース候補、ライス量、辛さ、ソース量、トッピング、サイドメニュー、クーポン候補、モック受取時間算出を用意する | T03 | 画面間をまたいで同じデータで表示できる |
-| T05 | Order State Store | 選択店舗、商品、カレーソース、ライス量、辛さ、ソース量、トッピング、価格、カート、適用クーポン、保存状態を持つ状態管理を作る | T03,T04 | 画面をまたいでも注文状態が崩れない |
+| T05 | Order State Store | 選択店舗、商品、カレーソース、ライス量、辛さ、ソース量、トッピング、価格、pending draft、カート、適用クーポン、保存状態を持つ状態管理を作る | T03,T04 | 画面をまたいでも注文状態が崩れず、S3 から S5 に pending draft を渡せる。pending draft は常に1件だけ保持され、トッピングは一意管理され、重複タップは no-op になる |
 | T06 | Shared UI Components | Primary/Secondary CTA、chip、card、price row、store header、sheet header を共通化する | T02,T05 | S2-S8 で共通UIを使い回せる |
 | T07 | S1 Store Select | 店舗選択の初期画面、受取目安表示、`保存済みから始める` 導線を実装する | T04,T05,T06 | 店舗選択後に S2 へ進める |
-| T08 | S2 Menu Discovery Layout | 店舗ヘッダー、検索欄、quick filters、For You、Popular、Menu List、下部導線を実装する | T04,T05,T06,T07 | 商品カードから S3 へ遷移できる |
+| T08 | S2 MenuDiscovery Layout | 店舗ヘッダー、検索欄、quick filters、For You、Popular、Menu List、下部導線を実装する | T04,T05,T06,T07 | 商品カードから S3 へ遷移できる。S3 から戻って別メニューを選んだ時は pending draft が新しい選択で置き換わる |
 | T09 | S2 Search / Filter Interaction | 検索アクティブ状態、候補キーワード、検索結果、Saved Combos 該当表示を入れる | T08 | 検索入力で一覧が切り替わる |
 | T10 | S4 Saved Combos Minimal Screen | 保存済み構成一覧、再開、メニューへ戻る、店舗変更の最低限 UI を作る | T05,T06,T07 | S1/S2/S8 から S4 に入り S3 へ進める |
-| T11 | S3 Stepper Base Layout | Hero image、商品情報、Current Order card、stepper、step content area、下部 CTA を実装する | T05,T06,T08 | 初期状態の S3 が stepper 前提で表示される |
-| T12 | S3 Stepper Flow | `カレーソース -> ライス量 -> 辛さ -> ソース量 -> トッピング -> 最終確認` の進行、戻る/進む、進捗表示を実装する | T05,T11 | 現在地と残り工程が崩れず進行できる |
-| T13 | S3 Customization Logic | 各 step の選択、トッピング追加削除、価格再計算、Current Order 更新、軽い反応を実装する | T05,T11,T12 | 変更が即時に価格とサマリーへ反映される |
+| T11 | S3 Two-Phase Base Layout | Hero image、商品情報、Order Snapshot card、phase switcher、基本設定 area、トッピング area、下部 CTA を実装する | T05,T06,T08 | 初期状態の S3 が 2 phase 前提で表示される |
+| T12 | S3 Basics To Toppings Flow | `基本設定 -> トッピング` の進行、戻る/進む、進捗表示、`Review Order` CTA から pending draft のまま S5 に渡す遷移を実装する | T05,T11 | 現在地と残り工程が崩れず進行できる |
+| T13 | S3 Customization Logic | 基本設定 phase の選択、ソース量折りたたみ、トッピング追加削除、価格再計算、Order Snapshot 更新、軽い反応を実装する | T05,T11,T12 | 変更が即時に価格とサマリーへ反映され、S5 では pending draft を review 用に受け取れる。選択済みトッピングは Added または非表示で扱い、重複追加できない |
 | T14 | S7 Save Favorite Sheet | 名前入力、注文サマリー、保存/キャンセルを持つ modal sheet を実装する | T05,T06,T13 | S3 と S5 から同じ保存 sheet を呼べる |
 | T15 | Favorite Persistence / Resume | 保存済み構成のローカル保存、再編集前提の復元、For You 反映を実装する | T05,T10,T14 | 保存後に S4 と S2 の再利用導線へ反映される |
-| T16 | S5 Order Review Layout | Pickup card、cart summary、Suggested Savings、Save This Combo、Price Summary、下部 CTA を実装する | T05,T06,T13 | カート確認、内容確認、注文確定導線が成立する |
+| T16 | S5 Order Review Layout | Pickup card、pending draft を含む cart summary、Suggested Savings、Save This Combo、Price Summary、下部 CTA を実装する | T05,T06,T13 | pending draft と cart line item の見せ分けができ、`内容を修正` は pending draft のみに対して表示される。初版 PoC では cart line item は read-only として扱い、クーポン適用後でも Add More を残す |
 | T17 | Coupon Matching Engine | 現在注文に対して適用可能クーポンだけを返すローカル判定を作る | T03,T04,T05 | S5 で提案対象を算出できる |
-| T18 | S5 Continue Shopping Loop | `2皿目のカレー` と `サイドメニュー追加` の導線で S2 に戻り、カート保持のまま再度 S5 に戻れるようにする | T05,T08,T13,T16 | 1皿目投入後に追加注文してもカート内容が崩れない |
+| T18 | S5 Continue Shopping Loop | `2皿目のカレー` と `サイドメニュー追加` の導線で `pending draft` を cart に昇格させてから S2 に戻り、カート保持のまま再度 S5 に戻れるようにする | T05,T08,T13,T16 | 追加注文ループ時に pending draft と cart の境界が崩れない |
 | T19 | S6 Coupon Suggestion Sheet | best match、適用後状態、Maybe Later、価格差分更新を持つ bottom sheet を実装する | T16,T17 | 適用/非適用で S5 の金額が更新される |
 | T20 | S5 First-Arrival Behavior | 初回到達時のみ S6 をハーフオープンし、以後は CTA 起点に戻す制御を入れる | T16,T19 | 強制感なく `自然に提案される` を再現できる |
-| T21 | Mock Place Order Flow | `Place Order` 押下、短い処理演出、モック注文確定、参照番号生成を実装する | T05,T16,T19 | S5 から S8 へ注文確定として遷移できる |
+| T21 | Mock Place Order Flow | `Place Order` 押下、`cartItems + pending draft` の統合確定、短い処理演出、モック注文確定、参照番号生成を実装する | T05,T16,T18,T19 | S5 から S8 へ注文確定として遷移できる。確定後は active order state が初期化される |
 | T22 | S8 Complete Screen | 成功演出、受取情報、注文サマリー、次アクション CTA を実装する | T21,T06 | 完了状態が一画面で明確に分かる |
-| T23 | Post-Complete Navigation | `Browse Menu Again`、`View Saved Combos`、`Change Store` の再訪導線を整理する | T22,T10 | 完了後の再利用導線が破綻しない |
-| T24 | Motion / Haptics Pass | stepper 遷移、トッピング追加、クーポン適用、保存、完了の反応を最小限の気持ちよさに整える | T13,T19,T22 | 動きが長すぎず、主要反応が揃う |
+| T23 | Post-Complete Navigation | `Browse Menu Again`、`View Saved Combos`、`Change Store` の再訪導線を整理する | T22,T10 | 完了後の再利用導線が破綻しない。`Change Store` では cartItems / pending draft / applied coupon を全て破棄して S1 に戻る |
+| T24 | Motion / Haptics Pass | phase 遷移、トッピング追加、クーポン適用、保存、完了の反応を最小限の気持ちよさに整える | T13,T19,T22 | 動きが長すぎず、主要反応が揃う |
 | T25 | Accessibility / Reduce Motion | VoiceOver 順序、色依存回避、Reduce Motion 代替、Dynamic Type 崩れ確認を行う | T08,T12,T16,T22 | 主導線がアクセシビリティ要件を満たす |
-| T26 | Demo QA / Content Sweep | 文言、価格一貫性、CTA優先度、stepper進捗、店舗名/受取時間/次アクション表示を通しで確認する | T07,T08,T09,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25 | PoC デモで詰まらない最低品質に達する |
+| T26 | Demo QA / Content Sweep | 文言、価格一貫性、CTA優先度、phase 進捗、店舗名/受取時間/次アクション表示を通しで確認する | T07,T08,T09,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25 | PoC デモで詰まらない最低品質に達する |
 
 ## 推奨実装順
 
@@ -139,7 +136,7 @@
 ## 初版 PoC で削らないもの
 
 - 店舗選択が注文文脈として常に見えること
-- S3 で stepper により進捗が常に見えること
+- S3 で phase により進捗が常に見えること
 - S3 での価格即時更新
 - S5 でのクーポン提案
 - S5/S3 からのお気に入り保存
@@ -157,7 +154,7 @@
 ## タスク分解上の注意点
 
 - `S4 Saved Combos` は専用ワイヤー未整備のため、初版は `再開の速さ` を優先した最小UIでよい
-- `S3 Curry Detail / Customize` の具体的な step UI は後続で詰めるが、stepper の順番と状態管理は先に固定する
+- `S3 Curry Detail / Customize` の具体的な phase UI は後続で詰めるが、`基本設定 -> トッピング` の順番と `Review Order` CTA から S5 に抜ける状態管理は先に固定する
 - `S6 Coupon Suggestion` は販促画面ではなく `注文の補助UI` として実装する
 - `S8 Order Complete` は `Done` ではなく `注文できた` と `どう受け取るか` を明示する
 - 画面ごとの装飾差より、主CTA・価格・選択済み状態の統一を優先する
@@ -176,12 +173,14 @@
 
 ### M2 完了条件
 
-- S3 で stepper に沿って注文内容を作り、カートに入れられる
+- S3 で 2 phase に沿って pending draft を作り、Review Order から S5 に渡せる
 - 保存済み構成を再開して再編集できる
 
 ### M3 完了条件
 
 - S5 で注文内容、店舗、価格、クーポン提案を確認できる
+- S5 で `pending draft` を review し、必要なら S3 に戻して再編集できる
+- S5 では `内容を修正` が pending draft のみに対して表示され、cart line item は初版 PoC では read-only である
 - S5 から 2皿目のカレーまたはサイド追加へ戻れる
 - クーポン適用の有無に関わらず注文確定へ進める
 
