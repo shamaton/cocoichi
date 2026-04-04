@@ -55,7 +55,6 @@ struct CurryDetailView: View {
     private let riceOptions = [200, 300, 400, 500]
     private let spiceOptions = [1, 2, 3, 4, 5]
     private let toppingColumns = [GridItem(.flexible(), spacing: POCSpacing.s), GridItem(.flexible(), spacing: POCSpacing.s)]
-    private let sauceColumns = [GridItem(.flexible(), spacing: POCSpacing.s), GridItem(.flexible(), spacing: POCSpacing.s)]
 
     var body: some View {
         Group {
@@ -176,14 +175,11 @@ struct CurryDetailView: View {
         VStack(alignment: .leading, spacing: POCSpacing.l) {
             VStack(alignment: .leading, spacing: POCSpacing.s) {
                 SectionHeader("ソースを選ぶ", subtitle: "最初に味の軸を決めると、後の調整が迷いにくくなります。")
-                LazyVGrid(columns: sauceColumns, spacing: POCSpacing.s) {
+                VStack(spacing: POCSpacing.s) {
                     ForEach(CurrySauceOption.allCases, id: \.self) { sauce in
                         SauceFlavorCard(
-                            title: sauce.rawValue,
-                            subtitle: sauce.subtitle,
-                            value: sauce.priceDelta == 0 ? "追加料金なし" : "+\(sauce.priceDelta.yenText)",
-                            isSelected: draft.currySauce == sauce,
-                            accent: sauce.accentColor
+                            sauce: sauce,
+                            isSelected: draft.currySauce == sauce
                         ) {
                             orderStore.setCurrySauce(sauce)
                         }
@@ -490,48 +486,104 @@ private struct CustomizationPhaseSwitcher: View {
 }
 
 private struct SauceFlavorCard: View {
-    let title: String
-    let subtitle: String
-    let value: String
+    let sauce: CurrySauceOption
     let isSelected: Bool
-    let accent: Color
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                HStack(alignment: .top) {
-                    Text(title)
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(POCColor.textPrimary)
-                    Spacer(minLength: 0)
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                        .foregroundStyle(isSelected ? accent : POCColor.textTertiary)
+            GeometryReader { proxy in
+                HStack(spacing: 0) {
+                    VStack(alignment: .leading, spacing: POCSpacing.s) {
+                        HStack(alignment: .top) {
+                            Text(sauce.cardTitle)
+                                .font(.system(size: 21, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            Spacer(minLength: 0)
+
+                            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                                .font(.title3.weight(.semibold))
+                                .foregroundStyle(isSelected ? .white : Color.white.opacity(0.68))
+                        }
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(sauce.priceBadgeTitle)
+                                .font(.title2.weight(.heavy))
+                                .foregroundStyle(sauce.accentColor)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.72)
+
+                            if let badgeSubtitle = sauce.priceBadgeSubtitle {
+                                Text(badgeSubtitle)
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(POCColor.textSecondary)
+                            }
+                        }
+                        .padding(.horizontal, POCSpacing.s)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                .fill(Color.white.opacity(0.96))
+                        )
+
+                        Spacer(minLength: 0)
+
+                        Text(sauce.subtitle)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(Color.white.opacity(0.96))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(POCSpacing.m)
+                    .frame(width: max(proxy.size.width * 0.42, 150), height: proxy.size.height, alignment: .leading)
+                    .background(sauce.accentColor)
+
+                    artwork
+                        .frame(width: proxy.size.width - max(proxy.size.width * 0.42, 150), height: proxy.size.height)
                 }
-
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(POCColor.textSecondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                Spacer(minLength: 0)
-
-                Text(value)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(isSelected ? accent : POCColor.textSecondary)
             }
-            .frame(maxWidth: .infinity, minHeight: 142, alignment: .leading)
-            .padding(POCSpacing.m)
-            .background(
-                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                    .fill(isSelected ? accent.opacity(0.16) : POCColor.elevated)
-            )
+            .frame(height: 170)
+            .clipShape(RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                    .stroke(isSelected ? accent : POCColor.line, lineWidth: 1)
+                    .stroke(isSelected ? sauce.accentColor : POCColor.line, lineWidth: isSelected ? 2 : 1)
             )
+            .shadow(color: Color.black.opacity(isSelected ? 0.12 : 0.06), radius: isSelected ? 18 : 12, x: 0, y: 8)
         }
         .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var artwork: some View {
+        if let uiImage = loadSauceImage() {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+                .overlay {
+                    LinearGradient(
+                        colors: [Color.clear, Color.black.opacity(0.08)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                }
+                .clipped()
+        } else {
+            LinearGradient(
+                colors: [sauce.accentColor.opacity(0.32), POCColor.elevatedStrong],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+    }
+
+    private func loadSauceImage() -> UIImage? {
+        let resourcePath = sauce.imageName as NSString
+        let resourceName = resourcePath.deletingPathExtension
+        let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else { return nil }
+        return UIImage(contentsOfFile: url.path)
     }
 }
 

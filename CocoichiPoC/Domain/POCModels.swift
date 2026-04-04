@@ -186,18 +186,29 @@ enum CouponEligibility: Codable, Hashable {
 }
 
 enum CurrySauceOption: String, CaseIterable, Codable, Hashable {
-    case original = "オリジナル"
-    case rich = "濃厚ビーフ"
-    case butter = "バターリッチ"
+    case original = "ポークソース"
+    case rich = "ビーフソース"
+    case butter = "ベジソース"
+
+    var cardTitle: String {
+        switch self {
+        case .original:
+            return "ポーク\nソース"
+        case .rich:
+            return "ビーフ\nソース"
+        case .butter:
+            return "ベジ\nソース"
+        }
+    }
 
     var subtitle: String {
         switch self {
         case .original:
-            return "迷わず始める定番のソース"
+            return "ココイチの基準になる、迷わず選べる定番ソース"
         case .rich:
-            return "コクを足したい日に向く深めの味"
+            return "ビーフの旨みが凝縮された、もうひとつの定番ソース"
         case .butter:
-            return "まろやかさを強めたい時の変化球"
+            return "野菜の甘みを感じやすい、軽やかな後味のソース"
         }
     }
 
@@ -219,8 +230,33 @@ enum CurrySauceOption: String, CaseIterable, Codable, Hashable {
         case .rich:
             return Color(hex: 0x6E3A22)
         case .butter:
-            return Color(hex: 0xE5B94E)
+            return Color(hex: 0x5E7D3B)
         }
+    }
+
+    var imageName: String {
+        switch self {
+        case .original:
+            return "pork-source.png"
+        case .rich:
+            return "beef-source.png"
+        case .butter:
+            return "vege-source.png"
+        }
+    }
+
+    var priceBadgeTitle: String {
+        if priceDelta == 0 {
+            return "追加料金なし"
+        }
+        return "\(priceDelta.yenText)増"
+    }
+
+    var priceBadgeSubtitle: String? {
+        if priceDelta == 0 {
+            return nil
+        }
+        return "現在価格に反映"
     }
 }
 
