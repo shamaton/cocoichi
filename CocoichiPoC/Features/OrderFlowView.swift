@@ -493,10 +493,10 @@ private struct SauceFlavorCard: View {
     var body: some View {
         Button(action: action) {
             GeometryReader { proxy in
-                let leftPaneWidth = max(proxy.size.width * 0.44, 162)
+                let leftPaneWidth = max(proxy.size.width * 0.43, 158)
 
                 HStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: POCSpacing.s) {
+                    VStack(alignment: .leading, spacing: 10) {
                         Text(sauce.cardTitle)
                             .font(.system(size: 17, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
@@ -506,7 +506,7 @@ private struct SauceFlavorCard: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(sauce.priceBadgeTitle)
-                                .font(.title3.weight(.heavy))
+                                .font(.headline.weight(.heavy))
                                 .foregroundStyle(sauce.accentColor)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.72)
@@ -518,21 +518,20 @@ private struct SauceFlavorCard: View {
                             }
                         }
                         .padding(.horizontal, POCSpacing.s)
-                        .padding(.vertical, 10)
+                        .padding(.vertical, 8)
                         .background(
                             RoundedRectangle(cornerRadius: 18, style: .continuous)
                                 .fill(Color.white.opacity(0.96))
                         )
 
-                        Spacer(minLength: 0)
-
                         Text(sauce.subtitle)
                             .font(.caption2.weight(.medium))
                             .foregroundStyle(Color.white.opacity(0.96))
                             .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(.horizontal, POCSpacing.m)
-                    .padding(.vertical, 14)
+                    .padding(.vertical, 12)
                     .frame(width: leftPaneWidth, height: proxy.size.height, alignment: .leading)
                     .background(sauce.accentColor)
 
@@ -540,7 +539,7 @@ private struct SauceFlavorCard: View {
                         .frame(width: proxy.size.width - leftPaneWidth, height: proxy.size.height)
                 }
             }
-            .frame(height: 178)
+            .frame(height: 160)
             .clipShape(RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
@@ -570,7 +569,7 @@ private struct SauceFlavorCard: View {
                 .scaledToFill()
                 .overlay {
                     LinearGradient(
-                        colors: [Color.clear, Color.black.opacity(0.08)],
+                        colors: [Color.clear, Color.black.opacity(0.05)],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
