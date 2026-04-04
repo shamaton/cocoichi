@@ -564,17 +564,22 @@ private struct SauceFlavorCard: View {
     @ViewBuilder
     private var artwork: some View {
         if let uiImage = loadSauceImage() {
-            Image(uiImage: uiImage)
-                .resizable()
-                .scaledToFill()
-                .overlay {
-                    LinearGradient(
-                        colors: [Color.clear, Color.black.opacity(0.05)],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                }
-                .clipped()
+            ZStack(alignment: .trailing) {
+                sauce.accentColor
+
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+            }
+            .overlay {
+                LinearGradient(
+                    colors: [Color.clear, Color.black.opacity(0.05)],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            }
+            .clipped()
         } else {
             LinearGradient(
                 colors: [sauce.accentColor.opacity(0.32), POCColor.elevatedStrong],
