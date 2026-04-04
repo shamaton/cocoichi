@@ -175,7 +175,7 @@ struct CurryDetailView: View {
     private func basicsContent(for draft: DraftOrder) -> some View {
         VStack(alignment: .leading, spacing: POCSpacing.l) {
             VStack(alignment: .leading, spacing: POCSpacing.s) {
-                SectionHeader("Select Your Sauce", subtitle: "最初に味の軸を決めると、後の調整が迷いにくくなります。")
+                SectionHeader("ソースを選ぶ", subtitle: "最初に味の軸を決めると、後の調整が迷いにくくなります。")
                 LazyVGrid(columns: sauceColumns, spacing: POCSpacing.s) {
                     ForEach(CurrySauceOption.allCases, id: \.self) { sauce in
                         SauceFlavorCard(
@@ -544,7 +544,7 @@ private struct RicePortionCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Rice Portion", subtitle: "標準量を軸に、片手で前後できる操作を優先します。")
+            SectionHeader("ライスの量", subtitle: "標準量を軸に、片手で前後できる操作を優先します。")
 
             VStack(alignment: .leading, spacing: POCSpacing.m) {
                 HStack {
@@ -592,7 +592,7 @@ private struct SpiceLevelCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Spice Level", subtitle: "辛さは離散選択で迷いなく決められる見せ方を優先します。")
+            SectionHeader("辛さレベル", subtitle: "辛さは離散選択で迷いなく決められる見せ方を優先します。")
 
             VStack(alignment: .leading, spacing: POCSpacing.m) {
                 HStack {
