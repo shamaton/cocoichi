@@ -493,25 +493,20 @@ private struct SauceFlavorCard: View {
     var body: some View {
         Button(action: action) {
             GeometryReader { proxy in
+                let leftPaneWidth = max(proxy.size.width * 0.44, 162)
+
                 HStack(spacing: 0) {
                     VStack(alignment: .leading, spacing: POCSpacing.s) {
-                        HStack(alignment: .top) {
-                            Text(sauce.cardTitle)
-                                .font(.system(size: 21, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
-                                .multilineTextAlignment(.leading)
-                                .fixedSize(horizontal: false, vertical: true)
-
-                            Spacer(minLength: 0)
-
-                            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                                .font(.title3.weight(.semibold))
-                                .foregroundStyle(isSelected ? .white : Color.white.opacity(0.68))
-                        }
+                        Text(sauce.cardTitle)
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.74)
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(sauce.priceBadgeTitle)
-                                .font(.title2.weight(.heavy))
+                                .font(.title3.weight(.heavy))
                                 .foregroundStyle(sauce.accentColor)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.72)
@@ -532,24 +527,36 @@ private struct SauceFlavorCard: View {
                         Spacer(minLength: 0)
 
                         Text(sauce.subtitle)
-                            .font(.caption.weight(.medium))
+                            .font(.caption2.weight(.medium))
                             .foregroundStyle(Color.white.opacity(0.96))
-                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(3)
                     }
-                    .padding(POCSpacing.m)
-                    .frame(width: max(proxy.size.width * 0.42, 150), height: proxy.size.height, alignment: .leading)
+                    .padding(.horizontal, POCSpacing.m)
+                    .padding(.vertical, 14)
+                    .frame(width: leftPaneWidth, height: proxy.size.height, alignment: .leading)
                     .background(sauce.accentColor)
 
                     artwork
-                        .frame(width: proxy.size.width - max(proxy.size.width * 0.42, 150), height: proxy.size.height)
+                        .frame(width: proxy.size.width - leftPaneWidth, height: proxy.size.height)
                 }
             }
-            .frame(height: 170)
+            .frame(height: 178)
             .clipShape(RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                     .stroke(isSelected ? sauce.accentColor : POCColor.line, lineWidth: isSelected ? 2 : 1)
             )
+            .overlay {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                        .fill(Color.black.opacity(0.42))
+                        .overlay {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 60, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
+                }
+            }
             .shadow(color: Color.black.opacity(isSelected ? 0.12 : 0.06), radius: isSelected ? 18 : 12, x: 0, y: 8)
         }
         .buttonStyle(.plain)

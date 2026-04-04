@@ -188,17 +188,10 @@ enum CouponEligibility: Codable, Hashable {
 enum CurrySauceOption: String, CaseIterable, Codable, Hashable {
     case original = "ポークソース"
     case rich = "ビーフソース"
-    case butter = "ココイチベジ"
+    case butter = "ココイチベジソース"
 
     var cardTitle: String {
-        switch self {
-        case .original:
-            return "ポーク\nソース"
-        case .rich:
-            return "ビーフ\nソース"
-        case .butter:
-            return "ココイチ\nベジ"
-        }
+        rawValue
     }
 
     var subtitle: String {
@@ -249,7 +242,7 @@ enum CurrySauceOption: String, CaseIterable, Codable, Hashable {
         if priceDelta == 0 {
             return "追加料金なし"
         }
-        return "\(priceDelta.yenText)増"
+        return "+\(priceDelta.yenText)"
     }
 
     var priceBadgeSubtitle: String? {
