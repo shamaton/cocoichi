@@ -51,6 +51,7 @@ struct CurryDetailView: View {
     @State private var currentPhase: CustomizationPhase = .basics
     @State private var isSauceAmountExpanded = false
     @State private var heroMinY: CGFloat = 0
+    @State private var riceArtworkTransitionDirection: RiceArtworkTransitionDirection = .increase
 
     private let riceOptions = RiceSelectionOption.all
     private let spiceOptions = [1, 2, 3, 4, 5]
@@ -191,9 +192,11 @@ struct CurryDetailView: View {
                 selectedOption: riceSelection(for: draft.riceGrams),
                 options: riceOptions,
                 currySauce: draft.currySauce,
+                artworkTransitionDirection: riceArtworkTransitionDirection,
                 onDecrease: { changeRiceSelection(by: -1, selected: draft.riceGrams) },
                 onIncrease: { changeRiceSelection(by: 1, selected: draft.riceGrams) },
                 onSelect: { option in
+                    riceArtworkTransitionDirection = option.grams >= draft.riceGrams ? .increase : .decrease
                     orderStore.setRiceGrams(option.grams)
                 }
             )
@@ -249,6 +252,7 @@ struct CurryDetailView: View {
     private func changeRiceSelection(by delta: Int, selected: Int) {
         let currentIndex = riceOptions.firstIndex(where: { $0.grams == selected }) ?? nearestRiceOptionIndex(for: selected)
         let nextIndex = min(max(currentIndex + delta, riceOptions.startIndex), riceOptions.index(before: riceOptions.endIndex))
+        riceArtworkTransitionDirection = delta >= 0 ? .increase : .decrease
         orderStore.setRiceGrams(riceOptions[nextIndex].grams)
     }
 
@@ -613,6 +617,7 @@ private struct RicePortionCard: View {
     let selectedOption: RiceSelectionOption
     let options: [RiceSelectionOption]
     let currySauce: CurrySauceOption
+    let artworkTransitionDirection: RiceArtworkTransitionDirection
     let onDecrease: () -> Void
     let onIncrease: () -> Void
     let onSelect: (RiceSelectionOption) -> Void
@@ -626,25 +631,24 @@ private struct RicePortionCard: View {
                     RiceAdjustButton(symbol: "minus", isDisabled: selectedOption.grams == options.first?.grams, action: onDecrease)
                     Spacer()
                     VStack(spacing: POCSpacing.s) {
-                        RicePortionArtwork(imageName: selectedOption.imageName, title: selectedOption.title)
-                            .frame(width: 208, height: 134)
-                            .background(
-                                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                                    .fill(POCColor.elevatedStrong)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                                    .stroke(POCColor.line, lineWidth: 1)
-                            )
+                        RiceArtworkCarousel(
+                            selectedOption: selectedOption,
+                            direction: artworkTransitionDirection
+                        )
 
                         VStack(spacing: 2) {
                             Text(selectedOption.title)
                                 .font(.system(size: 34, weight: .bold, design: .rounded))
+                                .monospacedDigit()
                                 .foregroundStyle(POCColor.curry)
+                                .lineLimit(1)
                             Text(riceHint)
                                 .font(.caption)
                                 .foregroundStyle(POCColor.textSecondary)
+                                .lineLimit(1)
                         }
+                        .frame(width: 220, height: 54)
+                        .multilineTextAlignment(.center)
                     }
                     Spacer()
                     RiceAdjustButton(symbol: "plus", isDisabled: selectedOption.grams == options.last?.grams, action: onIncrease)
@@ -698,6 +702,111 @@ private struct RicePortionCard: View {
             return "300g が基本価格です"
         }
         return "現在の\(currySauce.rawValue)基準の加算です"
+    }
+}
+
+private struct RiceArtworkCarousel: View {
+    let selectedOption: RiceSelectionOption
+    let direction: RiceArtworkTransitionDirection
+
+    @State private var displayedOption: RiceSelectionOption
+    @State private var incomingOption: RiceSelectionOption?
+    @State private var displayedOffset: CGFloat = 0
+    @State private var incomingOffset: CGFloat = 0
+    @State private var animationVersion = 0
+
+    private let artworkWidth: CGFloat = 208
+    private let artworkHeight: CGFloat = 134
+    private let slideDistance: CGFloat = 236
+    private let animationDuration = 0.24
+
+    init(selectedOption: RiceSelectionOption, direction: RiceArtworkTransitionDirection) {
+        self.selectedOption = selectedOption
+        self.direction = direction
+        _displayedOption = State(initialValue: selectedOption)
+    }
+
+    var body: some View {
+        ZStack {
+            artworkView(for: displayedOption)
+                .offset(x: displayedOffset)
+
+            if let incomingOption {
+                artworkView(for: incomingOption)
+                    .offset(x: incomingOffset)
+            }
+        }
+        .frame(width: artworkWidth, height: artworkHeight)
+        .background(
+            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                .fill(POCColor.elevatedStrong)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                .stroke(POCColor.line, lineWidth: 1)
+        )
+        .clipped()
+        .onChange(of: selectedOption.grams, initial: false) { oldValue, newValue in
+            guard oldValue != newValue else { return }
+            startSlideTransition(to: selectedOption)
+        }
+    }
+
+    private func artworkView(for option: RiceSelectionOption) -> some View {
+        RicePortionArtwork(imageName: option.imageName, title: option.title)
+            .frame(width: artworkWidth, height: artworkHeight)
+    }
+
+    private func startSlideTransition(to nextOption: RiceSelectionOption) {
+        if let currentIncomingOption = incomingOption {
+            displayedOption = currentIncomingOption
+            incomingOption = nil
+            displayedOffset = 0
+            incomingOffset = 0
+        }
+
+        animationVersion += 1
+        let currentVersion = animationVersion
+
+        incomingOption = nextOption
+        displayedOffset = 0
+        incomingOffset = direction.incomingOffset(distance: slideDistance)
+
+        withAnimation(.snappy(duration: animationDuration, extraBounce: 0)) {
+            displayedOffset = direction.outgoingOffset(distance: slideDistance)
+            incomingOffset = 0
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration) {
+            guard animationVersion == currentVersion else { return }
+            displayedOption = nextOption
+            incomingOption = nil
+            displayedOffset = 0
+            incomingOffset = 0
+        }
+    }
+}
+
+private enum RiceArtworkTransitionDirection {
+    case increase
+    case decrease
+
+    func outgoingOffset(distance: CGFloat) -> CGFloat {
+        switch self {
+        case .increase:
+            return -distance
+        case .decrease:
+            return distance
+        }
+    }
+
+    func incomingOffset(distance: CGFloat) -> CGFloat {
+        switch self {
+        case .increase:
+            return distance
+        case .decrease:
+            return -distance
+        }
     }
 }
 
