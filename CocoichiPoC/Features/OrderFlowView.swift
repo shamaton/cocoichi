@@ -643,19 +643,12 @@ private struct RicePortionCard: View {
                     RiceAdjustButton(symbol: "plus", isDisabled: selectedOption.grams == options.last?.grams, action: onIncrease)
                 }
 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: POCSpacing.xs) {
-                        ForEach(options, id: \.grams) { option in
-                            RiceSelectionChip(
-                                option: option,
-                                currySauce: currySauce,
-                                isSelected: selectedOption == option
-                            ) {
-                                onSelect(option)
-                            }
-                        }
-                    }
-                }
+                RiceSelectionStrip(
+                    options: options,
+                    selectedOption: selectedOption,
+                    currySauce: currySauce,
+                    onSelect: onSelect
+                )
             }
             .padding(POCSpacing.m)
             .pocCard(fill: POCColor.elevated)
@@ -668,6 +661,67 @@ private struct RicePortionCard: View {
 
     private var ricePriceDeltaText: String {
         RiceSelectionOption.priceText(for: ricePriceDelta)
+    }
+}
+
+private struct RiceSelectionStrip: View {
+    let options: [RiceSelectionOption]
+    let selectedOption: RiceSelectionOption
+    let currySauce: CurrySauceOption
+    let onSelect: (RiceSelectionOption) -> Void
+
+    private let chipWidth: CGFloat = 100
+    private let stripHeight: CGFloat = 112
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            GeometryReader { geometry in
+                let sideInset = max((geometry.size.width - chipWidth) / 2, 0)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: POCSpacing.xs) {
+                        Color.clear
+                            .frame(width: sideInset, height: 1)
+
+                        ForEach(options, id: \.grams) { option in
+                            RiceSelectionChip(
+                                option: option,
+                                currySauce: currySauce,
+                                isSelected: selectedOption == option
+                            ) {
+                                onSelect(option)
+                            }
+                            .id(option.grams)
+                        }
+
+                        Color.clear
+                            .frame(width: sideInset, height: 1)
+                    }
+                }
+                .onAppear {
+                    scrollToSelected(using: proxy, animated: false)
+                }
+                .onChange(of: selectedOption.grams, initial: false) { _, _ in
+                    scrollToSelected(using: proxy, animated: true)
+                }
+            }
+            .frame(height: stripHeight)
+        }
+    }
+
+    private func scrollToSelected(using proxy: ScrollViewProxy, animated: Bool) {
+        let work = {
+            proxy.scrollTo(selectedOption.grams, anchor: .center)
+        }
+        DispatchQueue.main.async {
+            if animated {
+                withAnimation(.snappy(duration: 0.24, extraBounce: 0)) {
+                    work()
+                }
+            } else {
+                work()
+            }
+        }
     }
 }
 
