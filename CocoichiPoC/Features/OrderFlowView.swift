@@ -52,7 +52,7 @@ struct CurryDetailView: View {
     @State private var isSauceAmountExpanded = false
     @State private var heroMinY: CGFloat = 0
 
-    private let riceOptions = [200, 300, 400, 500]
+    private let riceOptions = RiceSelectionOption.all
     private let spiceOptions = [1, 2, 3, 4, 5]
     private let toppingColumns = [GridItem(.flexible(), spacing: POCSpacing.s), GridItem(.flexible(), spacing: POCSpacing.s)]
 
@@ -188,12 +188,13 @@ struct CurryDetailView: View {
             }
 
             RicePortionCard(
-                selectedGrams: draft.riceGrams,
+                selectedOption: riceSelection(for: draft.riceGrams),
                 options: riceOptions,
+                currySauce: draft.currySauce,
                 onDecrease: { changeRiceSelection(by: -1, selected: draft.riceGrams) },
                 onIncrease: { changeRiceSelection(by: 1, selected: draft.riceGrams) },
-                onSelect: { grams in
-                    orderStore.setRiceGrams(grams)
+                onSelect: { option in
+                    orderStore.setRiceGrams(option.grams)
                 }
             )
 
@@ -246,9 +247,19 @@ struct CurryDetailView: View {
     }
 
     private func changeRiceSelection(by delta: Int, selected: Int) {
-        guard let index = riceOptions.firstIndex(of: selected) else { return }
-        let nextIndex = min(max(index + delta, riceOptions.startIndex), riceOptions.index(before: riceOptions.endIndex))
-        orderStore.setRiceGrams(riceOptions[nextIndex])
+        let currentIndex = riceOptions.firstIndex(where: { $0.grams == selected }) ?? nearestRiceOptionIndex(for: selected)
+        let nextIndex = min(max(currentIndex + delta, riceOptions.startIndex), riceOptions.index(before: riceOptions.endIndex))
+        orderStore.setRiceGrams(riceOptions[nextIndex].grams)
+    }
+
+    private func riceSelection(for grams: Int) -> RiceSelectionOption {
+        riceOptions.first(where: { $0.grams == grams }) ?? riceOptions[nearestRiceOptionIndex(for: grams)]
+    }
+
+    private func nearestRiceOptionIndex(for grams: Int) -> Int {
+        riceOptions.enumerated().min(by: {
+            abs($0.element.grams - grams) < abs($1.element.grams - grams)
+        })?.offset ?? riceOptions.startIndex
     }
 
     @ViewBuilder
@@ -358,7 +369,7 @@ private struct CurryDetailHeroCard: View {
     }
 
     private var currentPriceCaption: String {
-        draft.toppings.isEmpty && draft.currySauce.priceDelta == 0 && draft.sauceAmount.priceDelta == 0
+        draft.toppings.isEmpty && draft.currySauce.priceDelta == 0 && draft.ricePriceDelta == 0 && draft.sauceAmount.priceDelta == 0
             ? "ベース価格"
             : "選択内容を反映"
     }
@@ -599,41 +610,61 @@ private struct SauceFlavorCard: View {
 }
 
 private struct RicePortionCard: View {
-    let selectedGrams: Int
-    let options: [Int]
+    let selectedOption: RiceSelectionOption
+    let options: [RiceSelectionOption]
+    let currySauce: CurrySauceOption
     let onDecrease: () -> Void
     let onIncrease: () -> Void
-    let onSelect: (Int) -> Void
+    let onSelect: (RiceSelectionOption) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("ライスの量", subtitle: "標準量を軸に、片手で前後できる操作を優先します。")
+            SectionHeader("ライスの量", subtitle: "写真を見ながら量感を決めつつ、現在のソースに応じた差額を確認できます。")
 
             VStack(alignment: .leading, spacing: POCSpacing.m) {
                 HStack {
-                    RiceAdjustButton(symbol: "minus", isDisabled: selectedGrams == options.first, action: onDecrease)
+                    RiceAdjustButton(symbol: "minus", isDisabled: selectedOption.grams == options.first?.grams, action: onDecrease)
                     Spacer()
-                    VStack(spacing: 2) {
-                        Text("\(selectedGrams)g")
-                            .font(.system(size: 34, weight: .bold, design: .rounded))
-                            .foregroundStyle(POCColor.curry)
-                        Text(riceHint)
-                            .font(.caption)
-                            .foregroundStyle(POCColor.textSecondary)
+                    VStack(spacing: POCSpacing.s) {
+                        RicePortionArtwork(imageName: selectedOption.imageName, title: selectedOption.title)
+                            .frame(width: 208, height: 134)
+                            .background(
+                                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                                    .fill(POCColor.elevatedStrong)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                                    .stroke(POCColor.line, lineWidth: 1)
+                            )
+
+                        VStack(spacing: 2) {
+                            Text(selectedOption.title)
+                                .font(.system(size: 34, weight: .bold, design: .rounded))
+                                .foregroundStyle(POCColor.curry)
+                            Text(riceHint)
+                                .font(.caption)
+                                .foregroundStyle(POCColor.textSecondary)
+                        }
                     }
                     Spacer()
-                    RiceAdjustButton(symbol: "plus", isDisabled: selectedGrams == options.last, action: onIncrease)
+                    RiceAdjustButton(symbol: "plus", isDisabled: selectedOption.grams == options.last?.grams, action: onIncrease)
                 }
 
-                HStack(spacing: POCSpacing.xs) {
-                    ForEach(options, id: \.self) { grams in
-                        OptionChip(
-                            title: "\(grams)g",
-                            isSelected: selectedGrams == grams,
-                            selectedFill: POCColor.cheese,
-                            selectedForeground: POCColor.textPrimary
-                        ) {
-                            onSelect(grams)
+                HStack(alignment: .firstTextBaseline, spacing: POCSpacing.xs) {
+                    Text(ricePriceDeltaText)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(ricePriceDelta >= 0 ? POCColor.curry : POCColor.success)
+                    Text(priceRuleCaption)
+                        .font(.caption)
+                        .foregroundStyle(POCColor.textSecondary)
+                }
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: POCSpacing.xs) {
+                        ForEach(options, id: \.grams) { option in
+                            RiceSelectionChip(option: option, isSelected: selectedOption == option) {
+                                onSelect(option)
+                            }
                         }
                     }
                 }
@@ -644,7 +675,112 @@ private struct RicePortionCard: View {
     }
 
     private var riceHint: String {
-        selectedGrams >= 400 ? "がっつり寄りの構成です" : "標準寄りで組みやすい量です"
+        selectedOption.grams <= 200 ? "軽めに整えたい時の量です" :
+            (selectedOption.grams <= 350 ? "標準寄りで組みやすい量です" : "がっつり寄りの構成です")
+    }
+
+    private var ricePriceDelta: Int {
+        currySauce.ricePriceDelta(for: selectedOption.grams)
+    }
+
+    private var ricePriceDeltaText: String {
+        if ricePriceDelta == 0 {
+            return "基本価格"
+        }
+        return ricePriceDelta > 0 ? "+\(ricePriceDelta.yenText)" : "-\(abs(ricePriceDelta).yenText)"
+    }
+
+    private var priceRuleCaption: String {
+        if selectedOption.grams < 300 {
+            return "300g より軽めの設定です"
+        }
+        if selectedOption.grams == 300 {
+            return "300g が基本価格です"
+        }
+        return "現在の\(currySauce.rawValue)基準の加算です"
+    }
+}
+
+private struct RiceSelectionOption: Hashable {
+    let grams: Int
+
+    var title: String {
+        "\(grams)g"
+    }
+
+    var imageName: String {
+        "rice_\(grams).png"
+    }
+
+    static let all: [RiceSelectionOption] = [150, 200, 250, 300, 350, 400, 500, 600, 700, 800].map(RiceSelectionOption.init)
+}
+
+private struct RicePortionArtwork: View {
+    let imageName: String
+    let title: String
+
+    var body: some View {
+        Group {
+            if let uiImage = loadRiceImage() {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(.horizontal, POCSpacing.s)
+                    .padding(.vertical, POCSpacing.xs)
+            } else {
+                VStack(spacing: POCSpacing.xs) {
+                    Image(systemName: "takeoutbag.and.cup.and.straw.fill")
+                        .font(.system(size: 30, weight: .semibold))
+                        .foregroundStyle(POCColor.curry)
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(POCColor.textSecondary)
+                }
+            }
+        }
+    }
+
+    private func loadRiceImage() -> UIImage? {
+        let resourcePath = imageName as NSString
+        let resourceName = resourcePath.deletingPathExtension
+        let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
+        let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension, subdirectory: "RiceImages")
+            ?? Bundle.main.url(forResource: resourceName, withExtension: resourceExtension)
+        guard let url else { return nil }
+        return UIImage(contentsOfFile: url.path)
+    }
+}
+
+private struct RiceSelectionChip: View {
+    let option: RiceSelectionOption
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: POCSpacing.xs) {
+                RicePortionArtwork(imageName: option.imageName, title: option.title)
+                    .frame(width: 84, height: 56)
+                    .background(
+                        RoundedRectangle(cornerRadius: POCRadius.chip, style: .continuous)
+                            .fill(isSelected ? POCColor.cheese.opacity(0.2) : Color.white.opacity(0.55))
+                    )
+
+                Text(option.title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+            }
+            .padding(POCSpacing.xs)
+            .background(
+                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                    .fill(isSelected ? POCColor.cheese.opacity(0.3) : POCColor.elevatedStrong)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                    .stroke(isSelected ? POCColor.cheese : POCColor.line, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
 

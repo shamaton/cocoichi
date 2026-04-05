@@ -216,6 +216,26 @@ enum CurrySauceOption: String, CaseIterable, Codable, Hashable {
         }
     }
 
+    func ricePriceDelta(for riceGrams: Int) -> Int {
+        switch riceGrams {
+        case 150:
+            return -90
+        case 200:
+            return -60
+        case 250:
+            return -30
+        case 300:
+            return 0
+        case 350:
+            return self == .rich ? 78 : 65
+        case let grams where grams >= 400 && grams % 100 == 0:
+            let additionalHundreds = (grams - 300) / 100
+            return self == .rich ? additionalHundreds * 157 : additionalHundreds * 130
+        default:
+            return 0
+        }
+    }
+
     var accentColor: Color {
         switch self {
         case .original:
@@ -405,7 +425,11 @@ struct DraftOrder: Identifiable, Hashable, Codable {
     }
 
     var subtotal: Int {
-        menuItem.basePrice + currySauce.priceDelta + sauceAmount.priceDelta + toppings.map(\.price).reduce(0, +)
+        menuItem.basePrice + currySauce.priceDelta + ricePriceDelta + sauceAmount.priceDelta + toppings.map(\.price).reduce(0, +)
+    }
+
+    var ricePriceDelta: Int {
+        currySauce.ricePriceDelta(for: riceGrams)
     }
 
     var discount: Int {

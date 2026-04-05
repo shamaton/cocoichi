@@ -62,6 +62,7 @@
 			A00000000000000000000036 /* pork-source-sweet.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000036 /* pork-source-sweet.png */; };
 			A00000000000000000000037 /* pork-source.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000037 /* pork-source.png */; };
 			A00000000000000000000038 /* vege-source.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000038 /* vege-source.png */; };
+			A00000000000000000000039 /* RiceImages in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000039 /* RiceImages */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -120,6 +121,7 @@
 			B00000000000000000000036 /* pork-source-sweet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-source-sweet.png"; sourceTree = "<group>"; };
 			B00000000000000000000037 /* pork-source.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-source.png"; sourceTree = "<group>"; };
 			B00000000000000000000038 /* vege-source.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "vege-source.png"; sourceTree = "<group>"; };
+			B00000000000000000000039 /* RiceImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = RiceImages; sourceTree = "<group>"; };
 			B0000000000000000000000B /* CocoichiPoC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoichiPoC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -223,6 +225,7 @@
 					C0000000000000000000000C /* CurryGenreImages */,
 					C0000000000000000000000D /* CurrySourceImages */,
 					C0000000000000000000000B /* MenuImages */,
+					B00000000000000000000039 /* RiceImages */,
 				);
 				path = Resources;
 				sourceTree = "<group>";
@@ -394,6 +397,7 @@
 					A00000000000000000000036 /* pork-source-sweet.png in Resources */,
 					A00000000000000000000037 /* pork-source.png in Resources */,
 					A00000000000000000000038 /* vege-source.png in Resources */,
+					A00000000000000000000039 /* RiceImages in Resources */,
 					A0000000000000000000000B /* curry-menu-master.yaml in Resources */,
 				);
 			runOnlyForDeploymentPostprocessing = 0;
