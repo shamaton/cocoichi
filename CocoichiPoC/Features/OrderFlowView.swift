@@ -636,37 +636,21 @@ private struct RicePortionCard: View {
                             direction: artworkTransitionDirection
                         )
 
-                        VStack(spacing: 2) {
-                            Text(selectedOption.title)
-                                .font(.system(size: 34, weight: .bold, design: .rounded))
-                                .monospacedDigit()
-                                .foregroundStyle(POCColor.curry)
-                                .lineLimit(1)
-                            Text(riceHint)
-                                .font(.caption)
-                                .foregroundStyle(POCColor.textSecondary)
-                                .lineLimit(1)
-                        }
-                        .frame(width: 220, height: 54)
-                        .multilineTextAlignment(.center)
+                        RicePriceLine(priceText: ricePriceDeltaText, font: .title3.weight(.bold))
+                            .frame(width: 220, height: 34)
                     }
                     Spacer()
                     RiceAdjustButton(symbol: "plus", isDisabled: selectedOption.grams == options.last?.grams, action: onIncrease)
                 }
 
-                HStack(alignment: .firstTextBaseline, spacing: POCSpacing.xs) {
-                    Text(ricePriceDeltaText)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(ricePriceDelta >= 0 ? POCColor.curry : POCColor.success)
-                    Text(priceRuleCaption)
-                        .font(.caption)
-                        .foregroundStyle(POCColor.textSecondary)
-                }
-
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: POCSpacing.xs) {
                         ForEach(options, id: \.grams) { option in
-                            RiceSelectionChip(option: option, isSelected: selectedOption == option) {
+                            RiceSelectionChip(
+                                option: option,
+                                currySauce: currySauce,
+                                isSelected: selectedOption == option
+                            ) {
                                 onSelect(option)
                             }
                         }
@@ -678,30 +662,12 @@ private struct RicePortionCard: View {
         }
     }
 
-    private var riceHint: String {
-        selectedOption.grams <= 200 ? "軽めに整えたい時の量です" :
-            (selectedOption.grams <= 350 ? "標準寄りで組みやすい量です" : "がっつり寄りの構成です")
-    }
-
     private var ricePriceDelta: Int {
         currySauce.ricePriceDelta(for: selectedOption.grams)
     }
 
     private var ricePriceDeltaText: String {
-        if ricePriceDelta == 0 {
-            return "基本価格"
-        }
-        return ricePriceDelta > 0 ? "+\(ricePriceDelta.yenText)" : "-\(abs(ricePriceDelta).yenText)"
-    }
-
-    private var priceRuleCaption: String {
-        if selectedOption.grams < 300 {
-            return "300g より軽めの設定です"
-        }
-        if selectedOption.grams == 300 {
-            return "300g が基本価格です"
-        }
-        return "現在の\(currySauce.rawValue)基準の加算です"
+        RiceSelectionOption.priceText(for: ricePriceDelta)
     }
 }
 
@@ -754,6 +720,10 @@ private struct RiceArtworkCarousel: View {
 
     private func artworkView(for option: RiceSelectionOption) -> some View {
         RicePortionArtwork(imageName: option.imageName, title: option.title)
+            .overlay(alignment: .top) {
+                RiceGramsBadge(title: option.title)
+                    .padding(.top, POCSpacing.s)
+            }
             .frame(width: artworkWidth, height: artworkHeight)
     }
 
@@ -821,6 +791,19 @@ private struct RiceSelectionOption: Hashable {
         "rice_\(grams).png"
     }
 
+    func ricePriceDelta(for sauce: CurrySauceOption) -> Int {
+        sauce.ricePriceDelta(for: grams)
+    }
+
+    func ricePriceText(for sauce: CurrySauceOption) -> String {
+        Self.priceText(for: ricePriceDelta(for: sauce))
+    }
+
+    static func priceText(for priceDelta: Int) -> String {
+        guard priceDelta != 0 else { return "基本価格" }
+        return priceDelta > 0 ? "+\(priceDelta.yenText)" : "-\(abs(priceDelta).yenText)"
+    }
+
     static let all: [RiceSelectionOption] = [150, 200, 250, 300, 350, 400, 500, 600, 700, 800].map(RiceSelectionOption.init)
 }
 
@@ -862,6 +845,7 @@ private struct RicePortionArtwork: View {
 
 private struct RiceSelectionChip: View {
     let option: RiceSelectionOption
+    let currySauce: CurrySauceOption
     let isSelected: Bool
     let action: () -> Void
 
@@ -869,15 +853,18 @@ private struct RiceSelectionChip: View {
         Button(action: action) {
             VStack(spacing: POCSpacing.xs) {
                 RicePortionArtwork(imageName: option.imageName, title: option.title)
+                    .overlay(alignment: .top) {
+                        RiceGramsBadge(title: option.title, compact: true)
+                            .padding(.top, POCSpacing.xxs)
+                    }
                     .frame(width: 84, height: 56)
                     .background(
                         RoundedRectangle(cornerRadius: POCRadius.chip, style: .continuous)
                             .fill(isSelected ? POCColor.cheese.opacity(0.2) : Color.white.opacity(0.55))
                     )
 
-                Text(option.title)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(POCColor.textPrimary)
+                RicePriceLine(priceText: option.ricePriceText(for: currySauce), font: .caption.weight(.semibold), isCompact: true)
+                    .frame(width: 84, height: 18)
             }
             .padding(POCSpacing.xs)
             .background(
@@ -890,6 +877,36 @@ private struct RiceSelectionChip: View {
             )
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct RiceGramsBadge: View {
+    let title: String
+    var compact = false
+
+    var body: some View {
+        Text(title)
+            .font(compact ? .caption2.weight(.bold) : .subheadline.weight(.bold))
+            .monospacedDigit()
+            .foregroundStyle(Color.white)
+            .padding(.horizontal, compact ? POCSpacing.xs : POCSpacing.s)
+            .padding(.vertical, compact ? 3 : 5)
+            .background(Color.black.opacity(0.38), in: Capsule())
+    }
+}
+
+private struct RicePriceLine: View {
+    let priceText: String
+    let font: Font
+    var isCompact = false
+
+    var body: some View {
+        Text(priceText)
+            .font(font)
+            .monospacedDigit()
+            .foregroundStyle(POCColor.curry)
+        .frame(maxWidth: .infinity)
+        .multilineTextAlignment(.center)
     }
 }
 
