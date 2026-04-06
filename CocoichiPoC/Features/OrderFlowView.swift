@@ -52,9 +52,10 @@ struct CurryDetailView: View {
     @State private var isSauceAmountExpanded = false
     @State private var heroMinY: CGFloat = 0
     @State private var riceArtworkTransitionDirection: RiceArtworkTransitionDirection = .increase
+    @State private var spiceArtworkTransitionDirection: SpiceArtworkTransitionDirection = .increase
 
     private let riceOptions = RiceSelectionOption.all
-    private let spiceOptions = [1, 2, 3, 4, 5]
+    private let spiceOptions = SpiceSelectionOption.all
     private let toppingColumns = [GridItem(.flexible(), spacing: POCSpacing.s), GridItem(.flexible(), spacing: POCSpacing.s)]
 
     var body: some View {
@@ -202,10 +203,14 @@ struct CurryDetailView: View {
             )
 
             SpiceLevelCard(
-                selectedLevel: draft.spiceLevel,
+                selectedOption: spiceSelection(for: draft.spiceLevel),
                 options: spiceOptions,
-                onSelect: { level in
-                    orderStore.setSpiceLevel(level)
+                artworkTransitionDirection: spiceArtworkTransitionDirection,
+                onDecrease: { changeSpiceSelection(by: -1, selected: draft.spiceLevel) },
+                onIncrease: { changeSpiceSelection(by: 1, selected: draft.spiceLevel) },
+                onSelect: { option in
+                    spiceArtworkTransitionDirection = option.level >= draft.spiceLevel ? .increase : .decrease
+                    orderStore.setSpiceLevel(option.level)
                 }
             )
 
@@ -264,6 +269,23 @@ struct CurryDetailView: View {
         riceOptions.enumerated().min(by: {
             abs($0.element.grams - grams) < abs($1.element.grams - grams)
         })?.offset ?? riceOptions.startIndex
+    }
+
+    private func changeSpiceSelection(by delta: Int, selected: Int) {
+        let currentIndex = spiceOptions.firstIndex(where: { $0.level == selected }) ?? nearestSpiceOptionIndex(for: selected)
+        let nextIndex = min(max(currentIndex + delta, spiceOptions.startIndex), spiceOptions.index(before: spiceOptions.endIndex))
+        spiceArtworkTransitionDirection = delta >= 0 ? .increase : .decrease
+        orderStore.setSpiceLevel(spiceOptions[nextIndex].level)
+    }
+
+    private func spiceSelection(for level: Int) -> SpiceSelectionOption {
+        spiceOptions.first(where: { $0.level == level }) ?? spiceOptions[nearestSpiceOptionIndex(for: level)]
+    }
+
+    private func nearestSpiceOptionIndex(for level: Int) -> Int {
+        spiceOptions.enumerated().min(by: {
+            abs($0.element.level - level) < abs($1.element.level - level)
+        })?.offset ?? spiceOptions.startIndex
     }
 
     @ViewBuilder
@@ -964,9 +986,12 @@ private struct RicePriceLine: View {
 }
 
 private struct SpiceLevelCard: View {
-    let selectedLevel: Int
-    let options: [Int]
-    let onSelect: (Int) -> Void
+    let selectedOption: SpiceSelectionOption
+    let options: [SpiceSelectionOption]
+    let artworkTransitionDirection: SpiceArtworkTransitionDirection
+    let onDecrease: () -> Void
+    let onIncrease: () -> Void
+    let onSelect: (SpiceSelectionOption) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
@@ -974,42 +999,327 @@ private struct SpiceLevelCard: View {
 
             VStack(alignment: .leading, spacing: POCSpacing.m) {
                 HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("\(selectedLevel)辛")
-                            .font(.system(size: 32, weight: .bold, design: .rounded))
-                            .foregroundStyle(POCColor.red)
-                        Text(spiceHint)
-                            .font(.caption)
-                            .foregroundStyle(POCColor.textSecondary)
-                    }
-
+                    RiceAdjustButton(symbol: "minus", isDisabled: selectedOption.level == options.first?.level, action: onDecrease)
                     Spacer()
+                    VStack(spacing: POCSpacing.s) {
+                        SpiceArtworkCarousel(
+                            selectedOption: selectedOption,
+                            direction: artworkTransitionDirection
+                        )
 
-                    Image(systemName: selectedLevel >= 4 ? "flame.fill" : "flame")
-                        .font(.system(size: 28, weight: .semibold))
-                        .foregroundStyle(POCColor.red)
-                }
-
-                HStack(spacing: POCSpacing.xs) {
-                    ForEach(options, id: \.self) { level in
-                        OptionChip(
-                            title: "\(level)辛",
-                            isSelected: selectedLevel == level,
-                            selectedFill: POCColor.red,
-                            selectedForeground: .white
-                        ) {
-                            onSelect(level)
-                        }
+                        SpiceHintLine(text: selectedOption.detailText)
+                            .frame(width: 220, height: 34)
                     }
+                    Spacer()
+                    RiceAdjustButton(symbol: "plus", isDisabled: selectedOption.level == options.last?.level, action: onIncrease)
                 }
+
+                SpiceSelectionStrip(
+                    options: options,
+                    selectedOption: selectedOption,
+                    onSelect: onSelect
+                )
             }
             .padding(POCSpacing.m)
             .pocCard(fill: POCColor.elevated)
         }
     }
+}
 
-    private var spiceHint: String {
-        selectedLevel >= 4 ? "辛さを前に出す設定です" : "食べやすさを保った設定です"
+private struct SpiceSelectionStrip: View {
+    let options: [SpiceSelectionOption]
+    let selectedOption: SpiceSelectionOption
+    let onSelect: (SpiceSelectionOption) -> Void
+
+    private let chipWidth: CGFloat = 100
+    private let stripHeight: CGFloat = 112
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            GeometryReader { geometry in
+                let sideInset = max((geometry.size.width - chipWidth) / 2, 0)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: POCSpacing.xs) {
+                        Color.clear
+                            .frame(width: sideInset, height: 1)
+
+                        ForEach(options, id: \.level) { option in
+                            SpiceSelectionChip(option: option, isSelected: selectedOption == option) {
+                                onSelect(option)
+                            }
+                            .id(option.level)
+                        }
+
+                        Color.clear
+                            .frame(width: sideInset, height: 1)
+                    }
+                }
+                .onAppear {
+                    scrollToSelected(using: proxy)
+                }
+            }
+            .frame(height: stripHeight)
+        }
+    }
+
+    private func scrollToSelected(using proxy: ScrollViewProxy) {
+        DispatchQueue.main.async {
+            proxy.scrollTo(selectedOption.level, anchor: .center)
+        }
+    }
+}
+
+private struct SpiceArtworkCarousel: View {
+    let selectedOption: SpiceSelectionOption
+    let direction: SpiceArtworkTransitionDirection
+
+    @State private var displayedOption: SpiceSelectionOption
+    @State private var incomingOption: SpiceSelectionOption?
+    @State private var displayedOffset: CGFloat = 0
+    @State private var incomingOffset: CGFloat = 0
+    @State private var animationVersion = 0
+
+    private let artworkWidth: CGFloat = 208
+    private let artworkHeight: CGFloat = 134
+    private let slideDistance: CGFloat = 236
+    private let animationDuration = 0.24
+
+    init(selectedOption: SpiceSelectionOption, direction: SpiceArtworkTransitionDirection) {
+        self.selectedOption = selectedOption
+        self.direction = direction
+        _displayedOption = State(initialValue: selectedOption)
+    }
+
+    var body: some View {
+        ZStack {
+            artworkView(for: displayedOption)
+                .offset(x: displayedOffset)
+
+            if let incomingOption {
+                artworkView(for: incomingOption)
+                    .offset(x: incomingOffset)
+            }
+        }
+        .frame(width: artworkWidth, height: artworkHeight)
+        .background(
+            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                .fill(POCColor.elevatedStrong)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                .stroke(POCColor.line, lineWidth: 1)
+        )
+        .clipped()
+        .onChange(of: selectedOption.level, initial: false) { oldValue, newValue in
+            guard oldValue != newValue else { return }
+            startSlideTransition(to: selectedOption)
+        }
+    }
+
+    private func artworkView(for option: SpiceSelectionOption) -> some View {
+        SpicePortionArtwork(imageName: option.imageName, title: option.title)
+            .overlay(alignment: .top) {
+                SpiceLevelBadge(title: option.title)
+                    .padding(.top, POCSpacing.s)
+            }
+            .frame(width: artworkWidth, height: artworkHeight)
+    }
+
+    private func startSlideTransition(to nextOption: SpiceSelectionOption) {
+        if let currentIncomingOption = incomingOption {
+            displayedOption = currentIncomingOption
+            incomingOption = nil
+            displayedOffset = 0
+            incomingOffset = 0
+        }
+
+        animationVersion += 1
+        let currentVersion = animationVersion
+
+        incomingOption = nextOption
+        displayedOffset = 0
+        incomingOffset = direction.incomingOffset(distance: slideDistance)
+
+        withAnimation(.snappy(duration: animationDuration, extraBounce: 0)) {
+            displayedOffset = direction.outgoingOffset(distance: slideDistance)
+            incomingOffset = 0
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration) {
+            guard animationVersion == currentVersion else { return }
+            displayedOption = nextOption
+            incomingOption = nil
+            displayedOffset = 0
+            incomingOffset = 0
+        }
+    }
+}
+
+private enum SpiceArtworkTransitionDirection {
+    case increase
+    case decrease
+
+    func outgoingOffset(distance: CGFloat) -> CGFloat {
+        switch self {
+        case .increase:
+            return -distance
+        case .decrease:
+            return distance
+        }
+    }
+
+    func incomingOffset(distance: CGFloat) -> CGFloat {
+        switch self {
+        case .increase:
+            return distance
+        case .decrease:
+            return -distance
+        }
+    }
+}
+
+private struct SpiceSelectionOption: Hashable {
+    let level: Int
+    let imageValue: Int
+    let chipText: String
+    let detailText: String
+
+    var title: String {
+        "\(level)辛"
+    }
+
+    var imageName: String {
+        "spice_\(imageValue).png"
+    }
+
+    static let all: [SpiceSelectionOption] = [
+        SpiceSelectionOption(level: 1, imageValue: 5, chipText: "辛口", detailText: "辛口"),
+        SpiceSelectionOption(level: 2, imageValue: 10, chipText: "2倍", detailText: "2倍"),
+        SpiceSelectionOption(level: 3, imageValue: 20, chipText: "4倍", detailText: "4倍"),
+        SpiceSelectionOption(level: 4, imageValue: 30, chipText: "6倍", detailText: "6倍"),
+        SpiceSelectionOption(level: 5, imageValue: 40, chipText: "12倍", detailText: "12倍"),
+        SpiceSelectionOption(level: 6, imageValue: 50, chipText: "13倍", detailText: "13倍"),
+        SpiceSelectionOption(level: 7, imageValue: 60, chipText: "14倍", detailText: "14倍"),
+        SpiceSelectionOption(level: 8, imageValue: 70, chipText: "16倍", detailText: "16倍"),
+        SpiceSelectionOption(level: 9, imageValue: 80, chipText: "18倍", detailText: "18倍"),
+        SpiceSelectionOption(level: 10, imageValue: 100, chipText: "24倍", detailText: "24倍"),
+        SpiceSelectionOption(level: 15, imageValue: 150, chipText: "36倍", detailText: "36倍"),
+        SpiceSelectionOption(level: 20, imageValue: 200, chipText: "48倍", detailText: "48倍")
+    ]
+}
+
+private struct SpicePortionArtwork: View {
+    let imageName: String
+    let title: String
+
+    var body: some View {
+        Group {
+            if let uiImage = loadSpiceImage() {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(.horizontal, POCSpacing.l)
+                    .padding(.vertical, POCSpacing.xs)
+            } else {
+                VStack(spacing: POCSpacing.xs) {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 30, weight: .semibold))
+                        .foregroundStyle(POCColor.red)
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(POCColor.textSecondary)
+                }
+            }
+        }
+    }
+
+    private func loadSpiceImage() -> UIImage? {
+        let resourcePath = imageName as NSString
+        let resourceName = resourcePath.deletingPathExtension
+        let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
+        let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension, subdirectory: "SpiceImages")
+            ?? Bundle.main.url(forResource: resourceName, withExtension: resourceExtension)
+        guard let url else { return nil }
+        return UIImage(contentsOfFile: url.path)
+    }
+}
+
+private struct SpiceSelectionChip: View {
+    let option: SpiceSelectionOption
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: POCSpacing.xs) {
+                SpicePortionArtwork(imageName: option.imageName, title: option.title)
+                    .overlay(alignment: .top) {
+                        SpiceLevelBadge(title: option.title, compact: true)
+                            .padding(.top, POCSpacing.xxs)
+                    }
+                    .frame(width: 84, height: 56)
+                    .background(
+                        RoundedRectangle(cornerRadius: POCRadius.chip, style: .continuous)
+                            .fill(isSelected ? POCColor.red.opacity(0.16) : Color.white.opacity(0.55))
+                    )
+
+                SpiceHintLine(text: option.chipText, font: .caption.weight(.semibold), isCompact: true)
+                    .frame(width: 84, height: 18)
+            }
+            .padding(POCSpacing.xs)
+            .background(
+                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                    .fill(isSelected ? POCColor.red.opacity(0.22) : POCColor.elevatedStrong)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                    .stroke(isSelected ? POCColor.red : POCColor.line, lineWidth: 1)
+            )
+            .overlay {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                        .fill(Color.black.opacity(0.24))
+                        .overlay {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 34, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
+                }
+            }
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct SpiceLevelBadge: View {
+    let title: String
+    var compact = false
+
+    var body: some View {
+        Text(title)
+            .font(compact ? .caption2.weight(.bold) : .subheadline.weight(.bold))
+            .monospacedDigit()
+            .foregroundStyle(Color.white)
+            .padding(.horizontal, compact ? POCSpacing.xs : POCSpacing.s)
+            .padding(.vertical, compact ? 3 : 5)
+            .background(Color.black.opacity(0.38), in: Capsule())
+    }
+}
+
+private struct SpiceHintLine: View {
+    let text: String
+    var font: Font = .title3.weight(.bold)
+    var isCompact = false
+
+    var body: some View {
+        Text(text)
+            .font(font)
+            .foregroundStyle(POCColor.red)
+            .frame(maxWidth: .infinity)
+            .multilineTextAlignment(.center)
+            .lineLimit(isCompact ? 1 : 2)
+            .minimumScaleFactor(0.75)
     }
 }
 
@@ -1068,34 +1378,6 @@ private struct SauceAmountDisclosureCard: View {
         }
         .padding(POCSpacing.m)
         .pocCard(fill: POCColor.elevated)
-    }
-}
-
-private struct OptionChip: View {
-    let title: String
-    let isSelected: Bool
-    let selectedFill: Color
-    let selectedForeground: Color
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(isSelected ? selectedForeground : POCColor.textPrimary)
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, POCSpacing.s)
-                .padding(.vertical, POCSpacing.xs)
-                .background(
-                    Capsule()
-                        .fill(isSelected ? selectedFill : POCColor.elevatedStrong)
-                )
-                .overlay(
-                    Capsule()
-                        .stroke(isSelected ? selectedFill : POCColor.line, lineWidth: 1)
-                )
-        }
-        .buttonStyle(.plain)
     }
 }
 
