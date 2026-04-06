@@ -1181,31 +1181,30 @@ private enum SpiceArtworkTransitionDirection {
 
 private struct SpiceSelectionOption: Hashable {
     let level: Int
+    let title: String
     let imageValue: Int
     let chipText: String
     let detailText: String
-
-    var title: String {
-        "\(level)辛"
-    }
 
     var imageName: String {
         "spice_\(imageValue).png"
     }
 
     static let all: [SpiceSelectionOption] = [
-        SpiceSelectionOption(level: 1, imageValue: 5, chipText: "辛口", detailText: "辛口"),
-        SpiceSelectionOption(level: 2, imageValue: 10, chipText: "2倍", detailText: "2倍"),
-        SpiceSelectionOption(level: 3, imageValue: 20, chipText: "4倍", detailText: "4倍"),
-        SpiceSelectionOption(level: 4, imageValue: 30, chipText: "6倍", detailText: "6倍"),
-        SpiceSelectionOption(level: 5, imageValue: 40, chipText: "12倍", detailText: "12倍"),
-        SpiceSelectionOption(level: 6, imageValue: 50, chipText: "13倍", detailText: "13倍"),
-        SpiceSelectionOption(level: 7, imageValue: 60, chipText: "14倍", detailText: "14倍"),
-        SpiceSelectionOption(level: 8, imageValue: 70, chipText: "16倍", detailText: "16倍"),
-        SpiceSelectionOption(level: 9, imageValue: 80, chipText: "18倍", detailText: "18倍"),
-        SpiceSelectionOption(level: 10, imageValue: 100, chipText: "24倍", detailText: "24倍"),
-        SpiceSelectionOption(level: 15, imageValue: 150, chipText: "36倍", detailText: "36倍"),
-        SpiceSelectionOption(level: 20, imageValue: 200, chipText: "48倍", detailText: "48倍")
+        SpiceSelectionOption(level: -1, title: "甘口", imageValue: 0, chipText: "甘口", detailText: "辛さが苦手な方やお子様にもオススメ"),
+        SpiceSelectionOption(level: 0, title: "普通", imageValue: 5, chipText: "普通", detailText: "一般的な中辛程度"),
+        SpiceSelectionOption(level: 1, title: "1辛", imageValue: 10, chipText: "辛口", detailText: "辛口"),
+        SpiceSelectionOption(level: 2, title: "2辛", imageValue: 20, chipText: "2倍", detailText: "1辛の約2倍"),
+        SpiceSelectionOption(level: 3, title: "3辛", imageValue: 30, chipText: "4倍", detailText: "1辛の約4倍"),
+        SpiceSelectionOption(level: 4, title: "4辛", imageValue: 40, chipText: "6倍", detailText: "1辛の約6倍"),
+        SpiceSelectionOption(level: 5, title: "5辛", imageValue: 50, chipText: "12倍", detailText: "1辛の約12倍"),
+        SpiceSelectionOption(level: 6, title: "6辛", imageValue: 60, chipText: "13倍", detailText: "1辛の約13倍"),
+        SpiceSelectionOption(level: 7, title: "7辛", imageValue: 70, chipText: "14倍", detailText: "1辛の約14倍"),
+        SpiceSelectionOption(level: 8, title: "8辛", imageValue: 80, chipText: "16倍", detailText: "1辛の約16倍"),
+        SpiceSelectionOption(level: 9, title: "9辛", imageValue: 90, chipText: "18倍", detailText: "1辛の約18倍"),
+        SpiceSelectionOption(level: 10, title: "10辛", imageValue: 100, chipText: "24倍", detailText: "1辛の約24倍"),
+        SpiceSelectionOption(level: 15, title: "15辛", imageValue: 150, chipText: "36倍", detailText: "1辛の約36倍"),
+        SpiceSelectionOption(level: 20, title: "20辛", imageValue: 200, chipText: "48倍", detailText: "1辛の約48倍")
     ]
 }
 
@@ -1529,7 +1528,7 @@ struct SavedCombosView: View {
                                         .foregroundStyle(POCColor.textTertiary)
                                 }
 
-                                Text("\(favorite.draft.spiceLevel)辛 / \(favorite.draft.riceGrams)g / \(favorite.draft.total.yenText)")
+                                Text("\(favorite.draft.spiceLevelText) / \(favorite.draft.riceGrams)g / \(favorite.draft.total.yenText)")
                                     .font(.subheadline.weight(.medium))
 
                                 HStack {
@@ -1889,7 +1888,7 @@ struct DraftSnapshotCard: View {
             }
             SummaryRow(title: "Base", value: draft.menuItem.name)
             SummaryRow(title: "Sauce", value: draft.currySauce.rawValue)
-            SummaryRow(title: "Spice", value: "\(draft.spiceLevel)辛")
+            SummaryRow(title: "Spice", value: draft.spiceLevelText)
             SummaryRow(title: "Rice", value: "\(draft.riceGrams)g")
             SummaryRow(title: "Sauce Amount", value: draft.sauceAmount.rawValue)
             SummaryRow(title: "Topping", value: draft.toppings.isEmpty ? "なし" : draft.toppings.map(\.name).joined(separator: " / "))
@@ -1962,7 +1961,7 @@ private struct CartLineSummaryCard: View {
 
             Text(draft.menuItem.name)
                 .font(.headline.weight(.semibold))
-            Text("\(draft.spiceLevel)辛 / \(draft.riceGrams)g / \(draft.sauceAmount.rawValue)")
+            Text("\(draft.spiceLevelText) / \(draft.riceGrams)g / \(draft.sauceAmount.rawValue)")
                 .font(.subheadline)
                 .foregroundStyle(POCColor.textSecondary)
             Text(draft.toppings.isEmpty ? "トッピングなし" : draft.toppings.map(\.name).joined(separator: " / "))
@@ -1986,7 +1985,7 @@ private struct CompletedOrderCard: View {
             SectionHeader("Your Order")
             ForEach(Array(order.cartItems.enumerated()), id: \.element.id) { index, item in
                 SummaryRow(title: "\(index + 1)皿目", value: item.draft.menuItem.name)
-                SummaryRow(title: "内容", value: "\(item.draft.spiceLevel)辛 / \(item.draft.riceGrams)g / \(item.draft.toppings.isEmpty ? "トッピングなし" : item.draft.toppings.map(\.name).joined(separator: " / "))")
+                SummaryRow(title: "内容", value: "\(item.draft.spiceLevelText) / \(item.draft.riceGrams)g / \(item.draft.toppings.isEmpty ? "トッピングなし" : item.draft.toppings.map(\.name).joined(separator: " / "))")
                 SummaryRow(title: "小計", value: item.subtotal.yenText)
             }
             SummaryRow(title: "Coupon", value: order.appliedCoupon?.displayTitle ?? "-")

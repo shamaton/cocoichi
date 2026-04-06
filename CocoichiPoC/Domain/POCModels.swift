@@ -445,8 +445,19 @@ struct DraftOrder: Identifiable, Hashable, Codable {
         store.pickupLeadTimeText
     }
 
+    var spiceLevelText: String {
+        switch spiceLevel {
+        case -1:
+            return "甘口"
+        case 0:
+            return "普通"
+        default:
+            return "\(spiceLevel)辛"
+        }
+    }
+
     var suggestedFavoriteName: String {
-        "\(menuItem.name) \(spiceLevel)辛"
+        "\(menuItem.name) \(spiceLevelText)"
     }
 
     func toggling(topping: Topping) -> DraftOrder {
