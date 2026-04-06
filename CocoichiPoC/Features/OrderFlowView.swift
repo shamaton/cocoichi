@@ -929,6 +929,17 @@ private struct RiceSelectionChip: View {
                 RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
                     .stroke(isSelected ? POCColor.cheese : POCColor.line, lineWidth: 1)
             )
+            .overlay {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                        .fill(Color.black.opacity(0.24))
+                        .overlay {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 34, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
+                }
+            }
         }
         .buttonStyle(.plain)
     }
