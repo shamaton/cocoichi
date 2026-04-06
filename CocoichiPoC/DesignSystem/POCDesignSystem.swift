@@ -81,25 +81,15 @@ extension View {
 
 struct SectionHeader: View {
     let title: String
-    let subtitle: String?
 
-    init(_ title: String, subtitle: String? = nil) {
+    init(_ title: String) {
         self.title = title
-        self.subtitle = subtitle
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.xs) {
-            Text(title)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(POCColor.textPrimary)
-
-            if let subtitle {
-                Text(subtitle)
-                    .font(.subheadline)
-                    .foregroundStyle(POCColor.textSecondary)
-            }
-        }
+        Text(title)
+            .font(.title3.weight(.semibold))
+            .foregroundStyle(POCColor.textPrimary)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -272,7 +262,6 @@ struct EmptyStateCard: View {
 struct HeroBanner: View {
     let eyebrow: String
     let title: String
-    let subtitle: String
     let accent: [Color]
 
     var body: some View {
@@ -284,10 +273,6 @@ struct HeroBanner: View {
             Text(title)
                 .font(.largeTitle.weight(.bold))
                 .foregroundStyle(.white)
-
-            Text(subtitle)
-                .font(.subheadline)
-                .foregroundStyle(Color.white.opacity(0.9))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(POCSpacing.l)

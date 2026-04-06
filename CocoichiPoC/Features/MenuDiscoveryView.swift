@@ -51,7 +51,7 @@ struct MenuDiscoveryView: View {
 
                     if searchText.isEmpty, let favorite = orderStore.featuredFavorite {
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("For You", subtitle: "Saved Combos から今の気分につながる提案")
+                            SectionHeader("For You")
 
                             Button {
                                 orderStore.resumeFavorite(favorite)
@@ -84,7 +84,7 @@ struct MenuDiscoveryView: View {
 
                     if searchText.isEmpty, !popularItems.isEmpty {
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("Popular Today", subtitle: "写真から気分で選べるおすすめ")
+                            SectionHeader("Popular Today")
 
                             PopularMenuGrid(items: popularItems, contentWidth: contentWidth) { item in
                                 orderStore.beginOrder(with: item)

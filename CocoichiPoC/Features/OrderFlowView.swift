@@ -175,7 +175,7 @@ struct CurryDetailView: View {
     private func basicsContent(for draft: DraftOrder) -> some View {
         VStack(alignment: .leading, spacing: POCSpacing.l) {
             VStack(alignment: .leading, spacing: POCSpacing.s) {
-                SectionHeader("ソースを選ぶ", subtitle: "最初に味の軸を決めると、後の調整が迷いにくくなります。")
+                SectionHeader("ソースを選ぶ")
                 VStack(spacing: POCSpacing.s) {
                     ForEach(CurrySauceOption.allCases, id: \.self) { sauce in
                         SauceFlavorCard(
@@ -228,7 +228,7 @@ struct CurryDetailView: View {
                 )
             } else {
                 VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    SectionHeader("Selected Toppings", subtitle: "外したい時はチップをタップします。")
+                    SectionHeader("Selected Toppings")
                     FlexibleChipGroup(items: draft.toppings) { topping in
                         orderStore.toggleTopping(topping)
                     }
@@ -237,13 +237,13 @@ struct CurryDetailView: View {
 
             if !recommendedToppings(for: draft).isEmpty {
                 VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    SectionHeader("Recommended Toppings", subtitle: "このカレーと相性の良い候補を先に並べます。")
+                    SectionHeader("Recommended Toppings")
                     toppingGrid(recommendedToppings(for: draft), draft: draft)
                 }
             }
 
             VStack(alignment: .leading, spacing: POCSpacing.s) {
-                SectionHeader("More Toppings", subtitle: "定番の追加候補から広げられます。")
+                SectionHeader("More Toppings")
                 toppingGrid(otherToppings(for: draft), draft: draft)
             }
         }
@@ -624,7 +624,7 @@ private struct RicePortionCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("ライスの量", subtitle: "写真を見ながら量感を決めつつ、現在のソースに応じた差額を確認できます。")
+            SectionHeader("ライスの量")
 
             VStack(alignment: .leading, spacing: POCSpacing.m) {
                 HStack {
@@ -970,7 +970,7 @@ private struct SpiceLevelCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("辛さレベル", subtitle: "辛さは離散選択で迷いなく決められる見せ方を優先します。")
+            SectionHeader("辛さレベル")
 
             VStack(alignment: .leading, spacing: POCSpacing.m) {
                 HStack {
@@ -1222,7 +1222,7 @@ struct SavedCombosView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
-                SectionHeader("Saved Combos", subtitle: "いつもの注文を編集前提で再開します。")
+                SectionHeader("Saved Combos")
 
                 if orderStore.favoriteCombos.isEmpty {
                     EmptyStateCard(title: "保存済みの組み合わせはまだありません", message: "S3 か S5 の Save Combo から追加できます。")
@@ -1289,7 +1289,7 @@ struct OrderReviewView: View {
             if orderStore.hasReviewItems {
                 ScrollView {
                     VStack(alignment: .leading, spacing: POCSpacing.l) {
-                        SectionHeader("Pickup", subtitle: "受取店舗と受取目安を最後に確認します。")
+                        SectionHeader("Pickup")
 
                         if let store = orderStore.reviewStore {
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
@@ -1344,7 +1344,7 @@ struct OrderReviewView: View {
                         }
 
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("Add More", subtitle: "1皿目を保ったまま、2皿目や追加メニューを探しに戻れます。")
+                            SectionHeader("Add More")
 
                             HStack(spacing: POCSpacing.s) {
                                 SecondaryCTAButton(title: "2皿目のカレー", systemImage: "plus.circle") {
@@ -1423,7 +1423,6 @@ struct OrderCompleteView: View {
                     HeroBanner(
                         eyebrow: "Done",
                         title: "Order Placed",
-                        subtitle: "ご注文を受け付けました",
                         accent: [POCColor.success, POCColor.green]
                     )
 
@@ -1476,7 +1475,7 @@ struct CouponSuggestionSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: POCSpacing.l) {
-                    SectionHeader("Grab a Saving", subtitle: "この注文で使える候補だけを先に出します。")
+                    SectionHeader("Grab a Saving")
 
                     if let best = orderStore.availableCoupons.first {
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
@@ -1539,7 +1538,7 @@ struct SaveFavoriteSheet: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
-                SectionHeader("Save Combo", subtitle: "気に入った構成を名前付きで保存します。")
+                SectionHeader("Save Combo")
 
                 TextField("Name", text: $name)
                     .padding(.horizontal, POCSpacing.m)
@@ -1587,7 +1586,6 @@ struct DraftSnapshotCard: View {
     let draft: DraftOrder
     let showsCoupon: Bool
     var title = "Current Order"
-    var subtitle: String? = nil
     var fillColor: Color = POCColor.elevated
     var showsStore = false
     var showsPickup = false
@@ -1596,7 +1594,7 @@ struct DraftSnapshotCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
             HStack(alignment: .firstTextBaseline) {
-                SectionHeader(title, subtitle: subtitle)
+                SectionHeader(title)
                 if showsPickup {
                     Spacer(minLength: 0)
                     Text(draft.pickupWindowText)

@@ -10,14 +10,10 @@ struct StoreSelectView: View {
                 HeroBanner(
                     eyebrow: "Welcome",
                     title: "今日は何にする？",
-                    subtitle: "まずは受取店舗を決めて、ネイティブな注文フローに入ります。",
                     accent: [POCColor.curry, POCColor.red]
                 )
 
-                SectionHeader(
-                    "Pickup Store",
-                    subtitle: "店舗を決めたら、そのままメニュー検討へ進みます。ログインは不要です。"
-                )
+                SectionHeader("Pickup Store")
 
                 VStack(spacing: POCSpacing.m) {
                     ForEach(orderStore.stores) { store in
@@ -67,10 +63,7 @@ struct StoreSelectView: View {
                     }
                 }
 
-                SectionHeader(
-                    "Saved Combos",
-                    subtitle: "いつもの組み合わせから始める時短導線。"
-                )
+                SectionHeader("Saved Combos")
 
                 if orderStore.favoriteCombos.isEmpty {
                     EmptyStateCard(
