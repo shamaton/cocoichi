@@ -2,6 +2,20 @@
 
 App Store のレビューを取得する Go CLI を追加しています。
 
+## iOS PoC のローカル実行
+
+Xcode プロジェクトの確認は、基本的にルートの `Makefile` を使います。
+
+```bash
+make diagnose
+make build
+make run
+make test
+make agent-verify
+```
+
+ビルド成果物とログは `build/` 配下に出力されます。必要なら `AGENT_NAME=foo make build` のように agent 名を分けて実行できます。
+
 ## 使い方
 
 1 ページだけ取得する場合:

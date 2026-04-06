@@ -7,3 +7,5 @@
 *.xcworkspace/xcuserdata/
 *.xcodeproj/project.xcworkspace/xcuserdata/
 DerivedData/
+build/
+agents/current_name.txt

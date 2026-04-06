@@ -245,6 +245,10 @@ Read in order:
 - Do not use `/review` as a gate by itself. Use a reviewer subagent with an explicit JSON output contract instead.
 - `scripts/run-codex-review.sh` is legacy-only. Keep it only for reference or exceptional manual use, not as the standard path.
 - Before a review that uses `diff_range: HEAD`, check `git status --short` for untracked files. If a new file must be reviewed before commit, stage it first or use `git add -N` so it is visible to the diff-based review flow.
+- Prefer the repo `Makefile` for local iOS verification instead of ad-hoc `xcodebuild` commands.
+- Standard entry points are `make diagnose`, `make build`, `make run`, `make test`, and `make agent-verify`.
+- Build artifacts and logs are written under `build/`, separated by `AGENT_NAME`.
+- If you need per-agent isolation, set `AGENT_NAME=<name>` before running `make`.
 
 ## When Adding New Docs
 
