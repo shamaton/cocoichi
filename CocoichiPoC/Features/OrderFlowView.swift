@@ -699,28 +699,16 @@ private struct RiceSelectionStrip: View {
                     }
                 }
                 .onAppear {
-                    scrollToSelected(using: proxy, animated: false)
-                }
-                .onChange(of: selectedOption.grams, initial: false) { _, _ in
-                    scrollToSelected(using: proxy, animated: true)
+                    scrollToSelected(using: proxy)
                 }
             }
             .frame(height: stripHeight)
         }
     }
 
-    private func scrollToSelected(using proxy: ScrollViewProxy, animated: Bool) {
-        let work = {
-            proxy.scrollTo(selectedOption.grams, anchor: .center)
-        }
+    private func scrollToSelected(using proxy: ScrollViewProxy) {
         DispatchQueue.main.async {
-            if animated {
-                withAnimation(.snappy(duration: 0.24, extraBounce: 0)) {
-                    work()
-                }
-            } else {
-                work()
-            }
+            proxy.scrollTo(selectedOption.grams, anchor: .center)
         }
     }
 }
