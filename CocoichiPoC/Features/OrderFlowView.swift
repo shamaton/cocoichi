@@ -1191,7 +1191,7 @@ private struct SpiceSelectionOption: Hashable {
     }
 
     static let all: [SpiceSelectionOption] = [
-        SpiceSelectionOption(level: -1, title: "甘口", imageValue: 0, chipText: "甘口", detailText: "辛さが苦手な方やお子様にもオススメ"),
+        SpiceSelectionOption(level: -1, title: "甘口", imageValue: 0, chipText: "甘口", detailText: "辛さが苦手な方にオススメ"),
         SpiceSelectionOption(level: 0, title: "普通", imageValue: 5, chipText: "普通", detailText: "一般的な中辛程度"),
         SpiceSelectionOption(level: 1, title: "1辛", imageValue: 10, chipText: "辛口", detailText: "辛口"),
         SpiceSelectionOption(level: 2, title: "2辛", imageValue: 20, chipText: "2倍", detailText: "1辛の約2倍"),
