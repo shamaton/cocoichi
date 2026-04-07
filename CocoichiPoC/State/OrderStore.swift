@@ -92,7 +92,7 @@ final class OrderStore: ObservableObject {
             store: store,
             menuItem: menuItem,
             currySauce: .original,
-            spiceLevel: 2,
+            spiceLevel: 0,
             riceGrams: 300,
             sauceAmount: .regular,
             toppings: [],
