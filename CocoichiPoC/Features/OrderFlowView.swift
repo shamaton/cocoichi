@@ -1362,7 +1362,10 @@ private struct SauceAmountDisclosureCard: View {
                         }
                     }
                 }
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .transition(.asymmetric(
+                    insertion: .opacity.combined(with: .scale(scale: 0.98, anchor: .top)),
+                    removal: .opacity
+                ))
             }
         }
         .padding(POCSpacing.m)
