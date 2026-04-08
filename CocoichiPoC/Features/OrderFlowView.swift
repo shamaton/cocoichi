@@ -1335,25 +1335,15 @@ private struct SauceAmountDisclosureCard: View {
                 }
             } label: {
                 HStack(spacing: POCSpacing.s) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("ソース量を調整")
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(POCColor.textPrimary)
-                        Text("必要な人だけが開いて微調整する補助設定です。")
-                            .font(.caption)
-                            .foregroundStyle(POCColor.textSecondary)
-                    }
+                    Text("ソース量を調整")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
 
                     Spacer(minLength: 0)
 
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text(selectedAmount.rawValue)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(POCColor.curry)
-                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(POCColor.textTertiary)
-                    }
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(POCColor.textTertiary)
                 }
             }
             .buttonStyle(.plain)
@@ -1362,9 +1352,9 @@ private struct SauceAmountDisclosureCard: View {
                 VStack(spacing: POCSpacing.s) {
                     ForEach(SauceAmountOption.allCases, id: \.self) { amount in
                         SelectionCard(
-                            title: amount.rawValue,
+                            title: amount.cardTitle,
                             subtitle: amount.subtitle,
-                            value: amount.priceDelta == 0 ? "追加料金なし" : "+\(amount.priceDelta.yenText)",
+                            value: RiceSelectionOption.priceText(for: amount.priceDelta),
                             isSelected: selectedAmount == amount,
                             accent: amount.accentColor
                         ) {

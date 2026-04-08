@@ -271,38 +271,72 @@ enum CurrySauceOption: String, CaseIterable, Codable, Hashable {
 }
 
 enum SauceAmountOption: String, CaseIterable, Codable, Hashable {
-    case light = "少なめ"
-    case regular = "ふつう"
-    case extra = "多め"
+    case regular = "普通"
+    case extra = "ソース増し(お玉1杯分)"
+    case extraExtra = "ソース増し増し(お玉2杯分)"
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+
+        switch rawValue {
+        case Self.regular.rawValue, "ふつう", "少なめ":
+            self = .regular
+        case Self.extra.rawValue, "多め":
+            self = .extra
+        case Self.extraExtra.rawValue:
+            self = .extraExtra
+        default:
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unknown sauce amount option: \(rawValue)")
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+
+    var cardTitle: String {
+        switch self {
+        case .regular:
+            return "普通"
+        case .extra:
+            return "ソース増し"
+        case .extraExtra:
+            return "ソース増し増し"
+        }
+    }
 
     var subtitle: String {
         switch self {
-        case .light:
-            return "ライスを軽めに楽しむ"
         case .regular:
-            return "まずは基準の量で確認する"
+            return "増量なし"
         case .extra:
-            return "最後までソース感を残したい"
+            return "お玉1杯分"
+        case .extraExtra:
+            return "お玉2杯分"
         }
     }
 
     var priceDelta: Int {
         switch self {
-        case .light, .regular:
+        case .regular:
             return 0
         case .extra:
-            return 80
+            return 167
+        case .extraExtra:
+            return 334
         }
     }
 
     var accentColor: Color {
         switch self {
-        case .light:
-            return Color(hex: 0xF2D7A6)
         case .regular:
             return Color(hex: 0xB8752C)
         case .extra:
             return Color(hex: 0xB84E2F)
+        case .extraExtra:
+            return Color(hex: 0x9C2F1E)
         }
     }
 }
