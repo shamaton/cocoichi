@@ -68,12 +68,6 @@ struct CurryDetailView: View {
                                 }
                             }
 
-                        CustomizationPhaseSwitcher(currentPhase: .basics) { phase in
-                            if phase == .toppings {
-                                showToppings()
-                            }
-                        }
-
                         VStack(alignment: .leading, spacing: POCSpacing.m) {
                             phaseHeadline(for: .basics)
                             CurryBasicsContent(
@@ -169,25 +163,8 @@ struct CurryToppingsView: View {
                                 }
                             }
 
-                        CustomizationPhaseSwitcher(currentPhase: .toppings) { phase in
-                            if phase == .basics {
-                                navigator.pop()
-                            }
-                        }
-
                         VStack(alignment: .leading, spacing: POCSpacing.m) {
-                            HStack(alignment: .top, spacing: POCSpacing.s) {
-                                phaseHeadline(for: .toppings)
-
-                                Spacer(minLength: 0)
-
-                                Button("基本設定へ戻る") {
-                                    navigator.pop()
-                                }
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(POCColor.curry)
-                            }
-
+                            phaseHeadline(for: .toppings)
                             CurryToppingsContent(draft: draft)
                         }
                     }
@@ -568,54 +545,6 @@ private struct CurryDetailHeroMinYPreferenceKey: PreferenceKey {
 
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
-    }
-}
-
-private struct CustomizationPhaseSwitcher: View {
-    let currentPhase: CustomizationPhase
-    let onSelect: (CustomizationPhase) -> Void
-
-    var body: some View {
-        HStack(spacing: POCSpacing.xs) {
-            ForEach(CustomizationPhase.allCases) { phase in
-                Button {
-                    onSelect(phase)
-                } label: {
-                    HStack(spacing: POCSpacing.s) {
-                        Text("\(phase.rawValue + 1)")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(phase == currentPhase ? Color.white : POCColor.textPrimary)
-                            .frame(width: 24, height: 24)
-                            .background(
-                                Circle()
-                                    .fill(phase == currentPhase ? POCColor.curry : POCColor.elevated)
-                            )
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(phase.title)
-                                .font(.subheadline.weight(.semibold))
-                            Text(phase == .basics ? "ソース・ライス・辛さ" : "追加トッピング")
-                                .font(.caption)
-                                .foregroundStyle(phase == currentPhase ? POCColor.textPrimary.opacity(0.78) : POCColor.textTertiary)
-                        }
-
-                        Spacer(minLength: 0)
-                    }
-                    .foregroundStyle(phase == currentPhase ? POCColor.textPrimary : POCColor.textSecondary)
-                    .padding(.horizontal, POCSpacing.m)
-                    .padding(.vertical, POCSpacing.xs)
-                    .background(
-                        RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                            .fill(phase == currentPhase ? POCColor.elevatedStrong : POCColor.elevated)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                            .stroke(phase == currentPhase ? POCColor.curry.opacity(0.45) : POCColor.line, lineWidth: 1)
-                    )
-                }
-                .buttonStyle(.plain)
-            }
-        }
     }
 }
 
