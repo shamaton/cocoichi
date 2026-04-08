@@ -395,7 +395,7 @@ private struct CurryDetailHeroCard: View {
     }
 
     private var currentPriceCaption: String {
-        draft.toppings.isEmpty && draft.currySauce.priceDelta == 0 && draft.ricePriceDelta == 0 && draft.sauceAmount.priceDelta == 0
+        draft.toppings.isEmpty && draft.currySauce.priceDelta == 0 && draft.ricePriceDelta == 0 && draft.spicePriceDelta == 0 && draft.sauceAmount.priceDelta == 0
             ? "ベース価格"
             : "選択内容を反映"
     }
@@ -1007,7 +1007,7 @@ private struct SpiceLevelCard: View {
                             direction: artworkTransitionDirection
                         )
 
-                        SpiceHintLine(text: selectedOption.detailText)
+                        SpicePriceLine(priceText: selectedOption.priceText)
                             .frame(width: 220, height: 34)
                     }
                     Spacer()
@@ -1123,6 +1123,11 @@ private struct SpiceArtworkCarousel: View {
                 SpiceLevelBadge(title: option.title)
                     .padding(.top, POCSpacing.s)
             }
+            .overlay(alignment: .bottom) {
+                SpiceDetailCaption(text: option.detailText)
+                    .padding(.horizontal, POCSpacing.s)
+                    .padding(.bottom, POCSpacing.s)
+            }
             .frame(width: artworkWidth, height: artworkHeight)
     }
 
@@ -1183,28 +1188,35 @@ private struct SpiceSelectionOption: Hashable {
     let level: Int
     let title: String
     let imageValue: Int
-    let chipText: String
     let detailText: String
 
     var imageName: String {
         "spice_\(imageValue).png"
     }
 
+    var priceDelta: Int {
+        SpiceLevelPricing.priceDelta(for: level)
+    }
+
+    var priceText: String {
+        RiceSelectionOption.priceText(for: priceDelta)
+    }
+
     static let all: [SpiceSelectionOption] = [
-        SpiceSelectionOption(level: -1, title: "甘口", imageValue: 0, chipText: "甘口", detailText: "辛さが苦手な方にオススメ"),
-        SpiceSelectionOption(level: 0, title: "普通", imageValue: 5, chipText: "普通", detailText: "一般的な中辛程度"),
-        SpiceSelectionOption(level: 1, title: "1辛", imageValue: 10, chipText: "辛口", detailText: "辛口"),
-        SpiceSelectionOption(level: 2, title: "2辛", imageValue: 20, chipText: "2倍", detailText: "1辛の約2倍"),
-        SpiceSelectionOption(level: 3, title: "3辛", imageValue: 30, chipText: "4倍", detailText: "1辛の約4倍"),
-        SpiceSelectionOption(level: 4, title: "4辛", imageValue: 40, chipText: "6倍", detailText: "1辛の約6倍"),
-        SpiceSelectionOption(level: 5, title: "5辛", imageValue: 50, chipText: "12倍", detailText: "1辛の約12倍"),
-        SpiceSelectionOption(level: 6, title: "6辛", imageValue: 60, chipText: "13倍", detailText: "1辛の約13倍"),
-        SpiceSelectionOption(level: 7, title: "7辛", imageValue: 70, chipText: "14倍", detailText: "1辛の約14倍"),
-        SpiceSelectionOption(level: 8, title: "8辛", imageValue: 80, chipText: "16倍", detailText: "1辛の約16倍"),
-        SpiceSelectionOption(level: 9, title: "9辛", imageValue: 90, chipText: "18倍", detailText: "1辛の約18倍"),
-        SpiceSelectionOption(level: 10, title: "10辛", imageValue: 100, chipText: "24倍", detailText: "1辛の約24倍"),
-        SpiceSelectionOption(level: 15, title: "15辛", imageValue: 150, chipText: "36倍", detailText: "1辛の約36倍"),
-        SpiceSelectionOption(level: 20, title: "20辛", imageValue: 200, chipText: "48倍", detailText: "1辛の約48倍")
+        SpiceSelectionOption(level: -1, title: "甘口", imageValue: 0, detailText: "辛さが苦手な方にオススメ"),
+        SpiceSelectionOption(level: 0, title: "普通", imageValue: 5, detailText: "一般的な中辛程度"),
+        SpiceSelectionOption(level: 1, title: "1辛", imageValue: 10, detailText: "辛口"),
+        SpiceSelectionOption(level: 2, title: "2辛", imageValue: 20, detailText: "1辛の約2倍"),
+        SpiceSelectionOption(level: 3, title: "3辛", imageValue: 30, detailText: "1辛の約4倍"),
+        SpiceSelectionOption(level: 4, title: "4辛", imageValue: 40, detailText: "1辛の約6倍"),
+        SpiceSelectionOption(level: 5, title: "5辛", imageValue: 50, detailText: "1辛の約12倍"),
+        SpiceSelectionOption(level: 6, title: "6辛", imageValue: 60, detailText: "1辛の約13倍"),
+        SpiceSelectionOption(level: 7, title: "7辛", imageValue: 70, detailText: "1辛の約14倍"),
+        SpiceSelectionOption(level: 8, title: "8辛", imageValue: 80, detailText: "1辛の約16倍"),
+        SpiceSelectionOption(level: 9, title: "9辛", imageValue: 90, detailText: "1辛の約18倍"),
+        SpiceSelectionOption(level: 10, title: "10辛", imageValue: 100, detailText: "1辛の約24倍"),
+        SpiceSelectionOption(level: 15, title: "15辛", imageValue: 150, detailText: "1辛の約36倍"),
+        SpiceSelectionOption(level: 20, title: "20辛", imageValue: 200, detailText: "1辛の約48倍")
     ]
 }
 
@@ -1263,7 +1275,7 @@ private struct SpiceSelectionChip: View {
                             .fill(isSelected ? POCColor.red.opacity(0.16) : Color.white.opacity(0.55))
                     )
 
-                SpiceHintLine(text: option.chipText, font: .caption.weight(.semibold), isCompact: true)
+                SpicePriceLine(priceText: option.priceText, font: .caption.weight(.semibold), isCompact: true)
                     .frame(width: 84, height: 18)
             }
             .padding(POCSpacing.xs)
@@ -1306,14 +1318,32 @@ private struct SpiceLevelBadge: View {
     }
 }
 
-private struct SpiceHintLine: View {
+private struct SpiceDetailCaption: View {
     let text: String
+
+    var body: some View {
+        Text(text)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(Color.white)
+            .lineLimit(2)
+            .minimumScaleFactor(0.75)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, POCSpacing.s)
+            .padding(.vertical, 6)
+            .background(Color.black.opacity(0.38), in: Capsule())
+    }
+}
+
+private struct SpicePriceLine: View {
+    let priceText: String
     var font: Font = .title3.weight(.bold)
     var isCompact = false
 
     var body: some View {
-        Text(text)
+        Text(priceText)
             .font(font)
+            .monospacedDigit()
             .foregroundStyle(POCColor.red)
             .frame(maxWidth: .infinity)
             .multilineTextAlignment(.center)

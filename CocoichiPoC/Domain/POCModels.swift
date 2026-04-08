@@ -10,6 +10,33 @@ enum Pricing {
     }
 }
 
+enum SpiceLevelPricing {
+    static func priceDelta(for level: Int) -> Int {
+        switch level {
+        case -1, 0:
+            return 0
+        case 1:
+            return 25
+        case 2:
+            return 50
+        case 3:
+            return 75
+        case 4:
+            return 100
+        case 5:
+            return 125
+        case 6...10:
+            return 150
+        case 15:
+            return 175
+        case 20:
+            return 200
+        default:
+            return 0
+        }
+    }
+}
+
 enum MenuTag: String, CaseIterable, Codable, Hashable {
     case staple = "定番"
     case recommended = "おすすめ"
@@ -459,11 +486,15 @@ struct DraftOrder: Identifiable, Hashable, Codable {
     }
 
     var subtotal: Int {
-        menuItem.basePrice + currySauce.priceDelta + ricePriceDelta + sauceAmount.priceDelta + toppings.map(\.price).reduce(0, +)
+        menuItem.basePrice + currySauce.priceDelta + ricePriceDelta + spicePriceDelta + sauceAmount.priceDelta + toppings.map(\.price).reduce(0, +)
     }
 
     var ricePriceDelta: Int {
         currySauce.ricePriceDelta(for: riceGrams)
+    }
+
+    var spicePriceDelta: Int {
+        SpiceLevelPricing.priceDelta(for: spiceLevel)
     }
 
     var discount: Int {
