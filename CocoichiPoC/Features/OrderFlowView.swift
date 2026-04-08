@@ -1334,10 +1334,19 @@ private struct SauceAmountDisclosureCard: View {
                     isExpanded.toggle()
                 }
             } label: {
-                HStack(spacing: POCSpacing.s) {
-                    Text("ソース量を調整")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(POCColor.textPrimary)
+                HStack(alignment: .top, spacing: POCSpacing.s) {
+                    VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                        Text("ソース量を調整")
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(POCColor.textPrimary)
+
+                        if !isExpanded {
+                            Text("\(selectedAmount.cardTitle)(\(RiceSelectionOption.priceText(for: selectedAmount.priceDelta)))")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(POCColor.textSecondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
                     Spacer(minLength: 0)
 
