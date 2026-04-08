@@ -48,22 +48,17 @@ struct CurryDetailView: View {
     @EnvironmentObject private var navigator: AppNavigator
     @EnvironmentObject private var orderStore: OrderStore
 
-    @State private var currentPhase: CustomizationPhase = .basics
     @State private var isSauceAmountExpanded = false
     @State private var heroMinY: CGFloat = 0
     @State private var riceArtworkTransitionDirection: RiceArtworkTransitionDirection = .increase
     @State private var spiceArtworkTransitionDirection: SpiceArtworkTransitionDirection = .increase
-
-    private let riceOptions = RiceSelectionOption.all
-    private let spiceOptions = SpiceSelectionOption.all
-    private let toppingColumns = [GridItem(.flexible(), spacing: POCSpacing.s), GridItem(.flexible(), spacing: POCSpacing.s)]
 
     var body: some View {
         Group {
             if let draft = orderStore.draftOrder {
                 ScrollView {
                     VStack(alignment: .leading, spacing: POCSpacing.m) {
-                        CurryDetailHeroCard(draft: draft, phase: currentPhase)
+                        CurryDetailHeroCard(draft: draft, phase: .basics)
                             .background {
                                 GeometryReader { proxy in
                                     Color.clear.preference(
@@ -73,37 +68,20 @@ struct CurryDetailView: View {
                                 }
                             }
 
-                        CustomizationPhaseSwitcher(currentPhase: currentPhase) { phase in
-                            withAnimation(.snappy(duration: 0.28)) {
-                                currentPhase = phase
+                        CustomizationPhaseSwitcher(currentPhase: .basics) { phase in
+                            if phase == .toppings {
+                                showToppings()
                             }
                         }
 
                         VStack(alignment: .leading, spacing: POCSpacing.m) {
-                            HStack(alignment: .top, spacing: POCSpacing.s) {
-                                VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                                    Text(currentPhase.title)
-                                        .font(.title3.weight(.semibold))
-                                        .foregroundStyle(POCColor.textPrimary)
-                                    Text(currentPhase.subtitle)
-                                        .font(.subheadline)
-                                        .foregroundStyle(POCColor.textSecondary)
-                                }
-
-                                Spacer(minLength: 0)
-
-                                if currentPhase == .toppings {
-                                    Button("基本設定へ戻る") {
-                                        withAnimation(.snappy(duration: 0.28)) {
-                                            currentPhase = .basics
-                                        }
-                                    }
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(POCColor.curry)
-                                }
-                            }
-
-                            phaseContent(for: draft)
+                            phaseHeadline(for: .basics)
+                            CurryBasicsContent(
+                                draft: draft,
+                                isSauceAmountExpanded: $isSauceAmountExpanded,
+                                riceArtworkTransitionDirection: $riceArtworkTransitionDirection,
+                                spiceArtworkTransitionDirection: $spiceArtworkTransitionDirection
+                            )
                         }
                     }
                     .padding(POCSpacing.l)
@@ -114,7 +92,7 @@ struct CurryDetailView: View {
                     heroMinY = value
                 }
                 .overlay(alignment: .top) {
-                    CompactCurryDetailHeader(draft: draft, phase: currentPhase)
+                    CompactCurryDetailHeader(draft: draft, phase: .basics)
                         .padding(.horizontal, POCSpacing.l)
                         .padding(.top, POCSpacing.xs)
                         .opacity(showsCompactHeader ? 1 : 0)
@@ -127,17 +105,8 @@ struct CurryDetailView: View {
                         SecondaryCTAButton(title: "Save Combo", systemImage: "star") {
                             navigator.showSheet(.saveFavorite)
                         }
-                        PrimaryCTAButton(
-                            title: "\(currentPhase.actionTitle) \(draft.total.yenText)",
-                            systemImage: currentPhase == .basics ? "arrow.right" : "cart"
-                        ) {
-                            if currentPhase == .basics {
-                                withAnimation(.snappy(duration: 0.28)) {
-                                    currentPhase = .toppings
-                                }
-                            } else {
-                                navigator.push(.orderReview)
-                            }
+                        PrimaryCTAButton(title: "\(CustomizationPhase.basics.actionTitle) \(draft.total.yenText)", systemImage: "arrow.right") {
+                            showToppings()
                         }
                     }
                     .padding(.horizontal, POCSpacing.l)
@@ -146,7 +115,6 @@ struct CurryDetailView: View {
                     .background(.ultraThinMaterial)
                 }
                 .task(id: draft.id) {
-                    currentPhase = .basics
                     isSauceAmountExpanded = false
                 }
             } else {
@@ -162,18 +130,140 @@ struct CurryDetailView: View {
         heroMinY < -96
     }
 
-    @ViewBuilder
-    private func phaseContent(for draft: DraftOrder) -> some View {
-        switch currentPhase {
-        case .basics:
-            basicsContent(for: draft)
-        case .toppings:
-            toppingsContent(for: draft)
-        }
+    private func showToppings() {
+        guard navigator.path.last != .curryToppings else { return }
+        navigator.push(.curryToppings)
     }
 
     @ViewBuilder
-    private func basicsContent(for draft: DraftOrder) -> some View {
+    private func phaseHeadline(for phase: CustomizationPhase) -> some View {
+        VStack(alignment: .leading, spacing: POCSpacing.xs) {
+            Text(phase.title)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(POCColor.textPrimary)
+            Text(phase.subtitle)
+                .font(.subheadline)
+                .foregroundStyle(POCColor.textSecondary)
+        }
+    }
+}
+
+struct CurryToppingsView: View {
+    @EnvironmentObject private var navigator: AppNavigator
+    @EnvironmentObject private var orderStore: OrderStore
+
+    @State private var heroMinY: CGFloat = 0
+
+    var body: some View {
+        Group {
+            if let draft = orderStore.draftOrder {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: POCSpacing.m) {
+                        CurryDetailHeroCard(draft: draft, phase: .toppings)
+                            .background {
+                                GeometryReader { proxy in
+                                    Color.clear.preference(
+                                        key: CurryDetailHeroMinYPreferenceKey.self,
+                                        value: proxy.frame(in: .named("curryToppingsScroll")).minY
+                                    )
+                                }
+                            }
+
+                        CustomizationPhaseSwitcher(currentPhase: .toppings) { phase in
+                            if phase == .basics {
+                                navigator.pop()
+                            }
+                        }
+
+                        VStack(alignment: .leading, spacing: POCSpacing.m) {
+                            HStack(alignment: .top, spacing: POCSpacing.s) {
+                                phaseHeadline(for: .toppings)
+
+                                Spacer(minLength: 0)
+
+                                Button("基本設定へ戻る") {
+                                    navigator.pop()
+                                }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(POCColor.curry)
+                            }
+
+                            CurryToppingsContent(draft: draft)
+                        }
+                    }
+                    .padding(POCSpacing.l)
+                    .padding(.bottom, POCSpacing.xl)
+                }
+                .coordinateSpace(name: "curryToppingsScroll")
+                .onPreferenceChange(CurryDetailHeroMinYPreferenceKey.self) { value in
+                    heroMinY = value
+                }
+                .overlay(alignment: .top) {
+                    CompactCurryDetailHeader(draft: draft, phase: .toppings)
+                        .padding(.horizontal, POCSpacing.l)
+                        .padding(.top, POCSpacing.xs)
+                        .opacity(showsCompactHeader ? 1 : 0)
+                        .offset(y: showsCompactHeader ? 0 : -12)
+                        .allowsHitTesting(false)
+                }
+                .animation(.snappy(duration: 0.24), value: showsCompactHeader)
+                .safeAreaInset(edge: .bottom) {
+                    HStack(spacing: POCSpacing.s) {
+                        SecondaryCTAButton(title: "Save Combo", systemImage: "star") {
+                            navigator.showSheet(.saveFavorite)
+                        }
+                        PrimaryCTAButton(title: "\(CustomizationPhase.toppings.actionTitle) \(draft.total.yenText)", systemImage: "cart") {
+                            showOrderReview()
+                        }
+                    }
+                    .padding(.horizontal, POCSpacing.l)
+                    .padding(.top, POCSpacing.s)
+                    .padding(.bottom, POCSpacing.s)
+                    .background(.ultraThinMaterial)
+                }
+            } else {
+                EmptyStateCard(title: "選択中の商品がありません", message: "メニュー一覧から商品を選んでください。")
+                    .padding(POCSpacing.l)
+            }
+        }
+        .navigationTitle("Toppings")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var showsCompactHeader: Bool {
+        heroMinY < -96
+    }
+
+    private func showOrderReview() {
+        guard navigator.path.last != .orderReview else { return }
+        navigator.push(.orderReview)
+    }
+
+    @ViewBuilder
+    private func phaseHeadline(for phase: CustomizationPhase) -> some View {
+        VStack(alignment: .leading, spacing: POCSpacing.xs) {
+            Text(phase.title)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(POCColor.textPrimary)
+            Text(phase.subtitle)
+                .font(.subheadline)
+                .foregroundStyle(POCColor.textSecondary)
+        }
+    }
+}
+
+private struct CurryBasicsContent: View {
+    @EnvironmentObject private var orderStore: OrderStore
+
+    let draft: DraftOrder
+    @Binding var isSauceAmountExpanded: Bool
+    @Binding var riceArtworkTransitionDirection: RiceArtworkTransitionDirection
+    @Binding var spiceArtworkTransitionDirection: SpiceArtworkTransitionDirection
+
+    private let riceOptions = RiceSelectionOption.all
+    private let spiceOptions = SpiceSelectionOption.all
+
+    var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.l) {
             VStack(alignment: .leading, spacing: POCSpacing.s) {
                 SectionHeader("ソースを選ぶ")
@@ -223,37 +313,6 @@ struct CurryDetailView: View {
         }
     }
 
-    @ViewBuilder
-    private func toppingsContent(for draft: DraftOrder) -> some View {
-        VStack(alignment: .leading, spacing: POCSpacing.l) {
-            if draft.toppings.isEmpty {
-                EmptyStateCard(
-                    title: "トッピングなしでも進めます",
-                    message: "まずはベースの構成を保ったまま Review に進み、必要ならこの画面で追加してください。"
-                )
-            } else {
-                VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    SectionHeader("Selected Toppings")
-                    FlexibleChipGroup(items: draft.toppings) { topping in
-                        orderStore.toggleTopping(topping)
-                    }
-                }
-            }
-
-            if !recommendedToppings(for: draft).isEmpty {
-                VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    SectionHeader("Recommended Toppings")
-                    toppingGrid(recommendedToppings(for: draft), draft: draft)
-                }
-            }
-
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                SectionHeader("More Toppings")
-                toppingGrid(otherToppings(for: draft), draft: draft)
-            }
-        }
-    }
-
     private func changeRiceSelection(by delta: Int, selected: Int) {
         let currentIndex = riceOptions.firstIndex(where: { $0.grams == selected }) ?? nearestRiceOptionIndex(for: selected)
         let nextIndex = min(max(currentIndex + delta, riceOptions.startIndex), riceOptions.index(before: riceOptions.endIndex))
@@ -287,9 +346,47 @@ struct CurryDetailView: View {
             abs($0.element.level - level) < abs($1.element.level - level)
         })?.offset ?? spiceOptions.startIndex
     }
+}
+
+private struct CurryToppingsContent: View {
+    @EnvironmentObject private var orderStore: OrderStore
+
+    let draft: DraftOrder
+
+    private let toppingColumns = [GridItem(.flexible(), spacing: POCSpacing.s), GridItem(.flexible(), spacing: POCSpacing.s)]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.l) {
+            if draft.toppings.isEmpty {
+                EmptyStateCard(
+                    title: "トッピングなしでも進めます",
+                    message: "まずはベースの構成を保ったまま Review に進み、必要ならこの画面で追加してください。"
+                )
+            } else {
+                VStack(alignment: .leading, spacing: POCSpacing.s) {
+                    SectionHeader("Selected Toppings")
+                    FlexibleChipGroup(items: draft.toppings) { topping in
+                        orderStore.toggleTopping(topping)
+                    }
+                }
+            }
+
+            if !recommendedToppings.isEmpty {
+                VStack(alignment: .leading, spacing: POCSpacing.s) {
+                    SectionHeader("Recommended Toppings")
+                    toppingGrid(recommendedToppings)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                SectionHeader("More Toppings")
+                toppingGrid(otherToppings)
+            }
+        }
+    }
 
     @ViewBuilder
-    private func toppingGrid(_ toppings: [Topping], draft: DraftOrder) -> some View {
+    private func toppingGrid(_ toppings: [Topping]) -> some View {
         LazyVGrid(columns: toppingColumns, spacing: POCSpacing.s) {
             ForEach(toppings) { topping in
                 let isSelected = draft.toppings.contains(topping)
@@ -329,12 +426,12 @@ struct CurryDetailView: View {
         }
     }
 
-    private func recommendedToppings(for draft: DraftOrder) -> [Topping] {
+    private var recommendedToppings: [Topping] {
         let recommendedIDs = Set(draft.menuItem.recommendedToppingIDs)
         return orderStore.toppings.filter { recommendedIDs.contains($0.id) }
     }
 
-    private func otherToppings(for draft: DraftOrder) -> [Topping] {
+    private var otherToppings: [Topping] {
         let recommendedIDs = Set(draft.menuItem.recommendedToppingIDs)
         return orderStore.toppings.filter { !recommendedIDs.contains($0.id) }
     }

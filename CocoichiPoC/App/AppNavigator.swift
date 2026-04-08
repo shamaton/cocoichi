@@ -3,6 +3,7 @@ import SwiftUI
 enum AppScreen: Hashable {
     case menuDiscovery
     case curryDetail
+    case curryToppings
     case savedCombos
     case orderReview
     case orderComplete

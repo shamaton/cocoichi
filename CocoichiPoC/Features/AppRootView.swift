@@ -34,6 +34,8 @@ struct AppRootView: View {
             MenuDiscoveryView()
         case .curryDetail:
             CurryDetailView()
+        case .curryToppings:
+            CurryToppingsView()
         case .savedCombos:
             SavedCombosView()
         case .orderReview:
