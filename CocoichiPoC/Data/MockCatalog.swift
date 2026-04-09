@@ -60,8 +60,8 @@ enum MockCatalog {
         let shibuya = stores[0]
         let loinCutlet = menuItems.first(where: { $0.name == "ロースカツカレー" }) ?? menuItems[0]
         let porkCurry = menuItems.first(where: { $0.name == "ポークカレー" }) ?? menuItems[1]
-        let cheese = toppings.first(where: { $0.id == "cheese" }) ?? Topping(id: "cheese", name: "チーズ", price: 240, accentHex: 0xE5B94E)
-        let spinach = toppings.first(where: { $0.id == "spinach" }) ?? Topping(id: "spinach", name: "ほうれん草", price: 230, accentHex: 0x5E7D3B)
+        let cheese = toppings.first(where: { $0.id == "cheese" }) ?? Topping(id: "cheese", name: "チーズ", price: 240, accentHex: 0xE5B94E, group: .other)
+        let spinach = toppings.first(where: { $0.id == "spinach" }) ?? Topping(id: "spinach", name: "ほうれん草", price: 230, accentHex: 0x5E7D3B, group: .vegetable)
 
         return [
             FavoriteCombo(
@@ -99,7 +99,7 @@ enum MockCatalog {
 }
 
 private struct ToppingMasterEntry {
-    let groupName: String
+    let group: ToppingGroup
     let name: String
     let price: Int
 }
@@ -116,7 +116,8 @@ private enum ToppingMasterLoader {
                 id: makeID(for: entry.name, index: index),
                 name: entry.name,
                 price: entry.price,
-                accentHex: accentHex(for: entry.groupName)
+                accentHex: accentHex(for: entry),
+                group: entry.group
             )
         }
     }
@@ -131,19 +132,19 @@ private enum ToppingMasterLoader {
 
     private static func parse(_ source: String) -> [ToppingMasterEntry] {
         var entries: [ToppingMasterEntry] = []
-        var currentGroup: String?
+        var currentGroup: ToppingGroup?
         var currentName: String?
         var currentPrice: Int?
 
         func flushCurrentItem() {
             guard
-                let groupName = currentGroup,
+                let group = currentGroup,
                 let name = currentName,
                 let price = currentPrice
             else { return }
             entries.append(
                 ToppingMasterEntry(
-                    groupName: groupName,
+                    group: group,
                     name: name,
                     price: price
                 )
@@ -162,7 +163,7 @@ private enum ToppingMasterLoader {
 
             if !rawLine.hasPrefix(" "), trimmed.hasSuffix(":") {
                 flushCurrentItem()
-                currentGroup = String(trimmed.dropLast())
+                currentGroup = ToppingGroup(rawValue: String(trimmed.dropLast()))
                 continue
             }
 
@@ -186,18 +187,18 @@ private enum ToppingMasterLoader {
         return entries
     }
 
-    private static func accentHex(for groupName: String) -> UInt {
-        switch groupName {
-        case "肉類のトッピング":
-            return 0xB84E2F
-        case "魚介類のトッピング":
-            return 0x8DA9C4
-        case "野菜類のトッピング":
-            return 0x5E7D3B
-        case "その他のトッピング":
+    private static func accentHex(for entry: ToppingMasterEntry) -> UInt {
+        switch entry.name {
+        case "チーズ":
             return 0xE5B94E
+        case "ほうれん草", "ハーフほうれん草":
+            return 0x5E7D3B
+        case "半熟タマゴ", "ゆでタマゴ", "半熟タマゴタルタルソース", "とろ～りたまフライ", "ハーフスクランブルエッグ", "スクランブルエッグ":
+            return 0xF2D7A6
+        case "ソーセージ(2本)":
+            return 0xB84E2F
         default:
-            return 0xB8752C
+            return entry.group.accentHex
         }
     }
 
@@ -225,10 +226,10 @@ private enum ToppingMasterLoader {
     }
 
     private static let fallbackToppings: [Topping] = [
-        Topping(id: "cheese", name: "チーズ", price: 240, accentHex: 0xE5B94E),
-        Topping(id: "spinach", name: "ほうれん草", price: 230, accentHex: 0x5E7D3B),
-        Topping(id: "egg", name: "半熟タマゴ", price: 110, accentHex: 0xF2D7A6),
-        Topping(id: "sausage", name: "ソーセージ(2本)", price: 159, accentHex: 0xB84E2F),
+        Topping(id: "cheese", name: "チーズ", price: 240, accentHex: 0xE5B94E, group: .other),
+        Topping(id: "spinach", name: "ほうれん草", price: 230, accentHex: 0x5E7D3B, group: .vegetable),
+        Topping(id: "egg", name: "半熟タマゴ", price: 110, accentHex: 0xF2D7A6, group: .other),
+        Topping(id: "sausage", name: "ソーセージ(2本)", price: 159, accentHex: 0xB84E2F, group: .meat),
     ]
 
     private static let fallbackYAML = """

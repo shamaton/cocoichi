@@ -152,7 +152,7 @@ struct CurryToppingsView: View {
         Group {
             if let draft = orderStore.draftOrder {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: POCSpacing.m) {
+                    LazyVStack(alignment: .leading, spacing: POCSpacing.m, pinnedViews: [.sectionHeaders]) {
                         CurryDetailHeroCard(draft: draft, phase: .toppings)
                             .background {
                                 GeometryReader { proxy in
@@ -167,6 +167,8 @@ struct CurryToppingsView: View {
                             phaseHeadline(for: .toppings)
                             CurryToppingsContent(draft: draft)
                         }
+
+                        CurryToppingSectionList(draft: draft)
                     }
                     .padding(POCSpacing.l)
                     .padding(.bottom, POCSpacing.xl)
@@ -330,88 +332,204 @@ private struct CurryToppingsContent: View {
 
     let draft: DraftOrder
 
-    private let toppingColumns = [GridItem(.flexible(), spacing: POCSpacing.s), GridItem(.flexible(), spacing: POCSpacing.s)]
+    var body: some View {
+        if draft.toppings.isEmpty {
+            EmptyStateCard(
+                title: "トッピングなしでも進めます",
+                message: "まずはベースの構成を保ったまま Review に進み、必要ならこの画面で追加してください。"
+            )
+        } else {
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                SectionHeader("Selected Toppings")
+                FlexibleChipGroup(items: draft.toppings) { topping in
+                    orderStore.toggleTopping(topping)
+                }
+            }
+        }
+    }
+}
+
+private struct CurryToppingSectionList: View {
+    @EnvironmentObject private var orderStore: OrderStore
+
+    let draft: DraftOrder
 
     var body: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.l) {
-            if draft.toppings.isEmpty {
-                EmptyStateCard(
-                    title: "トッピングなしでも進めます",
-                    message: "まずはベースの構成を保ったまま Review に進み、必要ならこの画面で追加してください。"
-                )
-            } else {
-                VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    SectionHeader("Selected Toppings")
-                    FlexibleChipGroup(items: draft.toppings) { topping in
-                        orderStore.toggleTopping(topping)
+        ForEach(groupedSections) { section in
+            Section {
+                VStack(spacing: POCSpacing.s) {
+                    ForEach(section.items) { topping in
+                        CompactToppingRow(
+                            topping: topping,
+                            isSelected: selectedToppingIDs.contains(topping.id),
+                            isRecommended: recommendedToppingIDs.contains(topping.id)
+                        ) {
+                            orderStore.toggleTopping(topping)
+                        }
                     }
                 }
-            }
-
-            if !recommendedToppings.isEmpty {
-                VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    SectionHeader("Recommended Toppings")
-                    toppingGrid(recommendedToppings)
-                }
-            }
-
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                SectionHeader("More Toppings")
-                toppingGrid(otherToppings)
+            } header: {
+                StickyToppingGroupHeader(group: section.group)
             }
         }
     }
 
-    @ViewBuilder
-    private func toppingGrid(_ toppings: [Topping]) -> some View {
-        LazyVGrid(columns: toppingColumns, spacing: POCSpacing.s) {
-            ForEach(toppings) { topping in
-                let isSelected = draft.toppings.contains(topping)
-                Button {
-                    orderStore.toggleTopping(topping)
-                } label: {
-                    VStack(alignment: .leading, spacing: POCSpacing.s) {
+    private var selectedToppingIDs: Set<String> {
+        Set(draft.toppings.map(\.id))
+    }
+
+    private var recommendedToppingIDs: Set<String> {
+        Set(draft.menuItem.recommendedToppingIDs)
+    }
+
+    private var groupedSections: [GroupedToppingSection] {
+        ToppingGroup.allCases.compactMap { group in
+            let items = orderStore.toppings
+                .filter { $0.group == group }
+                .sorted(by: toppingSort)
+            guard !items.isEmpty else { return nil }
+            return GroupedToppingSection(group: group, items: items)
+        }
+    }
+
+    private func toppingSort(_ lhs: Topping, _ rhs: Topping) -> Bool {
+        let lhsRecommended = recommendedToppingIDs.contains(lhs.id)
+        let rhsRecommended = recommendedToppingIDs.contains(rhs.id)
+        if lhsRecommended != rhsRecommended {
+            return lhsRecommended && !rhsRecommended
+        }
+        if lhs.price != rhs.price {
+            return lhs.price < rhs.price
+        }
+        return lhs.name < rhs.name
+    }
+}
+
+private struct GroupedToppingSection: Identifiable {
+    let group: ToppingGroup
+    let items: [Topping]
+
+    var id: ToppingGroup { group }
+}
+
+private struct StickyToppingGroupHeader: View {
+    let group: ToppingGroup
+
+    var body: some View {
+        ZStack(alignment: .leading) {
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .fill(group.discoveryCardBackground)
+
+            HStack(spacing: POCSpacing.s) {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color.white.opacity(0.3))
+                    .frame(width: 40, height: 40)
+                    .overlay {
+                        Image(systemName: group.symbolName)
+                            .font(.headline)
+                            .foregroundStyle(.white.opacity(0.92))
+                    }
+
+                Text(group.rawValue)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .lineLimit(1)
+
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, POCSpacing.m)
+            .padding(.vertical, POCSpacing.xs)
+        }
+        .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+        .overlay(
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .stroke(POCColor.line, lineWidth: 1)
+        )
+    }
+}
+
+private struct CompactToppingRow: View {
+    let topping: Topping
+    let isSelected: Bool
+    let isRecommended: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: POCSpacing.m) {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(Color.white.opacity(0.32))
+                    .frame(width: ToppingRowLayout.iconWidth, height: ToppingRowLayout.iconHeight)
+                    .overlay {
+                        Image(systemName: isSelected ? "checkmark.circle.fill" : topping.group.symbolName)
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(isSelected ? topping.accentColor : Color.white.opacity(0.92))
+                    }
+
+                VStack(alignment: .leading, spacing: ToppingRowLayout.contentSpacing) {
+                    HStack(alignment: .top, spacing: POCSpacing.xs) {
                         Text(topping.name)
                             .font(.headline.weight(.semibold))
                             .foregroundStyle(POCColor.textPrimary)
-                        Text("+\(topping.price.yenText)")
-                            .font(.subheadline)
-                            .foregroundStyle(POCColor.textSecondary)
-                        Spacer(minLength: 0)
-                        Text(isSelected ? "Added" : "Add")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(isSelected ? Color.white : POCColor.curry)
-                            .padding(.horizontal, POCSpacing.xs)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule().fill(isSelected ? topping.accentColor : POCColor.background)
-                            )
+                            .lineLimit(2)
+
+                        if isRecommended {
+                            Text("おすすめ")
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(POCColor.curry)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(
+                                    Capsule().fill(Color.white.opacity(0.9))
+                                )
+                        }
                     }
-                    .frame(maxWidth: .infinity, minHeight: 132, alignment: .leading)
-                    .padding(POCSpacing.m)
-                    .background(
-                        RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                            .fill(isSelected ? topping.accentColor.opacity(0.2) : POCColor.elevated)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                            .stroke(isSelected ? topping.accentColor : POCColor.line, lineWidth: 1)
-                    )
+
+                    Text(isSelected ? "追加済みのトッピング" : "このトッピングを注文に追加")
+                        .font(.subheadline)
+                        .foregroundStyle(POCColor.textSecondary)
+                        .lineLimit(1)
                 }
-                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                VStack(alignment: .trailing, spacing: ToppingRowLayout.contentSpacing) {
+                    Text("+\(topping.price.yenText)")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+
+                    Text(isSelected ? "Added" : "Add")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(isSelected ? Color.white : POCColor.curry)
+                        .padding(.horizontal, POCSpacing.xs)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule().fill(isSelected ? topping.accentColor : Color.white.opacity(0.8))
+                        )
+                }
             }
+            .padding(.horizontal, ToppingRowLayout.horizontalPadding)
+            .padding(.vertical, ToppingRowLayout.verticalPadding)
+            .background(
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .fill(topping.group.discoveryCardBackground)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .stroke(isSelected ? topping.accentColor : POCColor.line, lineWidth: 1)
+            )
         }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(topping.name)、\(topping.price.yenText)、\(isSelected ? "追加済み" : "未追加")")
     }
+}
 
-    private var recommendedToppings: [Topping] {
-        let recommendedIDs = Set(draft.menuItem.recommendedToppingIDs)
-        return orderStore.toppings.filter { recommendedIDs.contains($0.id) }
-    }
-
-    private var otherToppings: [Topping] {
-        let recommendedIDs = Set(draft.menuItem.recommendedToppingIDs)
-        return orderStore.toppings.filter { !recommendedIDs.contains($0.id) }
-    }
+private enum ToppingRowLayout {
+    static let iconWidth: CGFloat = 76
+    static let iconHeight: CGFloat = 76
+    static let contentSpacing: CGFloat = POCSpacing.xs
+    static let horizontalPadding: CGFloat = POCSpacing.s
+    static let verticalPadding: CGFloat = POCSpacing.s
 }
 
 private struct CurryDetailHeroCard: View {

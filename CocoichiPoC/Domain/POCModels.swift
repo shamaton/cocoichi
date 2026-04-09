@@ -106,6 +106,68 @@ enum CurryMenuGroup: String, CaseIterable, Codable, Hashable {
     }
 }
 
+enum ToppingGroup: String, CaseIterable, Codable, Hashable {
+    case meat = "肉類のトッピング"
+    case seafood = "魚介類のトッピング"
+    case vegetable = "野菜類のトッピング"
+    case other = "その他のトッピング"
+
+    var accentHex: UInt {
+        switch self {
+        case .meat:
+            return 0xB84E2F
+        case .seafood:
+            return 0x8DA9C4
+        case .vegetable:
+            return 0x5E7D3B
+        case .other:
+            return 0xE5B94E
+        }
+    }
+
+    var discoveryCardBackground: LinearGradient {
+        switch self {
+        case .meat:
+            return LinearGradient(
+                colors: [Color(hex: 0xF8E5DD), Color(hex: 0xF4D8CB)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .seafood:
+            return LinearGradient(
+                colors: [Color(hex: 0xEAF4F8), Color(hex: 0xDDEBF5)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .vegetable:
+            return LinearGradient(
+                colors: [Color(hex: 0xECF3E3), Color(hex: 0xE1ECD2)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .other:
+            return LinearGradient(
+                colors: [Color(hex: 0xF8F0D8), Color(hex: 0xF5E6BE)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .meat:
+            return "fork.knife"
+        case .seafood:
+            return "fish"
+        case .vegetable:
+            return "leaf"
+        case .other:
+            return "sparkles"
+        }
+    }
+}
+
 struct Store: Identifiable, Hashable, Codable {
     let id: String
     let name: String
@@ -200,9 +262,48 @@ struct Topping: Identifiable, Hashable, Codable {
     let name: String
     let price: Int
     let accentHex: UInt
+    let group: ToppingGroup
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case price
+        case accentHex
+        case group
+    }
+
+    init(id: String, name: String, price: Int, accentHex: UInt, group: ToppingGroup = .other) {
+        self.id = id
+        self.name = name
+        self.price = price
+        self.accentHex = accentHex
+        self.group = group
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        price = try container.decode(Int.self, forKey: .price)
+        accentHex = try container.decode(UInt.self, forKey: .accentHex)
+        group = try container.decodeIfPresent(ToppingGroup.self, forKey: .group) ?? Self.inferredGroup(from: accentHex)
+    }
 
     var accentColor: Color {
         Color(hex: accentHex)
+    }
+
+    private static func inferredGroup(from accentHex: UInt) -> ToppingGroup {
+        switch accentHex {
+        case ToppingGroup.meat.accentHex:
+            return .meat
+        case ToppingGroup.seafood.accentHex:
+            return .seafood
+        case ToppingGroup.vegetable.accentHex:
+            return .vegetable
+        default:
+            return .other
+        }
     }
 }
 
@@ -527,8 +628,8 @@ struct DraftOrder: Identifiable, Hashable, Codable {
 
     func toggling(topping: Topping) -> DraftOrder {
         var next = self
-        if next.toppings.contains(topping) {
-            next.toppings.removeAll { $0 == topping }
+        if next.toppings.contains(where: { $0.id == topping.id }) {
+            next.toppings.removeAll { $0.id == topping.id }
         } else {
             next.toppings.append(topping)
         }
