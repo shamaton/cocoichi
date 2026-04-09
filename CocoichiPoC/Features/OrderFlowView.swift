@@ -484,28 +484,12 @@ private struct CompactToppingRow: View {
                                 )
                         }
                     }
-
-                    Text(isSelected ? "追加済みのトッピング" : "このトッピングを注文に追加")
-                        .font(.subheadline)
-                        .foregroundStyle(POCColor.textSecondary)
-                        .lineLimit(1)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                VStack(alignment: .trailing, spacing: ToppingRowLayout.contentSpacing) {
-                    Text("+\(topping.price.yenText)")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(POCColor.textPrimary)
-
-                    Text(isSelected ? "Added" : "Add")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(isSelected ? Color.white : POCColor.curry)
-                        .padding(.horizontal, POCSpacing.xs)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule().fill(isSelected ? topping.accentColor : Color.white.opacity(0.8))
-                        )
-                }
+                Text("+\(topping.price.yenText)")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
             }
             .padding(.horizontal, ToppingRowLayout.horizontalPadding)
             .padding(.vertical, ToppingRowLayout.verticalPadding)
@@ -525,11 +509,11 @@ private struct CompactToppingRow: View {
 }
 
 private enum ToppingRowLayout {
-    static let iconWidth: CGFloat = 76
-    static let iconHeight: CGFloat = 76
-    static let contentSpacing: CGFloat = POCSpacing.xs
+    static let iconWidth: CGFloat = 62
+    static let iconHeight: CGFloat = 62
+    static let contentSpacing: CGFloat = 6
     static let horizontalPadding: CGFloat = POCSpacing.s
-    static let verticalPadding: CGFloat = POCSpacing.s
+    static let verticalPadding: CGFloat = POCSpacing.xs
 }
 
 private struct CurryDetailHeroCard: View {
