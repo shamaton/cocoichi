@@ -1,0 +1,173 @@
+# 取得元: https://www.ichibanya.co.jp/menu/topping.html
+# 取得日: 2026-04-09
+# 価格: 公式サイト掲載の店内飲食価格
+# 注記: 一部店舗では取り扱いメニュー・価格が異なる場合があります
+
+肉類のトッピング:
+  - name: 手仕込ささみカツ(2本)
+    price: 495
+    taxIncludedPrice: 544
+    badges:
+      - 新メニュー
+      - 期間限定メニュー
+  - name: 手仕込ささみカツ(1本)
+    price: 248
+    taxIncludedPrice: 272
+    badges:
+      - 新メニュー
+      - 期間限定メニュー
+  - name: ハンバーグ(1個)
+    price: 150
+    taxIncludedPrice: 165
+  - name: ハーフ豚しゃぶ
+    price: 153
+    taxIncludedPrice: 168
+  - name: ソーセージ(2本)
+    price: 159
+    taxIncludedPrice: 174
+  - name: フライドチキン(3個)
+    price: 167
+    taxIncludedPrice: 183
+  - name: チキンにこみ
+    price: 262
+    taxIncludedPrice: 288
+  - name: フライドチキン(5個)
+    price: 278
+    taxIncludedPrice: 305
+  - name: メンチカツ
+    price: 297
+    taxIncludedPrice: 326
+  - name: 豚しゃぶ
+    price: 306
+    taxIncludedPrice: 336
+  - name: チキンカツ
+    price: 317
+    taxIncludedPrice: 348
+  - name: パリパリチキン
+    price: 317
+    taxIncludedPrice: 348
+  - name: ロースカツ
+    price: 320
+    taxIncludedPrice: 352
+  - name: 手仕込とんかつ
+    price: 497
+    taxIncludedPrice: 546
+  - name: 牛すじ煮込み（一部店舗限定）
+    price: 442
+    taxIncludedPrice: 486
+
+魚介類のトッピング:
+  - name: フィッシュフライ(1本)
+    price: 97
+    taxIncludedPrice: 106
+  - name: ハーフあさり
+    price: 97
+    taxIncludedPrice: 106
+  - name: ハーフイカ
+    price: 120
+    taxIncludedPrice: 132
+  - name: ハーフエビにこみ
+    price: 120
+    taxIncludedPrice: 132
+  - name: ツナ
+    price: 126
+    taxIncludedPrice: 138
+  - name: プチエビフライ
+    price: 160
+    taxIncludedPrice: 176
+    badges:
+      - 新メニュー
+  - name: たっぷりあさり
+    price: 193
+    taxIncludedPrice: 212
+  - name: エビあさり
+    price: 217
+    taxIncludedPrice: 238
+  - name: エビにこみ
+    price: 240
+    taxIncludedPrice: 264
+  - name: イカ
+    price: 240
+    taxIncludedPrice: 264
+  - name: 海の幸
+    price: 337
+    taxIncludedPrice: 370
+
+野菜類のトッピング:
+  - name: 桜えびとあさりの春野菜
+    price: 333
+    taxIncludedPrice: 366
+    badges:
+      - 新メニュー
+      - 期間限定メニュー
+  - name: なす(3個)
+    price: 82
+    taxIncludedPrice: 90
+  - name: ハーフほうれん草
+    price: 115
+    taxIncludedPrice: 126
+  - name: ハーフやさい
+    price: 124
+    taxIncludedPrice: 136
+  - name: コーン
+    price: 83
+    taxIncludedPrice: 91
+  - name: 単品ポテト
+    price: 83
+    taxIncludedPrice: 91
+  - name: 旨辛にんにく
+    price: 159
+    taxIncludedPrice: 174
+  - name: ほうれん草
+    price: 230
+    taxIncludedPrice: 252
+  - name: やさい
+    price: 248
+    taxIncludedPrice: 272
+
+その他のトッピング:
+  - name: わさびタルタル
+    price: 130
+    taxIncludedPrice: 143
+    badges:
+      - 新メニュー
+      - 期間限定メニュー
+  - name: とろ～りたまフライ
+    price: 181
+    taxIncludedPrice: 199
+  - name: ハーフスクランブルエッグ
+    price: 100
+    taxIncludedPrice: 110
+  - name: ハーフきのこ
+    price: 110
+    taxIncludedPrice: 121
+  - name: クリームコロッケ(カニ入り）(1個)
+    price: 110
+    taxIncludedPrice: 121
+  - name: ハーフチーズ
+    price: 120
+    taxIncludedPrice: 132
+  - name: クリーミータルタルソース
+    price: 68
+    taxIncludedPrice: 74
+  - name: 半熟タマゴ
+    price: 110
+    taxIncludedPrice: 120
+  - name: ゆでタマゴ
+    price: 110
+    taxIncludedPrice: 120
+  - name: 半熟タマゴタルタルソース
+    price: 177
+    taxIncludedPrice: 194
+  - name: 納豆
+    price: 152
+    taxIncludedPrice: 167
+  - name: スクランブルエッグ
+    price: 200
+    taxIncludedPrice: 220
+  - name: きのこ
+    price: 220
+    taxIncludedPrice: 242
+  - name: チーズ
+    price: 240
+    taxIncludedPrice: 264

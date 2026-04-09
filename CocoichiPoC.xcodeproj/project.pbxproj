@@ -18,6 +18,7 @@
 		A00000000000000000000009 /* MenuDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000009 /* MenuDiscoveryView.swift */; };
 		A0000000000000000000000A /* OrderFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000A /* OrderFlowView.swift */; };
 		A0000000000000000000000B /* curry-menu-master.yaml in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000C /* curry-menu-master.yaml */; };
+		A0000000000000000000003B /* topping-menu-master.yaml in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003B /* topping-menu-master.yaml */; };
 		A0000000000000000000000C /* pork-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000D /* pork-curry.png */; };
 		A0000000000000000000000D /* beef-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000E /* beef-curry.png */; };
 		A0000000000000000000000E /* chicken-cutlet-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000F /* chicken-cutlet-curry.png */; };
@@ -78,6 +79,7 @@
 		B00000000000000000000009 /* MenuDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuDiscoveryView.swift; sourceTree = "<group>"; };
 		B0000000000000000000000A /* OrderFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderFlowView.swift; sourceTree = "<group>"; };
 		B0000000000000000000000C /* curry-menu-master.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = "curry-menu-master.yaml"; sourceTree = "<group>"; };
+		B0000000000000000000003B /* topping-menu-master.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = "topping-menu-master.yaml"; sourceTree = "<group>"; };
 		B0000000000000000000000D /* pork-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000000E /* beef-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "beef-curry.png"; sourceTree = "<group>"; };
 		B0000000000000000000000F /* chicken-cutlet-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "chicken-cutlet-curry.png"; sourceTree = "<group>"; };
@@ -198,6 +200,7 @@
 			children = (
 				B00000000000000000000005 /* MockCatalog.swift */,
 				B0000000000000000000000C /* curry-menu-master.yaml */,
+				B0000000000000000000003B /* topping-menu-master.yaml */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -403,6 +406,7 @@
 					A00000000000000000000039 /* RiceImages in Resources */,
 					A0000000000000000000003A /* SpiceImages in Resources */,
 					A0000000000000000000000B /* curry-menu-master.yaml in Resources */,
+					A0000000000000000000003B /* topping-menu-master.yaml in Resources */,
 				);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
