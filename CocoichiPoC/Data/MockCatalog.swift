@@ -28,12 +28,7 @@ enum MockCatalog {
         ),
     ]
 
-    static let toppings: [Topping] = [
-        Topping(id: "cheese", name: "チーズ", price: 180, accentHex: 0xE5B94E),
-        Topping(id: "spinach", name: "ほうれん草", price: 120, accentHex: 0x5E7D3B),
-        Topping(id: "egg", name: "半熟たまご", price: 110, accentHex: 0xF2D7A6),
-        Topping(id: "sausage", name: "ソーセージ", price: 240, accentHex: 0xB84E2F),
-    ]
+    static let toppings: [Topping] = ToppingMasterLoader.load()
 
     static let menuItems: [MenuItem] = CurryMenuMasterLoader.load()
 
@@ -65,8 +60,8 @@ enum MockCatalog {
         let shibuya = stores[0]
         let loinCutlet = menuItems.first(where: { $0.name == "ロースカツカレー" }) ?? menuItems[0]
         let porkCurry = menuItems.first(where: { $0.name == "ポークカレー" }) ?? menuItems[1]
-        let cheese = toppings.first(where: { $0.id == "cheese" })!
-        let spinach = toppings.first(where: { $0.id == "spinach" })!
+        let cheese = toppings.first(where: { $0.id == "cheese" }) ?? Topping(id: "cheese", name: "チーズ", price: 240, accentHex: 0xE5B94E)
+        let spinach = toppings.first(where: { $0.id == "spinach" }) ?? Topping(id: "spinach", name: "ほうれん草", price: 230, accentHex: 0x5E7D3B)
 
         return [
             FavoriteCombo(
@@ -101,6 +96,156 @@ enum MockCatalog {
             ),
         ]
     }
+}
+
+private struct ToppingMasterEntry {
+    let groupName: String
+    let name: String
+    let price: Int
+}
+
+private enum ToppingMasterLoader {
+    static func load() -> [Topping] {
+        let entries = parse(loadSource())
+        if entries.isEmpty {
+            return fallbackToppings
+        }
+
+        return entries.enumerated().map { index, entry in
+            Topping(
+                id: makeID(for: entry.name, index: index),
+                name: entry.name,
+                price: entry.price,
+                accentHex: accentHex(for: entry.groupName)
+            )
+        }
+    }
+
+    private static func loadSource() -> String {
+        if let url = Bundle.main.url(forResource: "topping-menu-master", withExtension: "yaml"),
+           let source = try? String(contentsOf: url, encoding: .utf8) {
+            return source
+        }
+        return fallbackYAML
+    }
+
+    private static func parse(_ source: String) -> [ToppingMasterEntry] {
+        var entries: [ToppingMasterEntry] = []
+        var currentGroup: String?
+        var currentName: String?
+        var currentPrice: Int?
+
+        func flushCurrentItem() {
+            guard
+                let groupName = currentGroup,
+                let name = currentName,
+                let price = currentPrice
+            else { return }
+            entries.append(
+                ToppingMasterEntry(
+                    groupName: groupName,
+                    name: name,
+                    price: price
+                )
+            )
+            currentName = nil
+            currentPrice = nil
+        }
+
+        for rawLine in source.components(separatedBy: .newlines) {
+            let normalized = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
+            if normalized.isEmpty || normalized.hasPrefix("#") {
+                continue
+            }
+
+            let trimmed = rawLine.trimmingCharacters(in: .whitespaces)
+
+            if !rawLine.hasPrefix(" "), trimmed.hasSuffix(":") {
+                flushCurrentItem()
+                currentGroup = String(trimmed.dropLast())
+                continue
+            }
+
+            if trimmed.hasPrefix("- ") {
+                flushCurrentItem()
+                let firstKey = String(trimmed.dropFirst(2))
+                if firstKey.hasPrefix("name:") {
+                    currentName = parseValue(from: firstKey)
+                }
+                continue
+            }
+
+            if trimmed.hasPrefix("name:") {
+                currentName = parseValue(from: trimmed)
+            } else if trimmed.hasPrefix("price:") {
+                currentPrice = Int(parseValue(from: trimmed))
+            }
+        }
+
+        flushCurrentItem()
+        return entries
+    }
+
+    private static func accentHex(for groupName: String) -> UInt {
+        switch groupName {
+        case "肉類のトッピング":
+            return 0xB84E2F
+        case "魚介類のトッピング":
+            return 0x8DA9C4
+        case "野菜類のトッピング":
+            return 0x5E7D3B
+        case "その他のトッピング":
+            return 0xE5B94E
+        default:
+            return 0xB8752C
+        }
+    }
+
+    private static func makeID(for name: String, index: Int) -> String {
+        switch name {
+        case "チーズ":
+            return "cheese"
+        case "ほうれん草":
+            return "spinach"
+        case "半熟タマゴ":
+            return "egg"
+        case "ソーセージ(2本)":
+            return "sausage"
+        default:
+            let utf8Hex = name.utf8.map { String(format: "%02x", $0) }.joined()
+            return utf8Hex.isEmpty ? "topping-\(index)" : "topping-\(utf8Hex)"
+        }
+    }
+
+    private static func parseValue(from line: String) -> String {
+        guard let separator = line.firstIndex(of: ":") else { return "" }
+        return line[line.index(after: separator)...]
+            .trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: "\"", with: "")
+    }
+
+    private static let fallbackToppings: [Topping] = [
+        Topping(id: "cheese", name: "チーズ", price: 240, accentHex: 0xE5B94E),
+        Topping(id: "spinach", name: "ほうれん草", price: 230, accentHex: 0x5E7D3B),
+        Topping(id: "egg", name: "半熟タマゴ", price: 110, accentHex: 0xF2D7A6),
+        Topping(id: "sausage", name: "ソーセージ(2本)", price: 159, accentHex: 0xB84E2F),
+    ]
+
+    private static let fallbackYAML = """
+    肉類のトッピング:
+      - name: ソーセージ(2本)
+        price: 159
+
+    野菜類のトッピング:
+      - name: ほうれん草
+        price: 230
+
+    その他のトッピング:
+      - name: 半熟タマゴ
+        price: 110
+      - name: チーズ
+        price: 240
+    """
 }
 
 private struct CurryMenuMasterEntry {
