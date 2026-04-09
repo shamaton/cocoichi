@@ -117,7 +117,8 @@ private enum ToppingMasterLoader {
                 name: entry.name,
                 price: entry.price,
                 accentHex: accentHex(for: entry),
-                group: entry.group
+                group: entry.group,
+                imagePath: imagePath(for: entry)
             )
         }
     }
@@ -215,6 +216,15 @@ private enum ToppingMasterLoader {
         default:
             let utf8Hex = name.utf8.map { String(format: "%02x", $0) }.joined()
             return utf8Hex.isEmpty ? "topping-\(index)" : "topping-\(utf8Hex)"
+        }
+    }
+
+    private static func imagePath(for entry: ToppingMasterEntry) -> String? {
+        switch entry.name {
+        case "ハンバーグ(1個)":
+            return "hamburg-topping.png"
+        default:
+            return nil
         }
     }
 

@@ -461,9 +461,8 @@ private struct CompactToppingRow: View {
                     .fill(Color.white.opacity(0.32))
                     .frame(width: ToppingRowLayout.iconWidth, height: ToppingRowLayout.iconHeight)
                     .overlay {
-                        Image(systemName: isSelected ? "checkmark.circle.fill" : topping.group.symbolName)
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(isSelected ? topping.accentColor : Color.white.opacity(0.92))
+                        toppingArtwork
+                            .padding(ToppingRowLayout.imagePadding)
                     }
 
                 VStack(alignment: .leading, spacing: ToppingRowLayout.contentSpacing) {
@@ -506,11 +505,37 @@ private struct CompactToppingRow: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(topping.name)、\(topping.price.yenText)、\(isSelected ? "追加済み" : "未追加")")
     }
+
+    @ViewBuilder
+    private var toppingArtwork: some View {
+        if let toppingImage {
+            Image(uiImage: toppingImage)
+                .resizable()
+                .scaledToFit()
+        } else {
+            Image(systemName: isSelected ? "checkmark.circle.fill" : topping.group.symbolName)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(isSelected ? topping.accentColor : Color.white.opacity(0.92))
+        }
+    }
+
+    private var toppingImage: UIImage? {
+        guard let imagePath = topping.imagePath else { return nil }
+        let resourcePath = imagePath as NSString
+        let resourceName = resourcePath.deletingPathExtension
+        let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
+        if let bundledImage = UIImage(named: resourceName) {
+            return bundledImage
+        }
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else { return nil }
+        return UIImage(contentsOfFile: url.path)
+    }
 }
 
 private enum ToppingRowLayout {
     static let iconWidth: CGFloat = 62
     static let iconHeight: CGFloat = 62
+    static let imagePadding: CGFloat = 4
     static let contentSpacing: CGFloat = 6
     static let horizontalPadding: CGFloat = POCSpacing.s
     static let verticalPadding: CGFloat = POCSpacing.xs

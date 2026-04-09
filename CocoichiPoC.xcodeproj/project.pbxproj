@@ -19,6 +19,7 @@
 		A0000000000000000000000A /* OrderFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000A /* OrderFlowView.swift */; };
 		A0000000000000000000000B /* curry-menu-master.yaml in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000C /* curry-menu-master.yaml */; };
 		A0000000000000000000003B /* topping-menu-master.yaml in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003B /* topping-menu-master.yaml */; };
+		A0000000000000000000003C /* hamburg-topping.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003C /* hamburg-topping.png */; };
 		A0000000000000000000000C /* pork-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000D /* pork-curry.png */; };
 		A0000000000000000000000D /* beef-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000E /* beef-curry.png */; };
 		A0000000000000000000000E /* chicken-cutlet-curry.png in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000F /* chicken-cutlet-curry.png */; };
@@ -124,9 +125,10 @@
 			B00000000000000000000036 /* pork-source-sweet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-source-sweet.png"; sourceTree = "<group>"; };
 			B00000000000000000000037 /* pork-source.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-source.png"; sourceTree = "<group>"; };
 			B00000000000000000000038 /* vege-source.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "vege-source.png"; sourceTree = "<group>"; };
-			B00000000000000000000039 /* RiceImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = RiceImages; sourceTree = "<group>"; };
-			B0000000000000000000003A /* SpiceImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SpiceImages; sourceTree = "<group>"; };
-			B0000000000000000000000B /* CocoichiPoC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoichiPoC.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B00000000000000000000039 /* RiceImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = RiceImages; sourceTree = "<group>"; };
+		B0000000000000000000003A /* SpiceImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SpiceImages; sourceTree = "<group>"; };
+		B0000000000000000000003C /* hamburg-topping.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ToppingImages/hamburg-topping.png"; sourceTree = "<group>"; };
+		B0000000000000000000000B /* CocoichiPoC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoichiPoC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -230,6 +232,7 @@
 					C0000000000000000000000C /* CurryGenreImages */,
 					C0000000000000000000000D /* CurrySourceImages */,
 					C0000000000000000000000B /* MenuImages */,
+					B0000000000000000000003C /* hamburg-topping.png */,
 					B00000000000000000000039 /* RiceImages */,
 					B0000000000000000000003A /* SpiceImages */,
 				);
@@ -407,6 +410,7 @@
 					A0000000000000000000003A /* SpiceImages in Resources */,
 					A0000000000000000000000B /* curry-menu-master.yaml in Resources */,
 					A0000000000000000000003B /* topping-menu-master.yaml in Resources */,
+					A0000000000000000000003C /* hamburg-topping.png in Resources */,
 				);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

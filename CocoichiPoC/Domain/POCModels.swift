@@ -263,6 +263,7 @@ struct Topping: Identifiable, Hashable, Codable {
     let price: Int
     let accentHex: UInt
     let group: ToppingGroup
+    let imagePath: String?
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -270,14 +271,16 @@ struct Topping: Identifiable, Hashable, Codable {
         case price
         case accentHex
         case group
+        case imagePath
     }
 
-    init(id: String, name: String, price: Int, accentHex: UInt, group: ToppingGroup = .other) {
+    init(id: String, name: String, price: Int, accentHex: UInt, group: ToppingGroup = .other, imagePath: String? = nil) {
         self.id = id
         self.name = name
         self.price = price
         self.accentHex = accentHex
         self.group = group
+        self.imagePath = imagePath
     }
 
     init(from decoder: Decoder) throws {
@@ -287,6 +290,7 @@ struct Topping: Identifiable, Hashable, Codable {
         price = try container.decode(Int.self, forKey: .price)
         accentHex = try container.decode(UInt.self, forKey: .accentHex)
         group = try container.decodeIfPresent(ToppingGroup.self, forKey: .group) ?? Self.inferredGroup(from: accentHex)
+        imagePath = try container.decodeIfPresent(String.self, forKey: .imagePath)
     }
 
     var accentColor: Color {
