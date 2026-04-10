@@ -221,8 +221,34 @@ private enum ToppingMasterLoader {
 
     private static func imagePath(for entry: ToppingMasterEntry) -> String? {
         switch entry.name {
+        case "豚しゃぶ":
+            return "boiled-pork-topping.png"
+        case "ハーフ豚しゃぶ":
+            return "half-boiled-pork-topping.png"
+        case "チキンカツ":
+            return "chicken-cutlet-topping.png"
+        case "フライドチキン(3個)":
+            return "fried-chicken-3-topping.png"
+        case "フライドチキン(5個)":
+            return "fried-chicken-5-topping.png"
         case "ハンバーグ(1個)":
             return "hamburg-topping.png"
+        case "手仕込とんかつ":
+            return "handmade-pork-cutlet-topping.png"
+        case "メンチカツ":
+            return "mench-cutlet-topping.png"
+        case "パリパリチキン":
+            return "crispy-chicken-topping.png"
+        case "ロースカツ":
+            return "pork-cutlet-topping.png"
+        case "手仕込ささみカツ(1本)":
+            return "sasami-cutlet-1-topping.png"
+        case "手仕込ささみカツ(2本)":
+            return "sasami-cutlet-2-topping.png"
+        case "ソーセージ(2本)":
+            return "sausage-2-topping.png"
+        case "チキンにこみ":
+            return "simmered-chicken-topping.png"
         default:
             return nil
         }

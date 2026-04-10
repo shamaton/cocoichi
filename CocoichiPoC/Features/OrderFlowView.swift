@@ -527,7 +527,10 @@ private struct CompactToppingRow: View {
         if let bundledImage = UIImage(named: resourceName) {
             return bundledImage
         }
-        guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else { return nil }
+        if let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) {
+            return UIImage(contentsOfFile: url.path)
+        }
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension, subdirectory: "ToppingImages") else { return nil }
         return UIImage(contentsOfFile: url.path)
     }
 }
