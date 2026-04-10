@@ -52,9 +52,6 @@
   - name: 手仕込とんかつ
     price: 497
     taxIncludedPrice: 546
-  - name: 牛すじ煮込み（一部店舗限定）
-    price: 442
-    taxIncludedPrice: 486
 
 魚介類のトッピング:
   - name: フィッシュフライ(1本)
