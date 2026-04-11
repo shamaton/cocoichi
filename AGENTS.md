@@ -33,6 +33,12 @@ When multiple docs overlap, use this order of precedence:
 
 If you find a conflict, prefer the higher item and then update the lower one later if needed.
 
+## Derived Design Aid
+
+- `DESIGN.md`
+
+`DESIGN.md` is a derived AI-facing design system summary that complements the canonical PoC design docs above and must not override them.
+
 ## Fast Doc Index
 
 ### If you are defining product intent
@@ -88,12 +94,12 @@ Use these docs for:
 
 ### If you are working on visual design
 
-Read:
+Read first:
 
 - `docs/poc-visual-toneboard-2026-03-28.md`
 - `docs/poc-design-tokens-2026-03-28.md`
 
-Use these docs for:
+Use the canonical docs above for:
 
 - visual direction
 - color system
@@ -101,6 +107,15 @@ Use these docs for:
 - material usage
 - motion principles
 - semantic tokens by screen role
+
+Then consult:
+
+- `DESIGN.md`
+
+Use `DESIGN.md` only for:
+
+- AI-facing screen generation guidance
+- summarized visual prompts derived from the canonical docs
 
 ### If you are planning implementation work
 
@@ -234,6 +249,7 @@ Read in order:
 
 - There is a Go CLI in `cmd/appstore-reviews`, but the current PoC planning work is document-driven.
 - The `docs/` directory is the main working area for product and design decisions.
+- `DESIGN.md` is the root-level AI-facing design summary derived from the active PoC design docs.
 - `docs/poc-implementation-tasks-2026-03-29.md` is the execution breakdown for the active PoC docs.
 - Treat the PoC documents as the active workstream.
 
