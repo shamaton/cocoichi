@@ -421,14 +421,27 @@ private struct StickyToppingGroupHeader: View {
                 .fill(group.discoveryCardBackground)
 
             HStack(spacing: POCSpacing.s) {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.white.opacity(0.3))
-                    .frame(width: 40, height: 40)
-                    .overlay {
-                        Image(systemName: group.symbolName)
-                            .font(.headline)
-                            .foregroundStyle(.white.opacity(0.92))
+                Group {
+                    if let uiImage = genreImage {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                    } else {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color.white.opacity(0.3))
+                            .overlay {
+                                Image(systemName: group.symbolName)
+                                    .font(.headline)
+                                    .foregroundStyle(.white.opacity(0.92))
+                            }
                     }
+                }
+                .frame(width: 40, height: 40)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(Color.white.opacity(0.28), lineWidth: 1)
+                )
 
                 Text(group.rawValue)
                     .font(.title3.weight(.semibold))
@@ -445,6 +458,17 @@ private struct StickyToppingGroupHeader: View {
             RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                 .stroke(POCColor.line, lineWidth: 1)
         )
+    }
+
+    private var genreImage: UIImage? {
+        let resourcePath = group.genreImagePath as NSString
+        let resourceName = resourcePath.deletingPathExtension
+        let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
+        if let bundledImage = UIImage(named: resourceName) {
+            return bundledImage
+        }
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else { return nil }
+        return UIImage(contentsOfFile: url.path)
     }
 }
 

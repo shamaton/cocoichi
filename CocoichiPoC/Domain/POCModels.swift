@@ -112,6 +112,19 @@ enum ToppingGroup: String, CaseIterable, Codable, Hashable {
     case vegetable = "野菜類のトッピング"
     case other = "その他のトッピング"
 
+    var genreImagePath: String {
+        switch self {
+        case .meat:
+            return "curry-meats.png"
+        case .seafood:
+            return "curry-seafoods.png"
+        case .vegetable:
+            return "curry-vegetables.png"
+        case .other:
+            return "curry-kikan.png"
+        }
+    }
+
     var accentHex: UInt {
         switch self {
         case .meat:
