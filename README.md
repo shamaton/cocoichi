@@ -14,6 +14,8 @@ make test
 make agent-verify
 ```
 
+`make build` はビルド成功後、すでに `Booted` の iPhone Simulator があればその端末へ `.app` を再インストールして再起動します。自動反映を止めたい場合は `AUTO_RUN_ON_BOOTED_SIM=0 make build` を使ってください。
+
 ビルド成果物とログは `build/` 配下に出力されます。必要なら `AGENT_NAME=foo make build` のように agent 名を分けて実行できます。
 
 ## 使い方

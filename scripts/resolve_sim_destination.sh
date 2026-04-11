@@ -3,6 +3,7 @@ set -euo pipefail
 
 SIM_NAME=""
 SIM_UDID=""
+BOOTED_ONLY=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -14,8 +15,12 @@ while [[ $# -gt 0 ]]; do
       SIM_UDID="$2"
       shift 2
       ;;
+    --booted-only)
+      BOOTED_ONLY=1
+      shift
+      ;;
     -h|--help)
-      echo "Usage: resolve_sim_destination.sh [--sim-name NAME] [--sim-udid UDID]";
+      echo "Usage: resolve_sim_destination.sh [--sim-name NAME] [--sim-udid UDID] [--booted-only]";
       exit 0
       ;;
     *)
@@ -30,7 +35,7 @@ if [[ -n "$SIM_UDID" ]]; then
   exit 0
 fi
 
-SIM_NAME_ENV="$SIM_NAME" SIMCTL_LIST_JSON="${SIMCTL_LIST_JSON:-}" python3 - <<'PY'
+SIM_NAME_ENV="$SIM_NAME" BOOTED_ONLY_ENV="$BOOTED_ONLY" SIMCTL_LIST_JSON="${SIMCTL_LIST_JSON:-}" python3 - <<'PY'
 import json
 import os
 import re
@@ -40,6 +45,7 @@ from pathlib import Path
 
 name = (os.environ.get("SIM_NAME_ENV") or "").strip()
 name_lower = name.lower()
+booted_only = (os.environ.get("BOOTED_ONLY_ENV") or "0").strip() == "1"
 override = (os.environ.get("SIMCTL_LIST_JSON") or "").strip()
 
 def runtime_version(runtime_key: str):
@@ -113,10 +119,13 @@ if not candidates:
 if name and name_lower != "auto":
     matches = [c for c in candidates if c["name"] == name]
     if matches:
-        booted = [c for c in matches if c["state"] == "Booted"]
-        chosen = max(booted or matches, key=lambda c: c["runtime_version"])
-        print(f"platform=iOS Simulator,id={chosen['udid']}")
-        sys.exit(0)
+        preferred = [c for c in matches if c["state"] == "Booted"] if booted_only else matches
+        if preferred:
+            chosen = max(preferred, key=lambda c: c["runtime_version"])
+            print(f"platform=iOS Simulator,id={chosen['udid']}")
+            sys.exit(0)
+        print("")
+        sys.exit(1)
 
 # Prefer a booted iPhone if one exists.
 booted = [c for c in candidates if c["state"] == "Booted"]
@@ -124,6 +133,10 @@ if booted:
     chosen = max(booted, key=lambda c: (c["runtime_version"], model_rank(c["name"])))
     print(f"platform=iOS Simulator,id={chosen['udid']}")
     sys.exit(0)
+
+if booted_only:
+    print("")
+    sys.exit(1)
 
 # Otherwise choose the latest runtime + best iPhone model.
 chosen = max(candidates, key=lambda c: (c["runtime_version"], model_rank(c["name"])))

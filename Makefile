@@ -6,6 +6,7 @@ APP_PLATFORM := ios
 APP_GENERATOR := xcodegen
 CONFIGURATION ?= Debug
 SIM_NAME ?= auto
+AUTO_RUN_ON_BOOTED_SIM ?= 1
 TARGET_PREFIX := 
 SCRIPTS_DIR := ./scripts
 
@@ -59,6 +60,7 @@ $(TARGET_PREFIX)help:
 		"  make $(TARGET_PREFIX)diagnose                 Print toolchain + config info" \
 		"  make $(TARGET_PREFIX)test                     Run unit tests" \
 		"  make $(TARGET_PREFIX)run                      Run app (assumes prior build)" \
+		"  AUTO_RUN_ON_BOOTED_SIM=0 make $(TARGET_PREFIX)build Disable auto-refresh after build" \
 		"  make $(TARGET_PREFIX)build-and-run            Build then run" \
 		"  make $(TARGET_PREFIX)build-and-run-background Build then run in background" \
 		"  make $(TARGET_PREFIX)clean                    Clean derived data + logs" \
@@ -106,6 +108,9 @@ ifeq ($(APP_PLATFORM),ios)
 		SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
 		SWIFT_STRICT_CONCURRENCY=complete \
 		build
+	@if [ "$(AUTO_RUN_ON_BOOTED_SIM)" != "0" ]; then \
+		$(SCRIPTS_DIR)/run_app_ios_sim.sh --app-path "$(APP_PATH)" --sim-name "$(SIM_NAME)" --booted-only --background; \
+	fi
 else
 	@LOG_DIR="$(LOG_DIR)" CACHE_ROOT="$(CACHE_ROOT)" TMPDIR="$(TMPDIR_PATH)" $(XCBUILD) --label "$(AGENT_NAME)" --action build -- \
 		$(BUILD_FILE_FLAG) \
