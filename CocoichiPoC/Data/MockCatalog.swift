@@ -225,6 +225,28 @@ private enum ToppingMasterLoader {
             return "boiled-pork-topping.png"
         case "ハーフ豚しゃぶ":
             return "half-boiled-pork-topping.png"
+        case "フィッシュフライ(1本)":
+            return "fish-fry-topping.png"
+        case "ハーフあさり":
+            return "half-asari-topping.png"
+        case "ハーフイカ":
+            return "half-squid-topping.png"
+        case "ハーフエビにこみ":
+            return "half-simmered-shrimp-topping.png"
+        case "ツナ":
+            return "tuna-topping.png"
+        case "プチエビフライ":
+            return "petit-fried-shrimp-topping.png"
+        case "たっぷりあさり":
+            return "full-asari-topping.png"
+        case "エビあさり":
+            return "shrimp-asari-topping.png"
+        case "エビにこみ":
+            return "simmered-shrimp-topping.png"
+        case "イカ":
+            return "squid-topping.png"
+        case "海の幸":
+            return "seafood-mix-topping.png"
         case "チキンカツ":
             return "chicken-cutlet-topping.png"
         case "フライドチキン(3個)":
@@ -249,6 +271,50 @@ private enum ToppingMasterLoader {
             return "sausage-2-topping.png"
         case "チキンにこみ":
             return "simmered-chicken-topping.png"
+        case "桜えびとあさりの春野菜":
+            return "spring-special-topping.png"
+        case "なす(3個)":
+            return "eggplant-topping.png"
+        case "ハーフほうれん草":
+            return "half-spinach-topping.png"
+        case "ハーフやさい":
+            return "half-vegetable-topping.png"
+        case "コーン":
+            return "corn-topping.png"
+        case "単品ポテト":
+            return "potato-topping.png"
+        case "旨辛にんにく":
+            return "spicy-garlic-topping.png"
+        case "ほうれん草":
+            return "spinach-topping.png"
+        case "やさい":
+            return "vegetable-topping.png"
+        case "わさびタルタル":
+            return "wasabi-tartar-topping.png"
+        case "とろ～りたまフライ":
+            return "runny-fried-egg-topping.png"
+        case "ハーフスクランブルエッグ":
+            return "half-scrambled-egg-topping.png"
+        case "ハーフきのこ":
+            return "half-mushroom-topping.png"
+        case "ハーフチーズ":
+            return "half-cheese-topping.png"
+        case "クリーミータルタルソース":
+            return "creamy-tartar-topping.png"
+        case "半熟タマゴ":
+            return "soft-boiled-egg-topping.png"
+        case "ゆでタマゴ":
+            return "boiled-egg-topping.png"
+        case "半熟タマゴタルタルソース":
+            return "egg-tartar-topping.png"
+        case "納豆":
+            return "natto-topping.png"
+        case "スクランブルエッグ":
+            return "scrambled-egg-topping.png"
+        case "きのこ":
+            return "mushroom-topping.png"
+        case "チーズ":
+            return "cheese-topping.png"
         default:
             return nil
         }
