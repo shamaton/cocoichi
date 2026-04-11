@@ -138,9 +138,6 @@
   - name: ハーフきのこ
     price: 110
     taxIncludedPrice: 121
-  - name: クリームコロッケ(カニ入り）(1個)
-    price: 110
-    taxIncludedPrice: 121
   - name: ハーフチーズ
     price: 120
     taxIncludedPrice: 132
