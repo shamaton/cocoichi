@@ -126,10 +126,10 @@ struct MenuDiscoveryView: View {
             }
             .safeAreaInset(edge: .bottom) {
                 HStack(spacing: POCSpacing.s) {
-                    SecondaryCTAButton(title: "Saved Combos", systemImage: "clock") {
+                    SecondaryCTAButton(title: "保存済み", systemImage: "clock") {
                         navigator.push(.savedCombos)
                     }
-                    SecondaryCTAButton(title: "Browse by Mood", systemImage: "sparkles") {
+                    SecondaryCTAButton(title: "気分で探す", systemImage: "sparkles") {
                         selectedTag = .recommended
                     }
                 }

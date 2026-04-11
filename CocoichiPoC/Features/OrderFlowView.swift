@@ -30,7 +30,7 @@ private enum CustomizationPhase: Int, CaseIterable, Identifiable {
         case .basics:
             return "トッピングへ進む"
         case .toppings:
-            return "Review Order"
+            return "注文内容を確認"
         }
     }
 
@@ -96,7 +96,7 @@ struct CurryDetailView: View {
                 .animation(.snappy(duration: 0.24), value: showsCompactHeader)
                 .safeAreaInset(edge: .bottom) {
                     HStack(spacing: POCSpacing.s) {
-                        SecondaryCTAButton(title: "Save Combo", systemImage: "star") {
+                        SecondaryCTAButton(title: "組み合わせを保存", systemImage: "star") {
                             navigator.showSheet(.saveFavorite)
                         }
                         PrimaryCTAButton(title: "\(CustomizationPhase.basics.actionTitle) \(draft.total.yenText)", systemImage: "arrow.right") {
@@ -188,7 +188,7 @@ struct CurryToppingsView: View {
                 .animation(.snappy(duration: 0.24), value: showsCompactHeader)
                 .safeAreaInset(edge: .bottom) {
                     HStack(spacing: POCSpacing.s) {
-                        SecondaryCTAButton(title: "Save Combo", systemImage: "star") {
+                        SecondaryCTAButton(title: "組み合わせを保存", systemImage: "star") {
                             navigator.showSheet(.saveFavorite)
                         }
                         PrimaryCTAButton(title: "\(CustomizationPhase.toppings.actionTitle) \(draft.total.yenText)", systemImage: "cart") {
@@ -1869,10 +1869,10 @@ struct OrderReviewView: View {
                 }
                 .safeAreaInset(edge: .bottom) {
                     HStack(spacing: POCSpacing.s) {
-                        SecondaryCTAButton(title: "Save Combo", systemImage: "star") {
+                        SecondaryCTAButton(title: "組み合わせを保存", systemImage: "star") {
                             navigator.showSheet(.saveFavorite)
                         }
-                        PrimaryCTAButton(title: "Place Order \(orderStore.reviewTotal.yenText)", systemImage: "checkmark", isDisabled: !orderStore.hasReviewItems) {
+                        PrimaryCTAButton(title: "注文する \(orderStore.reviewTotal.yenText)", systemImage: "checkmark", isDisabled: !orderStore.hasReviewItems) {
                             orderStore.placeOrder()
                             navigator.push(.orderComplete)
                         }
@@ -1936,15 +1936,15 @@ struct OrderCompleteView: View {
                     )
 
                     VStack(spacing: POCSpacing.s) {
-                        PrimaryCTAButton(title: "Browse Menu Again", systemImage: "fork.knife") {
+                        PrimaryCTAButton(title: "もう一度メニューを見る", systemImage: "fork.knife") {
                             orderStore.resetForNextOrder(keepingStore: true)
                             navigator.popToMenuDiscovery()
                         }
-                        SecondaryCTAButton(title: "View Saved Combos", systemImage: "clock") {
+                        SecondaryCTAButton(title: "保存済みを確認", systemImage: "clock") {
                             orderStore.resetForNextOrder(keepingStore: true)
                             navigator.goToSavedCombosFromCompletion()
                         }
-                        SecondaryCTAButton(title: "Change Store", systemImage: "mappin.and.ellipse") {
+                        SecondaryCTAButton(title: "店舗を変更", systemImage: "mappin.and.ellipse") {
                             orderStore.resetForNextOrder(keepingStore: false)
                             navigator.resetToStoreSelect()
                         }
@@ -2010,7 +2010,7 @@ struct CouponSuggestionSheet: View {
                         }
                     }
 
-                    SecondaryCTAButton(title: "Maybe Later", systemImage: "xmark") {
+                    SecondaryCTAButton(title: "あとで", systemImage: "xmark") {
                         navigator.dismissSheet()
                     }
                 }
@@ -2054,10 +2054,10 @@ struct SaveFavoriteSheet: View {
                 Spacer()
 
                 HStack(spacing: POCSpacing.s) {
-                    SecondaryCTAButton(title: "Cancel", systemImage: "xmark") {
+                    SecondaryCTAButton(title: "キャンセル", systemImage: "xmark") {
                         navigator.dismissSheet()
                     }
-                    PrimaryCTAButton(title: "Save", systemImage: "star.fill", isDisabled: orderStore.draftOrder == nil) {
+                    PrimaryCTAButton(title: "保存する", systemImage: "star.fill", isDisabled: orderStore.draftOrder == nil) {
                         orderStore.saveCurrentFavorite(named: name)
                         navigator.dismissSheet()
                     }
