@@ -224,6 +224,9 @@
 | `chip.selected.foreground` | `color.text.primary` |
 | `chip.spicy.selected.background` | `color.accent.red` |
 | `chip.spicy.selected.foreground` | `color.text.inverse` |
+| `chip.storeOnly.background` | `color.accent.cream` |
+| `chip.storeOnly.foreground` | `color.text.primary` |
+| `chip.storeOnly.border` | `color.line.medium` |
 
 ### Price
 
@@ -249,6 +252,9 @@
 | Role | Token |
 | --- | --- |
 | Background | `surface.app.background` |
+| Store Context Header | `surface.card.default` |
+| This Store Only card | `surface.card.emphasis` |
+| Store Only badge | `chip.storeOnly.*` |
 | For You card | `surface.card.emphasis` |
 | Popular section card | `surface.card.default` |
 | Search field | `surface.card.default` + `radius.m` |

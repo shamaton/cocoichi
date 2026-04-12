@@ -99,7 +99,7 @@
 | T05 | Order State Store | 選択店舗、受取モード、商品、カレーソース、ライス量、辛さ、ソース量、トッピング、価格、pending draft、カート、適用クーポン、保存状態を持つ状態管理を作る | T03,T04 | 画面をまたいでも注文状態が崩れず、S3 から S5 に pending draft を渡せる。pending draft は常に1件だけ保持され、トッピングは一意管理され、重複タップは no-op になる。店舗変更時は store-scoped state をまとめて破棄できる |
 | T06 | Shared UI Components | Primary/Secondary CTA、chip、card、price row、store header、sheet header を共通化する | T02,T05 | S2-S8 で共通UIを使い回せる |
 | T07 | S1 Store Select | 注文開始や店舗変更時に呼び出せる店舗選択ゲート、`現在地 / 駅名 / 郵便番号 / 店名` の検索入口、受取目安表示、`保存済みから始める` 導線を実装する | T04,T05,T06 | 店舗選択後に S2 へ進める。GPS 失敗時も手入力検索で継続できる |
-| T08 | Home / S2 MenuDiscovery Layout | Home の受取先カード、期間限定バナー、おすすめ、他タブ導線と、S2 の店舗ヘッダー、検索欄、quick filters、For You、Popular、Menu List、下部導線を実装する | T04,T05,T06,T07 | Home から受取先設定やメニュー閲覧へ進め、S2 では商品カードから S3 へ遷移できる。店舗設定済み時だけ限定メニューを表示できる。S3 から戻って別メニューを選んだ時は pending draft が新しい選択で置き換わる |
+| T08 | Home / S2 MenuDiscovery Layout | Home の受取先カード、期間限定バナー、おすすめ、他タブ導線と、S2 の店舗ヘッダー、検索欄、quick filters、For You、Popular、Menu List、下部導線を実装する。S2 では店舗限定メニューをヘッダー直下または一覧バッジで自然に混ぜる | T04,T05,T06,T07 | Home から受取先設定やメニュー閲覧へ進め、S2 では商品カードから S3 へ遷移できる。店舗設定済み時だけ限定メニューを表示できる。限定商品が 0 件の店舗では無理にセクションを出さない。S3 から戻って別メニューを選んだ時は pending draft が新しい選択で置き換わる |
 | T09 | S2 Search / Filter Interaction | 検索アクティブ状態、候補キーワード、検索結果、Saved Combos 該当表示を入れる | T08 | 検索入力で一覧が切り替わる |
 | T10 | S4 Saved Combos Minimal Screen | 保存済み構成一覧、再開、メニューへ戻る、店舗変更の最低限 UI を作る | T05,T06,T07 | S1/S2/S8 から S4 に入り S3 へ進める |
 | T11 | S3 Two-Phase Base Layout | Hero image、商品情報、Order Snapshot card、phase switcher、基本設定 area、トッピング area、下部 CTA を実装する | T05,T06,T08 | 初期状態の S3 が 2 phase 前提で表示される |
