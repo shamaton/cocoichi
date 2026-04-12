@@ -383,6 +383,7 @@ Use an 8pt grid with 4pt support steps.
 
 - Start with success and pickup facts
 - Then show a compact order summary
+- Do not carry store-only discovery labels into the completion screen
 - Main next action is to browse again, not manage account settings
 
 ## 6. Depth & Elevation
