@@ -8,6 +8,7 @@
   - `docs/poc-home-tab-architecture-2026-04-12.md`
   - `docs/poc-wireframes-s1-store-select-2026-04-12.md`
   - `docs/poc-wireframes-home-tabs-2026-04-12.md`
+  - `docs/poc-wireframes-s4-saved-combos-2026-04-13.md`
   - `docs/poc-wireframes-s2-s3-2026-03-28.md`
   - `docs/poc-wireframes-s5-s6-2026-03-28.md`
   - `docs/poc-wireframes-s8-2026-03-28.md`
@@ -160,7 +161,7 @@
 
 ## タスク分解上の注意点
 
-- `S4 Saved Combos` は専用ワイヤー未整備のため、初版は `再開の速さ` を優先した最小UIでよい
+- `S4 Saved Combos` は `再開の速さ` を最優先にし、店舗不一致や限定商品の調整は `確認して再開` で吸収する
 - `S3 Curry Detail / Customize` の具体的な phase UI は後続で詰めるが、`基本設定 -> トッピング` の順番と `Review Order` CTA から S5 に抜ける状態管理は先に固定する
 - `S6 Coupon Suggestion` は販促画面ではなく `注文の補助UI` として実装する
 - `S8 Order Complete` は `Done` ではなく `注文できた` と `どう受け取るか` を明示する
