@@ -267,6 +267,7 @@
 | --- | --- |
 | Hero overlay card | `surface.card.glass` |
 | Order Snapshot card | `surface.card.default` |
+| Store Only badge | `chip.storeOnly.*` |
 | Selected topping | `state.selected` |
 | Spice selected | `chip.spicy.selected.background` |
 | Review CTA | `cta.primary.*` |

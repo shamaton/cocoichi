@@ -102,12 +102,12 @@
 | T08 | Home / S2 MenuDiscovery Layout | Home の受取先カード、期間限定バナー、おすすめ、他タブ導線と、S2 の店舗ヘッダー、検索欄、quick filters、For You、Popular、Menu List、下部導線を実装する。S2 では店舗限定メニューをヘッダー直下または一覧バッジで自然に混ぜる | T04,T05,T06,T07 | Home から受取先設定やメニュー閲覧へ進め、S2 では商品カードから S3 へ遷移できる。店舗設定済み時だけ限定メニューを表示できる。限定商品が 0 件の店舗では無理にセクションを出さない。S3 から戻って別メニューを選んだ時は pending draft が新しい選択で置き換わる |
 | T09 | S2 Search / Filter Interaction | 検索アクティブ状態、候補キーワード、検索結果、Saved Combos 該当表示を入れる | T08 | 検索入力で一覧が切り替わる |
 | T10 | S4 Saved Combos Minimal Screen | 保存済み構成一覧、再開、メニューへ戻る、店舗変更の最低限 UI を作る | T05,T06,T07 | S1/S2/S8 から S4 に入り S3 へ進める |
-| T11 | S3 Two-Phase Base Layout | Hero image、商品情報、Order Snapshot card、phase switcher、基本設定 area、トッピング area、下部 CTA を実装する | T05,T06,T08 | 初期状態の S3 が 2 phase 前提で表示される |
+| T11 | S3 Two-Phase Base Layout | Hero image、商品情報、Order Snapshot card、phase switcher、基本設定 area、トッピング area、下部 CTA を実装する。店舗限定商品では `この店舗限定` の補助表示も持つ | T05,T06,T08 | 初期状態の S3 が 2 phase 前提で表示される。店舗限定商品から入った時も限定文脈を落とさない |
 | T12 | S3 Basics To Toppings Flow | `基本設定 -> トッピング` の進行、戻る/進む、進捗表示、`Review Order` CTA から pending draft のまま S5 に渡す遷移を実装する | T05,T11 | 現在地と残り工程が崩れず進行できる |
 | T13 | S3 Customization Logic | 基本設定 phase の選択、ソース量折りたたみ、トッピング追加削除、価格再計算、Order Snapshot 更新、軽い反応を実装する | T05,T11,T12 | 変更が即時に価格とサマリーへ反映され、S5 では pending draft を review 用に受け取れる。選択済みトッピングは Added または非表示で扱い、重複追加できない |
 | T14 | S7 Save Favorite Sheet | 名前入力、注文サマリー、保存/キャンセルを持つ modal sheet を実装する | T05,T06,T13 | S3 と S5 から同じ保存 sheet を呼べる |
 | T15 | Favorite Persistence / Resume | 保存済み構成のローカル保存、再編集前提の復元、For You 反映を実装する | T05,T10,T14 | 保存後に S4 と S2 の再利用導線へ反映される |
-| T16 | S5 Order Review Layout | Pickup card、pending draft を含む cart summary、Suggested Savings、Save This Combo、Price Summary、下部 CTA を実装する | T05,T06,T13 | pending draft と cart line item の見せ分けができ、`内容を修正` は pending draft のみに対して表示される。初版 PoC では cart line item は read-only として扱い、クーポン適用後でも Add More を残す |
+| T16 | S5 Order Review Layout | Pickup card、pending draft を含む cart summary、Suggested Savings、Save This Combo、Price Summary、下部 CTA を実装する。店舗限定商品では order card に短い補助ラベルを残す | T05,T06,T13 | pending draft と cart line item の見せ分けができ、`内容を修正` は pending draft のみに対して表示される。初版 PoC では cart line item は read-only として扱い、クーポン適用後でも Add More を残す。店舗限定文脈を落とさない |
 | T17 | Coupon Matching Engine | 現在注文に対して適用可能クーポンだけを返すローカル判定を作る | T03,T04,T05 | S5 で提案対象を算出できる |
 | T18 | S5 Continue Shopping Loop | `2皿目のカレー` と `サイドメニュー追加` の導線で `pending draft` を cart に昇格させてから S2 に戻り、カート保持のまま再度 S5 に戻れるようにする | T05,T08,T13,T16 | 追加注文ループ時に pending draft と cart の境界が崩れない |
 | T19 | S6 Coupon Suggestion Sheet | best match、適用後状態、Maybe Later、価格差分更新を持つ bottom sheet を実装する | T16,T17 | 適用/非適用で S5 の金額が更新される |
