@@ -6,24 +6,30 @@ Derived from:
 
 - `docs/poc-app-direction-2026-03-28.md`
 - `docs/poc-screen-flow-2026-03-28.md`
+- `docs/poc-home-tab-architecture-2026-04-12.md`
+- `docs/poc-wireframes-s1-store-select-2026-04-12.md`
+- `docs/poc-wireframes-home-tabs-2026-04-12.md`
 - `docs/poc-wireframes-s2-s3-2026-03-28.md`
 - `docs/poc-wireframes-s5-s6-2026-03-28.md`
 - `docs/poc-wireframes-s8-2026-03-28.md`
 - `docs/poc-visual-toneboard-2026-03-28.md`
 - `docs/poc-design-tokens-2026-03-28.md`
 
-Last synced with those docs: `2026-04-11`
+Last synced with those docs: `2026-04-12`
 
 If this file conflicts with the PoC docs, follow this order:
 
 1. `docs/poc-app-direction-2026-03-28.md`
 2. `docs/poc-screen-flow-2026-03-28.md`
-3. `docs/poc-wireframes-s2-s3-2026-03-28.md`
-4. `docs/poc-wireframes-s5-s6-2026-03-28.md`
-5. `docs/poc-wireframes-s8-2026-03-28.md`
-6. `docs/poc-visual-toneboard-2026-03-28.md`
-7. `docs/poc-design-tokens-2026-03-28.md`
-8. `DESIGN.md`
+3. `docs/poc-home-tab-architecture-2026-04-12.md`
+4. `docs/poc-wireframes-s1-store-select-2026-04-12.md`
+5. `docs/poc-wireframes-home-tabs-2026-04-12.md`
+6. `docs/poc-wireframes-s2-s3-2026-03-28.md`
+7. `docs/poc-wireframes-s5-s6-2026-03-28.md`
+8. `docs/poc-wireframes-s8-2026-03-28.md`
+9. `docs/poc-visual-toneboard-2026-03-28.md`
+10. `docs/poc-design-tokens-2026-03-28.md`
+11. `DESIGN.md`
 
 ## 1. Visual Theme & Atmosphere
 
@@ -346,6 +352,7 @@ Use an 8pt grid with 4pt support steps.
 #### S2 Menu Discovery
 
 - Lead with store context and search
+- If the selected store has store-only items, surface them as a short discovery section or badge, not as a separate destination
 - Make discovery feel inviting and edible
 - Use larger imagery for recommended and popular items
 - Keep `Saved Combos` accessible without hijacking the page
@@ -355,12 +362,14 @@ Use an 8pt grid with 4pt support steps.
 - Hero image and current total should anchor the screen
 - Clearly separate `Basic Settings` and `Toppings`
 - Order snapshot should update immediately with user choices
+- If the item is store-only, keep that context visible with a short supporting badge or label
 - Save and review actions should never feel hidden
 
 #### S5 Order Review
 
 - Keep pickup information and pending draft easy to scan
 - `Place Order` must dominate the footer
+- If the order includes a store-only item, preserve that information as supporting context inside the order card
 - Coupon entry should feel like a helpful savings suggestion, not a detour
 
 #### S6 Coupon Suggestion Sheet
