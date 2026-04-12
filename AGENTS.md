@@ -300,6 +300,8 @@ Read in order:
 - `docs/poc-wireframes-s1-store-select-2026-04-12.md` defines the S1 store-select gate and search-entry wireframes.
 - `docs/poc-wireframes-home-tabs-2026-04-12.md` defines the app-level home, menu, order empty state, and tab bar wireframes.
 - `docs/poc-wireframes-s4-saved-combos-2026-04-13.md` defines Saved Combos listing, mismatch handling, and resume behavior.
+- `tasks/TASKS.md` is the canonical local backlog for active implementation progress.
+- `AGENTS.simple-tasks.md` complements this file with the `scripts/task.sh` task workflow.
 - Treat the PoC documents as the active workstream.
 
 ## Tooling Notes
@@ -307,6 +309,7 @@ Read in order:
 - In this repo, nested sandboxing can break `codex exec --sandbox read-only` with `sandbox-exec: sandbox_apply: Operation not permitted`.
 - Do not use `codex exec`-based review as the default review gate in this repo.
 - Prefer the subagent-based review flow documented in `docs/subagent-review-workflow-2026-03-31.md`.
+- Use `scripts/task.sh` for local progress tracking, and keep task metadata in `tasks/TASKS.md`.
 - Do not use `/review` as a gate by itself. Use a reviewer subagent with an explicit JSON output contract instead.
 - `scripts/run-codex-review.sh` is legacy-only. Keep it only for reference or exceptional manual use, not as the standard path.
 - Before a review that uses `diff_range: HEAD`, check `git status --short` for untracked files. If a new file must be reviewed before commit, stage it first or use `git add -N` so it is visible to the diff-based review flow.
@@ -330,5 +333,6 @@ Before starting substantial work:
 
 1. Read `AGENTS.md`
 2. Read the doc group relevant to your task
-3. Confirm whether your task is product, flow, wireframe, visual-token, or implementation-planning work
-4. Avoid making assumptions that contradict the current PoC docs
+3. Check `tasks/TASKS.md` if the work should map to an active implementation task
+4. Confirm whether your task is product, flow, wireframe, visual-token, or implementation-planning work
+5. Avoid making assumptions that contradict the current PoC docs
