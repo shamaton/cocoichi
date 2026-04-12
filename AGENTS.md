@@ -23,13 +23,14 @@ When multiple docs overlap, use this order of precedence:
 
 1. `docs/poc-app-direction-2026-03-28.md`
 2. `docs/poc-screen-flow-2026-03-28.md`
-3. `docs/poc-wireframes-s2-s3-2026-03-28.md`
-4. `docs/poc-wireframes-s5-s6-2026-03-28.md`
-5. `docs/poc-wireframes-s8-2026-03-28.md`
-6. `docs/poc-visual-toneboard-2026-03-28.md`
-7. `docs/poc-design-tokens-2026-03-28.md`
-8. `docs/app-renewal-planning-611124786-jp-2026-03-28.md`
-9. `docs/appstore-review-analysis-611124786-jp-2026-03-23.md`
+3. `docs/poc-home-tab-architecture-2026-04-12.md`
+4. `docs/poc-wireframes-s2-s3-2026-03-28.md`
+5. `docs/poc-wireframes-s5-s6-2026-03-28.md`
+6. `docs/poc-wireframes-s8-2026-03-28.md`
+7. `docs/poc-visual-toneboard-2026-03-28.md`
+8. `docs/poc-design-tokens-2026-03-28.md`
+9. `docs/app-renewal-planning-611124786-jp-2026-03-28.md`
+10. `docs/appstore-review-analysis-611124786-jp-2026-03-23.md`
 
 If you find a conflict, prefer the higher item and then update the lower one later if needed.
 
@@ -64,9 +65,11 @@ Read:
 
 - `docs/poc-app-direction-2026-03-28.md`
 - `docs/poc-screen-flow-2026-03-28.md`
+- `docs/poc-home-tab-architecture-2026-04-12.md`
 
 This defines:
 
+- the app-level home/tab shell
 - the primary flow
 - push vs sheet responsibilities
 - screen IDs
@@ -123,6 +126,7 @@ Read:
 
 - `docs/poc-app-direction-2026-03-28.md`
 - `docs/poc-screen-flow-2026-03-28.md`
+- `docs/poc-home-tab-architecture-2026-04-12.md`
 - `docs/poc-implementation-tasks-2026-03-29.md`
 
 Use these docs for:
@@ -198,9 +202,20 @@ These explain:
 Read in order:
 
 1. `docs/poc-screen-flow-2026-03-28.md`
-2. `docs/poc-wireframes-s2-s3-2026-03-28.md`
-3. `docs/poc-visual-toneboard-2026-03-28.md`
-4. `docs/poc-design-tokens-2026-03-28.md`
+2. `docs/poc-home-tab-architecture-2026-04-12.md`
+3. `docs/poc-wireframes-s2-s3-2026-03-28.md`
+4. `docs/poc-visual-toneboard-2026-03-28.md`
+5. `docs/poc-design-tokens-2026-03-28.md`
+
+### Task: implement or refine `Home` / app tab shell
+
+Read in order:
+
+1. `docs/poc-app-direction-2026-03-28.md`
+2. `docs/poc-screen-flow-2026-03-28.md`
+3. `docs/poc-home-tab-architecture-2026-04-12.md`
+4. `docs/poc-visual-toneboard-2026-03-28.md`
+5. `docs/poc-design-tokens-2026-03-28.md`
 
 ### Task: implement or refine `S3 Curry Detail / Customize`
 
@@ -243,7 +258,8 @@ Read in order:
 
 1. `docs/poc-app-direction-2026-03-28.md`
 2. `docs/poc-screen-flow-2026-03-28.md`
-3. `docs/poc-implementation-tasks-2026-03-29.md`
+3. `docs/poc-home-tab-architecture-2026-04-12.md`
+4. `docs/poc-implementation-tasks-2026-03-29.md`
 
 ## Repository Notes
 
@@ -251,6 +267,7 @@ Read in order:
 - The `docs/` directory is the main working area for product and design decisions.
 - `DESIGN.md` is the root-level AI-facing design summary derived from the active PoC design docs.
 - `docs/poc-implementation-tasks-2026-03-29.md` is the execution breakdown for the active PoC docs.
+- `docs/poc-home-tab-architecture-2026-04-12.md` defines how app launch, home, tabs, and store-context gating relate to the order flow.
 - Treat the PoC documents as the active workstream.
 
 ## Tooling Notes

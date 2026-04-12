@@ -5,6 +5,7 @@
 - 補完対象:
   - `docs/poc-app-direction-2026-03-28.md`
   - `docs/poc-screen-flow-2026-03-28.md`
+  - `docs/poc-home-tab-architecture-2026-04-12.md`
   - `docs/poc-wireframes-s2-s3-2026-03-28.md`
   - `docs/poc-wireframes-s5-s6-2026-03-28.md`
   - `docs/poc-wireframes-s8-2026-03-28.md`
@@ -18,14 +19,16 @@
 
 1. `docs/poc-app-direction-2026-03-28.md`
 2. `docs/poc-screen-flow-2026-03-28.md`
-3. 各ワイヤー / トーン / トークン資料
-4. 本ドキュメント
+3. `docs/poc-home-tab-architecture-2026-04-12.md`
+4. 各ワイヤー / トーン / トークン資料
+5. 本ドキュメント
 
 ## 実装前提
 
 - iOS-first のネイティブ PoC として進める
 - ネットワーク通信は必須にしない
 - ローカルデータとモック状態で注文完了まで通す
+- アプリ起動直後は `Home` タブを初期表示にしてよく、注文開始時に `S1 Store Select` を開く構成を許容する
 - 主導線は `S1 -> S2 -> S3(基本設定 -> トッピング) -> S5(cart/review) -> S6 -> S8`
 - 補助導線として `S4 Saved Combos` と `S7 Save Favorite Sheet` を入れる
 - ログイン、決済実連携、バックエンド実装、WebView は扱わない
@@ -39,6 +42,7 @@
 - 共通基盤を先に固め、画面実装は主導線順に積む
 - 価格、店舗、受取時間、保存済み構成、クーポン適用、カート内容はローカル状態で一貫管理する
 - メニュー YAML では `price` を実値、`virtualPrice` を PoC用の仮想表示価格として保持する
+- `Home` と `Menu` は店舗未設定でも閲覧可能にし、店舗設定済み時だけ店舗限定メニューを表示できる構造にする
 - `S2` でベースのカレーを選び、`S3` では `基本設定 phase -> トッピング phase` の 2段階で進める
 - `S5` は最終確認だけでなく、`pending draft を review し、必要なら cart line item に昇格させて 2皿目やサイドを追加するか判断する地点` として扱う
 - クーポンは `読ませる` のではなく `この注文で使える` を返すローカルルールで扱う
@@ -68,7 +72,7 @@
 
 ### M1. 注文開始から商品発見まで
 
-`S1 Store Select` と `S2 Menu Discovery` を実装し、商品詳細へ進める状態にする。
+`Home` タブ、`S1 Store Select`、`S2 Menu Discovery` を実装し、商品詳細へ進める状態にする。
 
 ### M2. カスタマイズと保存
 
@@ -86,14 +90,14 @@
 
 | ID | タスク | 内容 | 依存 | 完了条件 |
 | --- | --- | --- | --- | --- |
-| T01 | App Shell / Navigation | PoC 用の app entry、`NavigationStack`、sheet 制御、画面遷移のルートを作る | - | S1 から S8 まで遷移の骨格がある |
+| T01 | App Shell / Navigation | PoC 用の app entry、`TabView`、`NavigationStack`、sheet 制御、画面遷移のルートを作る | - | Home / Menu / Order / Rewards のタブ骨格と S1 から S8 までの遷移骨格がある |
 | T02 | Theme / Design Tokens | color, spacing, radius, typography, motion, haptics の foundation と semantic token を定義する | T01 | 画面実装が token 経由で色と CTA を参照できる |
 | T03 | Mock Domain Models | Store, MenuItem, CurrySauceOption, RicePortion, SpiceLevel, SauceAmountOption, Topping, CartLineItem, FavoriteCombo, Coupon, DraftOrder, CompletedOrder のモデルを作る | T01 | 主要画面に必要なローカルデータ構造が揃う |
-| T04 | Seed Data / Mock Rules | 店舗一覧、商品一覧、カレーソース候補、ライス量、辛さ、ソース量、トッピング、サイドメニュー、クーポン候補、モック受取時間算出を用意する | T03 | 画面間をまたいで同じデータで表示できる |
-| T05 | Order State Store | 選択店舗、商品、カレーソース、ライス量、辛さ、ソース量、トッピング、価格、pending draft、カート、適用クーポン、保存状態を持つ状態管理を作る | T03,T04 | 画面をまたいでも注文状態が崩れず、S3 から S5 に pending draft を渡せる。pending draft は常に1件だけ保持され、トッピングは一意管理され、重複タップは no-op になる |
+| T04 | Seed Data / Mock Rules | 店舗一覧、商品一覧、店舗限定メニュー可否、カレーソース候補、ライス量、辛さ、ソース量、トッピング、サイドメニュー、クーポン候補、モック受取時間算出を用意する | T03 | 画面間をまたいで同じデータで表示でき、店舗設定時だけ限定メニューを返せる |
+| T05 | Order State Store | 選択店舗、受取モード、商品、カレーソース、ライス量、辛さ、ソース量、トッピング、価格、pending draft、カート、適用クーポン、保存状態を持つ状態管理を作る | T03,T04 | 画面をまたいでも注文状態が崩れず、S3 から S5 に pending draft を渡せる。pending draft は常に1件だけ保持され、トッピングは一意管理され、重複タップは no-op になる。店舗変更時は store-scoped state をまとめて破棄できる |
 | T06 | Shared UI Components | Primary/Secondary CTA、chip、card、price row、store header、sheet header を共通化する | T02,T05 | S2-S8 で共通UIを使い回せる |
-| T07 | S1 Store Select | 店舗選択の初期画面、受取目安表示、`保存済みから始める` 導線を実装する | T04,T05,T06 | 店舗選択後に S2 へ進める |
-| T08 | S2 MenuDiscovery Layout | 店舗ヘッダー、検索欄、quick filters、For You、Popular、Menu List、下部導線を実装する | T04,T05,T06,T07 | 商品カードから S3 へ遷移できる。S3 から戻って別メニューを選んだ時は pending draft が新しい選択で置き換わる |
+| T07 | S1 Store Select | 注文開始や店舗変更時に呼び出せる店舗選択ゲート、受取目安表示、`保存済みから始める` 導線を実装する | T04,T05,T06 | 店舗選択後に S2 へ進める |
+| T08 | Home / S2 MenuDiscovery Layout | Home の受取先カード、期間限定バナー、おすすめ、他タブ導線と、S2 の店舗ヘッダー、検索欄、quick filters、For You、Popular、Menu List、下部導線を実装する | T04,T05,T06,T07 | Home から受取先設定やメニュー閲覧へ進め、S2 では商品カードから S3 へ遷移できる。店舗設定済み時だけ限定メニューを表示できる。S3 から戻って別メニューを選んだ時は pending draft が新しい選択で置き換わる |
 | T09 | S2 Search / Filter Interaction | 検索アクティブ状態、候補キーワード、検索結果、Saved Combos 該当表示を入れる | T08 | 検索入力で一覧が切り替わる |
 | T10 | S4 Saved Combos Minimal Screen | 保存済み構成一覧、再開、メニューへ戻る、店舗変更の最低限 UI を作る | T05,T06,T07 | S1/S2/S8 から S4 に入り S3 へ進める |
 | T11 | S3 Two-Phase Base Layout | Hero image、商品情報、Order Snapshot card、phase switcher、基本設定 area、トッピング area、下部 CTA を実装する | T05,T06,T08 | 初期状態の S3 が 2 phase 前提で表示される |
