@@ -24,14 +24,15 @@ When multiple docs overlap, use this order of precedence:
 1. `docs/poc-app-direction-2026-03-28.md`
 2. `docs/poc-screen-flow-2026-03-28.md`
 3. `docs/poc-home-tab-architecture-2026-04-12.md`
-4. `docs/poc-wireframes-home-tabs-2026-04-12.md`
-5. `docs/poc-wireframes-s2-s3-2026-03-28.md`
-6. `docs/poc-wireframes-s5-s6-2026-03-28.md`
-7. `docs/poc-wireframes-s8-2026-03-28.md`
-8. `docs/poc-visual-toneboard-2026-03-28.md`
-9. `docs/poc-design-tokens-2026-03-28.md`
-10. `docs/app-renewal-planning-611124786-jp-2026-03-28.md`
-11. `docs/appstore-review-analysis-611124786-jp-2026-03-23.md`
+4. `docs/poc-wireframes-s1-store-select-2026-04-12.md`
+5. `docs/poc-wireframes-home-tabs-2026-04-12.md`
+6. `docs/poc-wireframes-s2-s3-2026-03-28.md`
+7. `docs/poc-wireframes-s5-s6-2026-03-28.md`
+8. `docs/poc-wireframes-s8-2026-03-28.md`
+9. `docs/poc-visual-toneboard-2026-03-28.md`
+10. `docs/poc-design-tokens-2026-03-28.md`
+11. `docs/app-renewal-planning-611124786-jp-2026-03-28.md`
+12. `docs/appstore-review-analysis-611124786-jp-2026-03-23.md`
 
 If you find a conflict, prefer the higher item and then update the lower one later if needed.
 
@@ -84,6 +85,7 @@ Primary flow:
 
 Read the relevant wireframe doc first:
 
+- `docs/poc-wireframes-s1-store-select-2026-04-12.md`
 - `docs/poc-wireframes-home-tabs-2026-04-12.md`
 - `docs/poc-wireframes-s2-s3-2026-03-28.md`
 - `docs/poc-wireframes-s5-s6-2026-03-28.md`
@@ -199,6 +201,16 @@ These explain:
 
 ## Suggested Read Order By Task
 
+### Task: implement or refine `S1 Welcome / Store Select`
+
+Read in order:
+
+1. `docs/poc-screen-flow-2026-03-28.md`
+2. `docs/poc-home-tab-architecture-2026-04-12.md`
+3. `docs/poc-wireframes-s1-store-select-2026-04-12.md`
+4. `docs/poc-visual-toneboard-2026-03-28.md`
+5. `docs/poc-design-tokens-2026-03-28.md`
+
 ### Task: implement or refine `S2 Menu Discovery`
 
 Read in order:
@@ -272,6 +284,7 @@ Read in order:
 - `DESIGN.md` is the root-level AI-facing design summary derived from the active PoC design docs.
 - `docs/poc-implementation-tasks-2026-03-29.md` is the execution breakdown for the active PoC docs.
 - `docs/poc-home-tab-architecture-2026-04-12.md` defines how app launch, home, tabs, and store-context gating relate to the order flow.
+- `docs/poc-wireframes-s1-store-select-2026-04-12.md` defines the S1 store-select gate and search-entry wireframes.
 - `docs/poc-wireframes-home-tabs-2026-04-12.md` defines the app-level home, menu, order empty state, and tab bar wireframes.
 - Treat the PoC documents as the active workstream.
 
