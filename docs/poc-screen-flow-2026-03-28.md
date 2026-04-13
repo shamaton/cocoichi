@@ -38,7 +38,7 @@
 | S4 | Saved Combos | 保存済みのお気に入り構成を選ぶ |
 | S5 | Order Review | カート内容の確認と注文確定、追加注文判断 |
 | S6 | Coupon Suggestion Sheet | 適用可能クーポンの提案 |
-| S7 | Save Favorite Sheet | 現在の組み合わせ保存 |
+| S7 | Save Favorite Sheet | 完了した注文をお気に入り名付きで保存 |
 | S8 | Order Complete | 注文完了演出と次行動提示 |
 
 ## 全体遷移図
@@ -55,16 +55,14 @@ flowchart TD
     D --> B
 
     C --> E[S5 Order Review]
-    C --> G[S7 Save Favorite Sheet]
-    G --> C
 
     E --> F[S6 Coupon Suggestion Sheet]
     E --> B
     F --> E
     E --> H[S8 Order Complete]
-    E --> G
-    G --> E
 
+    H --> G[S7 Save Favorite Sheet]
+    G --> H
     H --> B
     H --> D
     H --> A
@@ -190,7 +188,6 @@ UIメモ:
 遷移:
 
 - `Review Order` -> `S5 Order Review`
-- `お気に入り保存` -> `S7 Save Favorite Sheet`
 - `戻る` -> `S2 Menu Discovery` または `S4 Saved Combos`
 
 UIメモ:
@@ -202,7 +199,7 @@ UIメモ:
 - トッピング、辛さ、量、ソース系の変更は即時反映
 - 価格とビジュアルの変化を遅延なく見せる
 - `S3` は draft を作り込む画面、`S5` は pending draft を受けて review / 追加注文 / 注文確定を判断する画面として責務を分ける
-- 保存操作は別画面遷移ではなく sheet が適切
+- 保存導線は完了後に寄せ、`S3` では作り込むことに集中させる
 
 ### S4. Saved Combos
 
@@ -233,7 +230,6 @@ UIメモ:
 
 - `商品を追加する` -> `S2 Menu Discovery`
 - `クーポンを見る` -> `S6 Coupon Suggestion Sheet`
-- `お気に入りとして保存` -> `S7 Save Favorite Sheet`
 - `注文する` -> `S8 Order Complete`
 - `内容を修正` -> `S3 Curry Detail / Customize`
 
@@ -246,6 +242,7 @@ UIメモ:
 - `注文する` では残っている `pending draft` も cart と一緒に確定対象へ含める
 - 1皿目追加後に `2皿目のカレー` または `サイドメニュー` へ戻る導線を持つ
 - クーポンは独立画面へ飛ばさず sheet で補助表示する
+- お気に入り保存はここでは出さず、完了後の `S8` で提案する
 - 注文ボタンは強い主要CTAとして固定配置する
 
 ### S6. Coupon Suggestion Sheet
@@ -270,7 +267,7 @@ UIメモ:
 
 目的:
 
-- 気に入った構成をその場で保存する
+- 完了した注文を、次回再利用しやすい名前で保存する
 
 遷移:
 
@@ -279,13 +276,12 @@ UIメモ:
 
 呼び出し元:
 
-- `S3 Curry Detail / Customize`
-- `S5 Order Review`
+- `S8 Order Complete`
 
 UIメモ:
 
 - modal sheet 想定
-- 名前編集を最短で終えられるようにする
+- 直前の注文内容が分かる状態で、名前編集を最短で終えられるようにする
 
 ### S8. Order Complete
 
@@ -296,6 +292,7 @@ UIメモ:
 
 遷移:
 
+- `お気に入りとして保存` -> `S7 Save Favorite Sheet`
 - `もう一度メニューを見る` -> `S2 Menu Discovery`
 - `保存済みを見る` -> `S4 Saved Combos`
 - `店舗選択に戻る` -> `S1 Welcome / Store Select`
@@ -304,6 +301,7 @@ UIメモ:
 
 - 注文確定、受取店舗、受取目安を明示する
 - 成功演出は出すが、長すぎない
+- 保存提案は成功確認の後に短く置き、主CTAを奪わない
 - 触覚フィードバックを組み合わせる
 
 ## 状態変化とモーダル方針
@@ -359,7 +357,7 @@ UIメモ:
 - S7 Save Favorite Sheet
 
 PoCとして最初に成立させるべきなのは、`最短注文フローが気持ちよく完走できること` です。
-お気に入り保存は重要ですが、主導線が成立してから載せてもよいです。
+完了後のお気に入り保存は重要ですが、主導線が成立してから載せてもよいです。
 
 ## 次に詰める論点
 

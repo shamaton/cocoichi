@@ -202,7 +202,7 @@ When a screen has a primary CTA, keep its styling visually consistent across the
 
 Use for:
 
-- `Save Combo`
+- `Save This Order`
 - `View Saved Combos`
 - `Change Store`
 

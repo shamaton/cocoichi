@@ -271,7 +271,6 @@
 | Selected topping | `state.selected` |
 | Spice selected | `chip.spicy.selected.background` |
 | Review CTA | `cta.primary.*` |
-| Save Combo CTA | `cta.secondary.*` |
 
 ### S5 Order Review
 
@@ -283,7 +282,6 @@
 | Suggested Savings card | `surface.card.emphasis` |
 | Price Summary | `price.summary.background` |
 | Place Order CTA | `cta.primary.*` |
-| Save Combo CTA | `cta.secondary.*` |
 
 ### S6 Coupon Suggestion Sheet
 
@@ -303,6 +301,8 @@
 | Background | `surface.app.background` |
 | Success mark | `color.status.success` |
 | Pickup info card | `surface.card.default` |
+| Save This Order card | `surface.card.default` |
+| Save This Order CTA | `cta.secondary.*` |
 | Browse Menu Again CTA | `cta.primary.*` |
 | Secondary actions | `cta.secondary.*` |
 
