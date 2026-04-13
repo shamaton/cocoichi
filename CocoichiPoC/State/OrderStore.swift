@@ -7,6 +7,7 @@ final class OrderStore: ObservableObject {
     @Published private(set) var toppings = MockCatalog.toppings
     @Published private(set) var coupons = MockCatalog.coupons
     @Published var selectedStore: Store?
+    @Published var selectedFulfillmentMode: FulfillmentMode = .pickup
     @Published var cartItems: [CartLineItem] = []
     @Published var draftOrder: DraftOrder?
     @Published var appliedCoupon: Coupon?
@@ -35,6 +36,15 @@ final class OrderStore: ObservableObject {
 
     var featuredFavorite: FavoriteCombo? {
         favoriteCombos.sorted(by: { $0.lastUsedAt > $1.lastUsedAt }).first
+    }
+
+    var visibleMenuItems: [MenuItem] {
+        menuItems.filter { $0.isAvailable(at: selectedStore) }
+    }
+
+    var storeLimitedMenuItems: [MenuItem] {
+        guard selectedStore != nil else { return [] }
+        return visibleMenuItems.filter(\.isStoreLimited)
     }
 
     var reviewSubtotal: Int {
@@ -72,6 +82,7 @@ final class OrderStore: ObservableObject {
 
     func selectStore(_ store: Store) {
         selectedStore = store
+        selectedFulfillmentMode = .pickup
         if let draftOrder {
             self.draftOrder = draftOrder
         }
@@ -79,6 +90,7 @@ final class OrderStore: ObservableObject {
 
     func clearStoreSelection() {
         selectedStore = nil
+        selectedFulfillmentMode = .pickup
         cartItems = []
         draftOrder = nil
         appliedCoupon = nil
@@ -106,6 +118,7 @@ final class OrderStore: ObservableObject {
 
     func resumeFavorite(_ favorite: FavoriteCombo) {
         selectedStore = favorite.draft.store
+        selectedFulfillmentMode = .pickup
         // 保存済み構成は再編集前提なので、クーポンは持ち越さず注文内容だけ再開する。
         draftOrder = favorite.draft.sanitizedForFavorite()
         completedOrder = nil
@@ -194,6 +207,7 @@ final class OrderStore: ObservableObject {
         // 完了後の再注文では店舗維持、店舗変更では完全リセットに分ける。
         if !keepingStore {
             selectedStore = nil
+            selectedFulfillmentMode = .pickup
         } else {
             selectedStore = store
         }

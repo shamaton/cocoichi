@@ -194,6 +194,20 @@ struct Store: Identifiable, Hashable, Codable {
     }
 }
 
+enum FulfillmentMode: String, Codable, Hashable {
+    case pickup
+    case delivery
+
+    var label: String {
+        switch self {
+        case .pickup:
+            return "店舗受取"
+        case .delivery:
+            return "デリバリー"
+        }
+    }
+}
+
 struct MenuItem: Identifiable, Hashable, Codable {
     let id: String
     let name: String
@@ -206,6 +220,9 @@ struct MenuItem: Identifiable, Hashable, Codable {
     let imagePath: String?
     let recommendedToppingIDs: [String]
     let accentHexes: [UInt]
+    let isGlobal: Bool
+    let availableStoreIDs: [String]
+    let availabilityNote: String?
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -219,6 +236,9 @@ struct MenuItem: Identifiable, Hashable, Codable {
         case imagePath
         case recommendedToppingIDs
         case accentHexes
+        case isGlobal
+        case availableStoreIDs
+        case availabilityNote
     }
 
     init(
@@ -232,7 +252,10 @@ struct MenuItem: Identifiable, Hashable, Codable {
         searchKeywords: [String],
         imagePath: String? = nil,
         recommendedToppingIDs: [String],
-        accentHexes: [UInt]
+        accentHexes: [UInt],
+        isGlobal: Bool = true,
+        availableStoreIDs: [String] = [],
+        availabilityNote: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -245,6 +268,9 @@ struct MenuItem: Identifiable, Hashable, Codable {
         self.imagePath = imagePath
         self.recommendedToppingIDs = recommendedToppingIDs
         self.accentHexes = accentHexes
+        self.isGlobal = isGlobal
+        self.availableStoreIDs = availableStoreIDs
+        self.availabilityNote = availabilityNote
     }
 
     init(from decoder: Decoder) throws {
@@ -262,12 +288,27 @@ struct MenuItem: Identifiable, Hashable, Codable {
         imagePath = try container.decodeIfPresent(String.self, forKey: .imagePath)
         recommendedToppingIDs = try container.decodeIfPresent([String].self, forKey: .recommendedToppingIDs) ?? []
         accentHexes = try container.decodeIfPresent([UInt].self, forKey: .accentHexes) ?? group.accentHexes
+        isGlobal = try container.decodeIfPresent(Bool.self, forKey: .isGlobal) ?? true
+        availableStoreIDs = try container.decodeIfPresent([String].self, forKey: .availableStoreIDs) ?? []
+        availabilityNote = try container.decodeIfPresent(String.self, forKey: .availabilityNote)
     }
 
     var accentColors: [Color] {
         accentHexes.map { Color(hex: $0) }
     }
 
+    var isStoreLimited: Bool {
+        !isGlobal || !availableStoreIDs.isEmpty
+    }
+
+    func isAvailable(at store: Store?) -> Bool {
+        if isGlobal && availableStoreIDs.isEmpty {
+            return true
+        }
+
+        guard let store else { return false }
+        return availableStoreIDs.contains(store.id)
+    }
 }
 
 struct Topping: Identifiable, Hashable, Codable {

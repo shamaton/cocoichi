@@ -17,7 +17,11 @@ struct MenuDiscoveryView: View {
                     if let store = orderStore.selectedStore {
                         StoreContextCard(store: store) {
                             orderStore.resetForNextOrder(keepingStore: false)
-                            navigator.resetToStoreSelect()
+                            navigator.presentStoreSelect()
+                        }
+                    } else {
+                        MissingStoreCard {
+                            navigator.presentStoreSelect(nextTab: .menu)
                         }
                     }
 
@@ -87,8 +91,7 @@ struct MenuDiscoveryView: View {
                             SectionHeader("Popular Today")
 
                             PopularMenuGrid(items: popularItems, contentWidth: contentWidth) { item in
-                                orderStore.beginOrder(with: item)
-                                navigator.push(.curryDetail)
+                                startOrder(for: item)
                             }
                         }
                     }
@@ -104,8 +107,7 @@ struct MenuDiscoveryView: View {
                                 VStack(spacing: POCSpacing.s) {
                                     ForEach(section.items) { item in
                                         CompactMenuRow(item: item) {
-                                            orderStore.beginOrder(with: item)
-                                            navigator.push(.curryDetail)
+                                            startOrder(for: item)
                                         }
                                     }
                                 }
@@ -143,13 +145,22 @@ struct MenuDiscoveryView: View {
         }
     }
 
+    private func startOrder(for item: MenuItem) {
+        guard orderStore.selectedStore != nil else {
+            navigator.presentStoreSelect(nextTab: .menu)
+            return
+        }
+        orderStore.beginOrder(with: item)
+        navigator.push(.curryDetail)
+    }
+
     private func availableContentWidth(in proxy: GeometryProxy) -> CGFloat {
         let horizontalInsets = proxy.safeAreaInsets.leading + proxy.safeAreaInsets.trailing
         return max(0, proxy.size.width - horizontalInsets - (POCSpacing.l * 2))
     }
 
     private var filteredMenuItems: [MenuItem] {
-        orderStore.menuItems.filter { item in
+        orderStore.visibleMenuItems.filter { item in
             let matchesTag = selectedTag.map { item.tags.contains($0) } ?? true
             let matchesSearch: Bool
             if searchText.isEmpty {
@@ -193,6 +204,27 @@ struct MenuDiscoveryView: View {
         let fallbackItems = featured.filter { !curatedIDSet.contains($0.id) }
 
         return Array((curatedItems + fallbackItems).prefix(4))
+    }
+}
+
+private struct MissingStoreCard: View {
+    let onSelectStore: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            Text("受取先を選ぶと店舗限定メニューも見られます")
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(POCColor.textPrimary)
+            Text("まずは共通メニューを見られます。注文に進む前に店舗を選びます。")
+                .font(.subheadline)
+                .foregroundStyle(POCColor.textSecondary)
+            Button("店舗を選ぶ", action: onSelectStore)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(POCColor.curry)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(POCSpacing.m)
+        .pocCard(fill: POCColor.elevated)
     }
 }
 

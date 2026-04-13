@@ -19,7 +19,7 @@ struct StoreSelectView: View {
                     ForEach(orderStore.stores) { store in
                         Button {
                             orderStore.selectStore(store)
-                            navigator.showMenuDiscovery()
+                            navigator.completeStoreSelection()
                         } label: {
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
                                 HStack(alignment: .top) {
@@ -78,7 +78,7 @@ struct StoreSelectView: View {
             }
             .padding(POCSpacing.l)
         }
-        .navigationTitle("Store Select")
+        .navigationTitle("受取先を選ぶ")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -1,7 +1,14 @@
 import SwiftUI
 
+enum AppTab: Hashable {
+    case home
+    case menu
+    case order
+    case rewards
+}
+
 enum AppScreen: Hashable {
-    case menuDiscovery
+    case storeSelect
     case curryDetail
     case curryToppings
     case savedCombos
@@ -18,12 +25,28 @@ enum AppSheet: String, Identifiable {
 
 @MainActor
 final class AppNavigator: ObservableObject {
-    // S1 は root に固定し、S2 以降だけを path 管理に乗せると初期画面への復帰が単純になる。
+    // PoC では Home を root に置き、注文開始時だけ S1 をゲートとして開く。
+    @Published var selectedTab: AppTab = .home
     @Published var path: [AppScreen] = []
     @Published var presentedSheet: AppSheet?
+    private var nextTabAfterStoreSelect: AppTab = .menu
+    private var nextPathAfterStoreSelect: [AppScreen] = []
 
     func showMenuDiscovery() {
-        path = [.menuDiscovery]
+        selectedTab = .menu
+        path = []
+    }
+
+    func presentStoreSelect(nextTab: AppTab = .menu, nextPath: [AppScreen] = []) {
+        nextTabAfterStoreSelect = nextTab
+        nextPathAfterStoreSelect = nextPath
+        path = [.storeSelect]
+        presentedSheet = nil
+    }
+
+    func completeStoreSelection() {
+        selectedTab = nextTabAfterStoreSelect
+        path = nextPathAfterStoreSelect
     }
 
     func push(_ screen: AppScreen) {
@@ -36,17 +59,17 @@ final class AppNavigator: ObservableObject {
     }
 
     func popToMenuDiscovery() {
-        path = [.menuDiscovery]
+        selectedTab = .menu
+        path = []
     }
 
     func resetToStoreSelect() {
-        path = []
-        presentedSheet = nil
+        presentStoreSelect()
     }
 
     func goToSavedCombosFromCompletion() {
-        // 完了画面からは再利用導線を優先するため、S2 を経由した文脈で S4 を開く。
-        path = [.menuDiscovery, .savedCombos]
+        selectedTab = .menu
+        path = [.savedCombos]
     }
 
     func showSheet(_ sheet: AppSheet) {

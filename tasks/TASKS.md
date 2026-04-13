@@ -6,15 +6,23 @@
    Id: 1-home-tab-shell-and-launch
    Scope: Now / M1
    Files: CocoichiPoC/Features/AppRootView.swift, CocoichiPoC/App/AppNavigator.swift, CocoichiPoC/Features/HomeView.swift
-   Note: Home起動 + TabView(Home/Menu/Order/Rewards) + 注文時のみS1ゲートに寄せる。ref: docs/poc-home-tab-architecture-2026-04-12.md
+   Note: Home起動のTabView/AppShell実装完了。Home/Menu/Order/Rewards追加、S1を注文開始ゲート化、make build成功
    Detail: tasks/details/1-home-tab-shell-and-launch.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-13T10:43:09Z
+   Done by: CODEX
+   Done at: 2026-04-13T10:52:53Z
 
 2. fulfillment-and-store-context
    Id: 2-fulfillment-and-store-context
    Scope: Now / M1
    Files: CocoichiPoC/State/OrderStore.swift, CocoichiPoC/Domain/POCModels.swift, CocoichiPoC/Data/MockCatalog.swift
-   Note: selectedFulfillmentMode と店舗スコープ状態、店舗限定メニュー判定を追加する。ref: docs/poc-implementation-tasks-2026-03-29.md
+   Note: selectedFulfillmentMode と availableStoreIDs ベースの表示判定を追加。Home/Menuが店舗状態を参照、make build成功
    Detail: tasks/details/2-fulfillment-and-store-context.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-13T10:49:02Z
+   Done by: CODEX
+   Done at: 2026-04-13T10:50:42Z
 
 3. s1-store-select-gate
    Id: 3-s1-store-select-gate
