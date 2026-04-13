@@ -95,13 +95,8 @@ struct CurryDetailView: View {
                 }
                 .animation(.snappy(duration: 0.24), value: showsCompactHeader)
                 .safeAreaInset(edge: .bottom) {
-                    HStack(spacing: POCSpacing.s) {
-                        SecondaryCTAButton(title: "組み合わせを保存", systemImage: "star") {
-                            navigator.showSheet(.saveFavorite)
-                        }
-                        PrimaryCTAButton(title: "\(CustomizationPhase.basics.actionTitle) \(draft.total.yenText)", systemImage: "arrow.right") {
-                            showToppings()
-                        }
+                    PrimaryCTAButton(title: "\(CustomizationPhase.basics.actionTitle) \(draft.total.yenText)", systemImage: "arrow.right") {
+                        showToppings()
                     }
                     .padding(.horizontal, POCSpacing.l)
                     .padding(.top, POCSpacing.s)
@@ -187,13 +182,8 @@ struct CurryToppingsView: View {
                 }
                 .animation(.snappy(duration: 0.24), value: showsCompactHeader)
                 .safeAreaInset(edge: .bottom) {
-                    HStack(spacing: POCSpacing.s) {
-                        SecondaryCTAButton(title: "組み合わせを保存", systemImage: "star") {
-                            navigator.showSheet(.saveFavorite)
-                        }
-                        PrimaryCTAButton(title: "\(CustomizationPhase.toppings.actionTitle) \(draft.total.yenText)", systemImage: "cart") {
-                            showOrderReview()
-                        }
+                    PrimaryCTAButton(title: "\(CustomizationPhase.toppings.actionTitle) \(draft.total.yenText)", systemImage: "cart") {
+                        showOrderReview()
                     }
                     .padding(.horizontal, POCSpacing.l)
                     .padding(.top, POCSpacing.s)
@@ -1718,7 +1708,7 @@ struct SavedCombosView: View {
                 SectionHeader("Saved Combos")
 
                 if orderStore.favoriteCombos.isEmpty {
-                    EmptyStateCard(title: "保存済みの組み合わせはまだありません", message: "S3 か S5 の Save Combo から追加できます。")
+                    EmptyStateCard(title: "保存済みの組み合わせはまだありません", message: "注文完了後に保存すると、ここからすぐ再開できます。")
                 } else {
                     ForEach(orderStore.favoriteCombos) { favorite in
                         Button {
@@ -1868,14 +1858,9 @@ struct OrderReviewView: View {
                     .padding(POCSpacing.l)
                 }
                 .safeAreaInset(edge: .bottom) {
-                    HStack(spacing: POCSpacing.s) {
-                        SecondaryCTAButton(title: "組み合わせを保存", systemImage: "star") {
-                            navigator.showSheet(.saveFavorite)
-                        }
-                        PrimaryCTAButton(title: "注文する \(orderStore.reviewTotal.yenText)", systemImage: "checkmark", isDisabled: !orderStore.hasReviewItems) {
-                            orderStore.placeOrder()
-                            navigator.push(.orderComplete)
-                        }
+                    PrimaryCTAButton(title: "注文する \(orderStore.reviewTotal.yenText)", systemImage: "checkmark", isDisabled: !orderStore.hasReviewItems) {
+                        orderStore.placeOrder()
+                        navigator.push(.orderComplete)
                     }
                     .padding(.horizontal, POCSpacing.l)
                     .padding(.top, POCSpacing.s)
@@ -1929,6 +1914,35 @@ struct OrderCompleteView: View {
                     .pocCard(fill: POCColor.elevated)
 
                     CompletedOrderCard(order: completedOrder)
+
+                    if let savedFavoriteName = orderStore.recentlySavedFavoriteName {
+                        VStack(alignment: .leading, spacing: POCSpacing.s) {
+                            SectionHeader("Saved")
+                            Text("「\(savedFavoriteName)」として保存しました。")
+                                .font(.headline.weight(.semibold))
+                                .foregroundStyle(POCColor.textPrimary)
+                            Text("保存済みの組み合わせから次回すぐ再開できます。")
+                                .font(.subheadline)
+                                .foregroundStyle(POCColor.textSecondary)
+                        }
+                        .padding(POCSpacing.m)
+                        .pocCard(fill: POCColor.elevatedStrong)
+                    } else if let favoriteCandidate = orderStore.favoriteSaveCandidate {
+                        VStack(alignment: .leading, spacing: POCSpacing.s) {
+                            SectionHeader("Save This Order")
+                            Text("今回の1皿をいつもの候補に保存できます。")
+                                .font(.headline.weight(.semibold))
+                                .foregroundStyle(POCColor.textPrimary)
+                            Text("\(favoriteCandidate.menuItem.name) / \(favoriteCandidate.spiceLevelText) / \(favoriteCandidate.riceGrams)g")
+                                .font(.subheadline)
+                                .foregroundStyle(POCColor.textSecondary)
+                            SecondaryCTAButton(title: "保存する", systemImage: "star") {
+                                navigator.showSheet(.saveFavorite)
+                            }
+                        }
+                        .padding(POCSpacing.m)
+                        .pocCard(fill: POCColor.elevated)
+                    }
 
                     EmptyStateCard(
                         title: "Next",
@@ -2031,7 +2045,7 @@ struct SaveFavoriteSheet: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
-                SectionHeader("Save Combo")
+                SectionHeader("Save This Order")
 
                 TextField("Name", text: $name)
                     .padding(.horizontal, POCSpacing.m)
@@ -2045,8 +2059,12 @@ struct SaveFavoriteSheet: View {
                             .stroke(POCColor.line, lineWidth: 1)
                     )
 
-                if let draft = orderStore.draftOrder {
-                    DraftSnapshotCard(draft: draft, showsCoupon: false)
+                if let draft = orderStore.favoriteSaveCandidate {
+                    DraftSnapshotCard(
+                        draft: draft,
+                        showsCoupon: false,
+                        title: orderStore.completedOrder == nil ? "Current Order" : "今回の1皿"
+                    )
                 } else {
                     EmptyStateCard(title: "保存できる注文がありません", message: "商品を選んでから再度開いてください。")
                 }
@@ -2057,8 +2075,8 @@ struct SaveFavoriteSheet: View {
                     SecondaryCTAButton(title: "キャンセル", systemImage: "xmark") {
                         navigator.dismissSheet()
                     }
-                    PrimaryCTAButton(title: "保存する", systemImage: "star.fill", isDisabled: orderStore.draftOrder == nil) {
-                        orderStore.saveCurrentFavorite(named: name)
+                    PrimaryCTAButton(title: "保存する", systemImage: "star.fill", isDisabled: orderStore.favoriteSaveCandidate == nil) {
+                        orderStore.saveFavorite(named: name)
                         navigator.dismissSheet()
                     }
                 }
@@ -2067,7 +2085,7 @@ struct SaveFavoriteSheet: View {
             .navigationTitle("Save Favorite")
             .navigationBarTitleDisplayMode(.inline)
             .task {
-                if name.isEmpty, let draft = orderStore.draftOrder {
+                if name.isEmpty, let draft = orderStore.favoriteSaveCandidate {
                     name = draft.suggestedFavoriteName
                 }
             }

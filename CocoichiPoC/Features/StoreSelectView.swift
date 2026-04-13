@@ -320,7 +320,7 @@ struct StoreSelectView: View {
             if orderStore.favoriteCombos.isEmpty {
                 EmptyStateCard(
                     title: "保存済みの組み合わせはまだありません",
-                    message: "商品を選んだ後に Save Combo から追加できます。"
+                    message: "注文完了後に保存すると、次回ここからすぐ再開できます。"
                 )
             } else {
                 SecondaryCTAButton(title: "保存済みから始める", systemImage: "clock.arrow.trianglehead.counterclockwise") {

@@ -79,6 +79,10 @@
    Id: 8-carry-store-specific-context-through-review
    Scope: Later / M2-M3
    Files: CocoichiPoC/Features/OrderFlowView.swift, CocoichiPoC/Features/OrderReviewView.swift, CocoichiPoC/Features/OrderCompleteView.swift
-   Note: 店舗限定文脈は S3/S5 まで保持し、S8 には持ち込まない整合にする。ref: docs/poc-wireframes-s5-s6-2026-03-28.md / docs/poc-wireframes-s8-2026-03-28.md
+   Note: S3/S5の保存CTAを撤去し、S8完了後のみ保存提案へ変更。SaveFavoriteSheet は完了注文ベースに切替。make build成功
    Detail: tasks/details/8-carry-store-specific-context-through-review.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-13T23:24:40Z
+   Done by: CODEX
+   Done at: 2026-04-13T23:29:42Z
 
