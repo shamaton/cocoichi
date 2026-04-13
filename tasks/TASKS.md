@@ -39,8 +39,12 @@
    Id: 4-home-screen-poc
    Scope: Next / M1
    Files: CocoichiPoC/Features/HomeView.swift, CocoichiPoC/State/OrderStore.swift
-   Note: 受取先カード、期間限定バナー、おすすめ、他タブ導線を実装する。店舗未設定でも閲覧可能にする。ref: docs/poc-wireframes-home-tabs-2026-04-12.md
+   Note: Homeに他タブショートカット、Seasonal CTA、即注文導線を追加。ワイヤーの情報優先度に寄せ、make build成功
    Detail: tasks/details/4-home-screen-poc.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-13T23:05:25Z
+   Done by: CODEX
+   Done at: 2026-04-13T23:07:11Z
 
 5. menu-discovery-store-aware
    Id: 5-menu-discovery-store-aware
@@ -57,8 +61,12 @@
    Id: 6-order-and-rewards-placeholders
    Scope: Next / M1
    Files: CocoichiPoC/Features/OrderTabView.swift, CocoichiPoC/Features/RewardsView.swift, CocoichiPoC/Features/AppRootView.swift
-   Note: Order 空状態と Rewards プレースホルダーをタブ骨格に載せる。ref: docs/poc-wireframes-home-tabs-2026-04-12.md
+   Note: Order空状態とRewardsプレースホルダーを強化。メニュー/保存済み導線と将来価値表示を追加、make build成功
    Detail: tasks/details/6-order-and-rewards-placeholders.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-13T23:05:37Z
+   Done by: CODEX
+   Done at: 2026-04-13T23:07:11Z
 
 7. saved-combos-minimal-flow
    Id: 7-saved-combos-minimal-flow

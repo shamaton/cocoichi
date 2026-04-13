@@ -103,8 +103,9 @@ private struct HomeView: View {
                     featuredStoreItemCard(item: featuredStoreItem)
                 }
                 recommendedSection
-                savedCombosSection
                 startQuicklySection
+                savedCombosSection
+                otherTabsSection
             }
             .padding(POCSpacing.l)
             .padding(.bottom, 96)
@@ -155,6 +156,10 @@ private struct HomeView: View {
                 }
 
                 Spacer()
+
+                Text(orderStore.selectedStore == nil ? "未設定" : "Change")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(POCColor.curry)
             }
 
             PrimaryCTAButton(title: orderStore.selectedStore == nil ? "選択する" : "変更する", systemImage: "arrow.right") {
@@ -177,9 +182,15 @@ private struct HomeView: View {
                         title: orderStore.selectedStore == nil ? "スパイスカレー特集" : "春のおすすめトッピング特集",
                         accent: [POCColor.red, POCColor.cheese]
                     )
-                    Text(orderStore.selectedStore == nil ? "今だけのおすすめをチェック" : "この店舗で今食べたいおすすめを探す")
-                        .font(.subheadline)
-                        .foregroundStyle(POCColor.textSecondary)
+                    HStack {
+                        Text(orderStore.selectedStore == nil ? "今だけのおすすめをチェック" : "この店舗で今食べたいおすすめを探す")
+                            .font(.subheadline)
+                            .foregroundStyle(POCColor.textSecondary)
+                        Spacer()
+                        Text(orderStore.selectedStore == nil ? "メニューへ" : "見る")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(POCColor.curry)
+                    }
                 }
             }
             .buttonStyle(.plain)
@@ -193,7 +204,7 @@ private struct HomeView: View {
                 HStack(spacing: POCSpacing.s) {
                     ForEach(recommendedItems) { item in
                         Button {
-                            navigator.selectedTab = .menu
+                            startHomeOrder(for: item)
                         } label: {
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
                                 MenuArtworkBadge(item: item)
@@ -221,7 +232,7 @@ private struct HomeView: View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
             SectionHeader("This Store Only")
             Button {
-                navigator.selectedTab = .menu
+                startHomeOrder(for: item)
             } label: {
                 HStack(spacing: POCSpacing.m) {
                     MenuArtworkBadge(item: item)
@@ -297,6 +308,46 @@ private struct HomeView: View {
         }
     }
 
+    private var otherTabsSection: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            SectionHeader("Other Tabs")
+            HStack(spacing: POCSpacing.s) {
+                HomeShortcutCard(
+                    title: "メニュー",
+                    subtitle: "一覧から探す",
+                    systemImage: "fork.knife"
+                ) {
+                    navigator.selectedTab = .menu
+                }
+
+                HomeShortcutCard(
+                    title: "オーダー",
+                    subtitle: orderStore.hasReviewItems ? "今の注文へ" : "状態を確認",
+                    systemImage: "cart"
+                ) {
+                    navigator.selectedTab = .order
+                }
+
+                HomeShortcutCard(
+                    title: "リワード",
+                    subtitle: "将来機能",
+                    systemImage: "seal"
+                ) {
+                    navigator.selectedTab = .rewards
+                }
+            }
+        }
+    }
+
+    private func startHomeOrder(for item: MenuItem) {
+        guard orderStore.selectedStore != nil else {
+            navigator.presentStoreSelect(nextTab: .menu)
+            return
+        }
+        orderStore.beginOrder(with: item)
+        navigator.push(.curryDetail)
+    }
+
     private var recommendedItems: [MenuItem] {
         Array(orderStore.visibleMenuItems.filter { item in
             item.tags.contains(.recommended) || item.tags.contains(.staple)
@@ -338,8 +389,13 @@ private struct OrderTabView: View {
                         message: "メニューから商品を選ぶと、ここに現在の注文が表示されます。"
                     )
 
-                    PrimaryCTAButton(title: "メニューを見る", systemImage: "fork.knife") {
-                        navigator.showMenuDiscovery()
+                    HStack(spacing: POCSpacing.s) {
+                        PrimaryCTAButton(title: "メニューを見る", systemImage: "fork.knife") {
+                            navigator.showMenuDiscovery()
+                        }
+                        SecondaryCTAButton(title: "保存済みを見る", systemImage: "clock") {
+                            navigator.push(.savedCombos)
+                        }
                     }
                 } else {
                     EmptyStateCard(
@@ -347,8 +403,13 @@ private struct OrderTabView: View {
                         message: "まずは店舗を選ぶと、受取時間と注文導線が確定します。"
                     )
 
-                    PrimaryCTAButton(title: "受取先を選ぶ", systemImage: "location") {
-                        navigator.presentStoreSelect(nextTab: .menu)
+                    HStack(spacing: POCSpacing.s) {
+                        PrimaryCTAButton(title: "受取先を選ぶ", systemImage: "location") {
+                            navigator.presentStoreSelect(nextTab: .menu)
+                        }
+                        SecondaryCTAButton(title: "メニューを見る", systemImage: "fork.knife") {
+                            navigator.selectedTab = .menu
+                        }
                     }
                 }
             }
@@ -391,6 +452,8 @@ private struct OrderTabView: View {
 }
 
 private struct RewardsPlaceholderView: View {
+    @EnvironmentObject private var navigator: AppNavigator
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
@@ -406,6 +469,19 @@ private struct RewardsPlaceholderView: View {
                 )
 
                 VStack(alignment: .leading, spacing: POCSpacing.s) {
+                    SectionHeader("Will Live Here")
+
+                    FutureValueCard(
+                        title: "スタンプ / リワード",
+                        message: "注文後に自然につながる継続利用価値をここに置きます。"
+                    )
+                    FutureValueCard(
+                        title: "注文履歴と保存同期",
+                        message: "会員価値が立つ情報は主導線を止めずここに集約します。"
+                    )
+                }
+
+                VStack(alignment: .leading, spacing: POCSpacing.s) {
                     SectionHeader("Future Work")
                     Text("ログインは注文開始時に促し、起動時には毎回求めない方針を検討します。")
                         .font(.subheadline)
@@ -413,6 +489,10 @@ private struct RewardsPlaceholderView: View {
                 }
                 .padding(POCSpacing.m)
                 .pocCard(fill: POCColor.elevated)
+
+                SecondaryCTAButton(title: "メニューに戻る", systemImage: "fork.knife") {
+                    navigator.selectedTab = .menu
+                }
             }
             .padding(POCSpacing.l)
             .padding(.bottom, 96)
@@ -441,5 +521,52 @@ private struct MenuArtworkBadge: View {
                     .foregroundStyle(Color.white.opacity(0.92))
                     .padding(POCSpacing.s)
             }
+    }
+}
+
+private struct HomeShortcutCard: View {
+    let title: String
+    let subtitle: String
+    let systemImage: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                Image(systemName: systemImage)
+                    .font(.headline)
+                    .foregroundStyle(POCColor.curry)
+                Text(title)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(POCColor.textSecondary)
+                    .lineLimit(2)
+            }
+            .frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
+            .padding(POCSpacing.m)
+            .pocCard(fill: POCColor.elevated)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct FutureValueCard: View {
+    let title: String
+    let message: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.xs) {
+            Text(title)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(POCColor.textPrimary)
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(POCColor.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(POCSpacing.m)
+        .pocCard(fill: POCColor.elevated)
     }
 }
