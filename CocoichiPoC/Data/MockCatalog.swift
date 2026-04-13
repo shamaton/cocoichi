@@ -30,7 +30,7 @@ enum MockCatalog {
 
     static let toppings: [Topping] = ToppingMasterLoader.load()
 
-    static let menuItems: [MenuItem] = CurryMenuMasterLoader.load()
+    static let menuItems: [MenuItem] = CurryMenuMasterLoader.load() + [storeOnlyMenuItem]
 
     static let coupons: [Coupon] = [
         Coupon(
@@ -96,6 +96,23 @@ enum MockCatalog {
             ),
         ]
     }
+
+    private static let storeOnlyMenuItem = MenuItem(
+        id: "shibuya-store-limited-ebi-katsu-curry",
+        name: "海老カツカレー",
+        group: .limitedTime,
+        subtitle: "渋谷道玄坂店限定 / 数量限定のサクッとした一皿",
+        actualBasePrice: 998,
+        basePrice: Pricing.virtualDisplayedPrice(for: 998),
+        tags: [.recommended, .rich],
+        searchKeywords: ["限定", "渋谷", "海老", "えび", "海老カツ", "店舗限定"],
+        imagePath: nil,
+        recommendedToppingIDs: ["spinach", "egg"],
+        accentHexes: [0xB84E2F, 0xE5B94E],
+        isGlobal: false,
+        availableStoreIDs: ["shibuya-dogenzaka"],
+        availabilityNote: "渋谷道玄坂店限定"
+    )
 }
 
 private struct ToppingMasterEntry {

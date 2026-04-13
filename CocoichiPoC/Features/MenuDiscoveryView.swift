@@ -96,6 +96,21 @@ struct MenuDiscoveryView: View {
                         }
                     }
 
+                    if searchText.isEmpty, let store = orderStore.selectedStore, !storeOnlyItems.isEmpty {
+                        VStack(alignment: .leading, spacing: POCSpacing.s) {
+                            SectionHeader("This Store Only")
+                            Text("\(store.name)で選べる限定メニュー")
+                                .font(.subheadline)
+                                .foregroundStyle(POCColor.textSecondary)
+
+                            ForEach(storeOnlyItems) { item in
+                                CompactMenuRow(item: item) {
+                                    startOrder(for: item)
+                                }
+                            }
+                        }
+                    }
+
                     if groupedSections.isEmpty {
                         EmptyStateCard(
                             title: "該当するカレーがありません",
@@ -178,10 +193,19 @@ struct MenuDiscoveryView: View {
 
     private var groupedSections: [GroupedMenuSection] {
         CurryMenuGroup.allCases.compactMap { group in
-            let items = filteredMenuItems.filter { $0.group == group }
+            let items = groupedMenuItems.filter { $0.group == group }
             guard !items.isEmpty else { return nil }
             return GroupedMenuSection(group: group, items: items)
         }
+    }
+
+    private var groupedMenuItems: [MenuItem] {
+        let hiddenStoreOnlyIDs = Set(searchText.isEmpty ? storeOnlyItems.map(\.id) : [])
+        return filteredMenuItems.filter { !hiddenStoreOnlyIDs.contains($0.id) }
+    }
+
+    private var storeOnlyItems: [MenuItem] {
+        filteredMenuItems.filter(\.isStoreLimited)
     }
 
     private var popularItems: [MenuItem] {
@@ -310,8 +334,14 @@ private struct PopularMenuCard: View {
                     .lineLimit(2, reservesSpace: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                PriceLabel(amount: item.basePrice, isDiscount: false)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+                HStack(alignment: .center, spacing: POCSpacing.xs) {
+                    if item.isStoreLimited {
+                        StoreOnlyBadge()
+                    }
+                    Spacer()
+                    PriceLabel(amount: item.basePrice, isDiscount: false)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
             }
             .padding(PopularMenuLayout.cardPadding)
             .pocCard(fill: item.group.discoveryCardBackground)
@@ -382,11 +412,16 @@ private struct CompactMenuRow: View {
                 )
 
                 VStack(alignment: .leading, spacing: CompactMenuLayout.contentSpacing) {
-                    Text(item.name)
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(POCColor.textPrimary)
-                        .lineLimit(2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    VStack(alignment: .leading, spacing: POCSpacing.xxs) {
+                        if item.isStoreLimited {
+                            StoreOnlyBadge()
+                        }
+                        Text(item.name)
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(POCColor.textPrimary)
+                            .lineLimit(2)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
 
                     Spacer(minLength: 0)
 
@@ -410,6 +445,20 @@ private struct CompactMenuRow: View {
             )
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct StoreOnlyBadge: View {
+    var body: some View {
+        Text("限定")
+            .font(.caption2.weight(.bold))
+            .foregroundStyle(Color.white)
+            .padding(.horizontal, POCSpacing.xs)
+            .padding(.vertical, 4)
+            .background(
+                Capsule()
+                    .fill(POCColor.red)
+            )
     }
 }
 
