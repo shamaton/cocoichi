@@ -684,6 +684,13 @@ struct DraftOrder: Identifiable, Hashable, Codable {
         "\(menuItem.name) \(spiceLevelText)"
     }
 
+    var toppingsSummary: String {
+        if toppings.isEmpty {
+            return "トッピングなし"
+        }
+        return toppings.map(\.name).joined(separator: " / ")
+    }
+
     func toggling(topping: Topping) -> DraftOrder {
         var next = self
         if next.toppings.contains(where: { $0.id == topping.id }) {

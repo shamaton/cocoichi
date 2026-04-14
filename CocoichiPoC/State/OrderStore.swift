@@ -1,5 +1,10 @@
 import Foundation
 
+enum FavoriteResumeState: Equatable {
+    case ready(message: String)
+    case needsReview(message: String)
+}
+
 @MainActor
 final class OrderStore: ObservableObject {
     @Published private(set) var stores = MockCatalog.stores
@@ -127,16 +132,39 @@ final class OrderStore: ObservableObject {
     }
 
     func resumeFavorite(_ favorite: FavoriteCombo) {
-        selectedStore = favorite.draft.store
+        let resumeStore = selectedStore ?? favorite.draft.store
         selectedFulfillmentMode = .pickup
         // 保存済み構成は再編集前提なので、クーポンは持ち越さず注文内容だけ再開する。
-        draftOrder = favorite.draft.sanitizedForFavorite()
+        var resumedDraft = favorite.draft.sanitizedForFavorite()
+        resumedDraft.store = resumeStore
+        selectedStore = resumeStore
+        draftOrder = resumedDraft
         completedOrder = nil
         recentlySavedFavoriteName = nil
         if cartItems.isEmpty {
             hasPresentedCouponSuggestion = false
         }
         markFavoriteUsed(favorite.id)
+    }
+
+    func favoriteResumeState(for favorite: FavoriteCombo) -> FavoriteResumeState {
+        guard let selectedStore else {
+            return .ready(message: "保存時の店舗でそのまま再開します")
+        }
+
+        let savedStore = favorite.draft.store
+        let isSameStore = savedStore.id == selectedStore.id
+        let isAvailableAtCurrentStore = favorite.draft.menuItem.isAvailable(at: selectedStore)
+
+        if isSameStore {
+            return .ready(message: "\(selectedStore.name)ですぐ再開できます")
+        }
+
+        if isAvailableAtCurrentStore {
+            return .ready(message: "\(selectedStore.name)向けに受取時間を再計算して再開します")
+        }
+
+        return .needsReview(message: "この店舗では限定商品がない可能性があります")
     }
 
     func setSpiceLevel(_ level: Int) {

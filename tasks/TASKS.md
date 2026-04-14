@@ -72,8 +72,12 @@
    Id: 7-saved-combos-minimal-flow
    Scope: Later / M2
    Files: CocoichiPoC/Features/SavedCombosView.swift, CocoichiPoC/State/OrderStore.swift
-   Note: 店舗一致・不一致・Needs Review を持つ Saved Combos 最小導線を整える。ref: docs/poc-wireframes-s4-saved-combos-2026-04-13.md
+   Note: Saved Combos を店舗コンテキスト付きで再編。Ready Here / Needs Review / 確認シート / 再開導線を追加。make build成功
    Detail: tasks/details/7-saved-combos-minimal-flow.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-14T08:35:11Z
+   Done by: CODEX
+   Done at: 2026-04-14T08:39:04Z
 
 8. carry-store-specific-context-through-review
    Id: 8-carry-store-specific-context-through-review
