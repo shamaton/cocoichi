@@ -69,7 +69,6 @@ struct CurryDetailView: View {
                             }
 
                         VStack(alignment: .leading, spacing: POCSpacing.m) {
-                            phaseHeadline(for: .basics)
                             CurryBasicsContent(
                                 draft: draft,
                                 isSauceAmountExpanded: $isSauceAmountExpanded,
@@ -111,7 +110,7 @@ struct CurryDetailView: View {
                     .padding(POCSpacing.l)
             }
         }
-        .navigationTitle("Customize")
+        .navigationTitle("基本設定")
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -235,7 +234,7 @@ private struct CurryBasicsContent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.l) {
             VStack(alignment: .leading, spacing: POCSpacing.s) {
-                SectionHeader("ソースを選ぶ")
+                SectionHeader("ソースの種類")
                 VStack(spacing: POCSpacing.s) {
                     ForEach(CurrySauceOption.allCases, id: \.self) { sauce in
                         SauceFlavorCard(
