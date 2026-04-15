@@ -58,6 +58,7 @@ struct CurryDetailView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: POCSpacing.m) {
                         CurryDetailHeroCard(draft: draft, phase: .basics)
+                            .padding(.horizontal, -POCSpacing.l)
                             .background {
                                 GeometryReader { proxy in
                                     Color.clear.preference(
@@ -135,6 +136,7 @@ struct CurryToppingsView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: POCSpacing.m, pinnedViews: [.sectionHeaders]) {
                         CurryDetailHeroCard(draft: draft, phase: .toppings)
+                            .padding(.horizontal, -POCSpacing.l)
                             .background {
                                 GeometryReader { proxy in
                                     Color.clear.preference(

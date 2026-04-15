@@ -340,15 +340,14 @@ struct CurryDetailHeroCard: View {
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             artwork
-                .frame(height: 216)
-                .clipShape(RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             LinearGradient(
                 colors: [Color.black.opacity(0.02), Color.black.opacity(0.62)],
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .clipShape(RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             VStack(alignment: .leading, spacing: POCSpacing.xs) {
                 Text(phase.eyebrow.uppercased())
@@ -380,8 +379,10 @@ struct CurryDetailHeroCard: View {
             }
             .padding(POCSpacing.m)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .aspectRatio(heroAspectRatio, contentMode: .fit)
         .overlay(
-            RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous)
+            Rectangle()
                 .stroke(Color.white.opacity(0.18), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 10)
@@ -393,10 +394,15 @@ struct CurryDetailHeroCard: View {
             : "選択内容を反映"
     }
 
+    private var heroAspectRatio: CGFloat {
+        guard let menuImage, menuImage.size.height > 0 else { return 370.0 / 247.0 }
+        return menuImage.size.width / menuImage.size.height
+    }
+
     @ViewBuilder
     private var artwork: some View {
-        if let uiImage = loadMenuImage() {
-            Image(uiImage: uiImage)
+        if let menuImage {
+            Image(uiImage: menuImage)
                 .resizable()
                 .scaledToFill()
         } else {
@@ -406,6 +412,10 @@ struct CurryDetailHeroCard: View {
                 endPoint: .bottomTrailing
             )
         }
+    }
+
+    private var menuImage: UIImage? {
+        loadMenuImage()
     }
 
     private func loadMenuImage() -> UIImage? {
