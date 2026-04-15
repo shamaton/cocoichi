@@ -158,7 +158,6 @@ struct CurryToppingsView: View {
                             }
 
                         VStack(alignment: .leading, spacing: POCSpacing.m) {
-                            phaseHeadline(for: .toppings)
                             CurryToppingsContent(draft: draft)
                         }
 
@@ -194,7 +193,7 @@ struct CurryToppingsView: View {
                     .padding(POCSpacing.l)
             }
         }
-        .navigationTitle("Toppings")
+        .navigationTitle("トッピング")
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -207,17 +206,6 @@ struct CurryToppingsView: View {
         navigator.push(.orderReview)
     }
 
-    @ViewBuilder
-    private func phaseHeadline(for phase: CustomizationPhase) -> some View {
-        VStack(alignment: .leading, spacing: POCSpacing.xs) {
-            Text(phase.title)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(POCColor.textPrimary)
-            Text(phase.subtitle)
-                .font(.subheadline)
-                .foregroundStyle(POCColor.textSecondary)
-        }
-    }
 }
 
 private struct CurryBasicsContent: View {
@@ -322,12 +310,7 @@ private struct CurryToppingsContent: View {
     let draft: DraftOrder
 
     var body: some View {
-        if draft.toppings.isEmpty {
-            EmptyStateCard(
-                title: "トッピングなしでも進めます",
-                message: "まずはベースの構成を保ったまま Review に進み、必要ならこの画面で追加してください。"
-            )
-        } else {
+        if !draft.toppings.isEmpty {
             VStack(alignment: .leading, spacing: POCSpacing.s) {
                 SectionHeader("Selected Toppings")
                 FlexibleChipGroup(items: draft.toppings) { topping in
