@@ -10,7 +10,7 @@ private enum CustomizationPhase: Int, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .basics:
-            return "基本設定"
+            return "ソース・ライス・辛さ"
         case .toppings:
             return "トッピング"
         }
@@ -110,7 +110,7 @@ struct CurryDetailView: View {
                     .padding(POCSpacing.l)
             }
         }
-        .navigationTitle("基本設定")
+        .navigationTitle("ソース・ライス・辛さ")
         .navigationBarTitleDisplayMode(.inline)
     }
 
