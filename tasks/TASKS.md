@@ -90,3 +90,14 @@
    Done by: CODEX
    Done at: 2026-04-13T23:29:42Z
 
+9. order-flow-view-split
+   Id: 9-order-flow-view-split
+   Scope: Now / M2-M3
+   Files: CocoichiPoC/Features/OrderFlowView.swift, CocoichiPoC/Features/OrderFlowCustomizationComponents.swift, CocoichiPoC/Features/SavedCombosView.swift, CocoichiPoC/Features/OrderReviewView.swift, CocoichiPoC/Features/OrderCompleteView.swift, CocoichiPoC/Features/OrderFlowSharedViews.swift, CocoichiPoC.xcodeproj/project.pbxproj
+   Note: OrderFlowView を画面別/共通部品別に分割。make build 成功
+   Detail: tasks/details/9-order-flow-view-split.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-15T06:01:59Z
+   Done by: CODEX
+   Done at: 2026-04-15T06:10:01Z
+

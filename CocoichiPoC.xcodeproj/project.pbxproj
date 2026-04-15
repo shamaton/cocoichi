@@ -17,6 +17,10 @@
 		A00000000000000000000008 /* StoreSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000008 /* StoreSelectView.swift */; };
 		A00000000000000000000009 /* MenuDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000009 /* MenuDiscoveryView.swift */; };
 		A0000000000000000000000A /* OrderFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000A /* OrderFlowView.swift */; };
+		A0000000000000000000003D /* OrderFlowCustomizationComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003D /* OrderFlowCustomizationComponents.swift */; };
+		A0000000000000000000003E /* SavedCombosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003E /* SavedCombosView.swift */; };
+		A0000000000000000000003F /* OrderReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003F /* OrderReviewView.swift */; };
+		A00000000000000000000040 /* OrderCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000040 /* OrderCompleteView.swift */; };
 		A0000000000000000000000B /* curry-menu-master.yaml in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000C /* curry-menu-master.yaml */; };
 		A0000000000000000000003B /* topping-menu-master.yaml in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003B /* topping-menu-master.yaml */; };
 		A0000000000000000000003C /* ToppingImages in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003C /* ToppingImages */; };
@@ -79,6 +83,10 @@
 		B00000000000000000000008 /* StoreSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreSelectView.swift; sourceTree = "<group>"; };
 		B00000000000000000000009 /* MenuDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuDiscoveryView.swift; sourceTree = "<group>"; };
 		B0000000000000000000000A /* OrderFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderFlowView.swift; sourceTree = "<group>"; };
+		B0000000000000000000003D /* OrderFlowCustomizationComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderFlowCustomizationComponents.swift; sourceTree = "<group>"; };
+		B0000000000000000000003E /* SavedCombosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCombosView.swift; sourceTree = "<group>"; };
+		B0000000000000000000003F /* OrderReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderReviewView.swift; sourceTree = "<group>"; };
+		B00000000000000000000040 /* OrderCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderCompleteView.swift; sourceTree = "<group>"; };
 		B0000000000000000000000C /* curry-menu-master.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = "curry-menu-master.yaml"; sourceTree = "<group>"; };
 		B0000000000000000000003B /* topping-menu-master.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = "topping-menu-master.yaml"; sourceTree = "<group>"; };
 		B0000000000000000000000D /* pork-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-curry.png"; sourceTree = "<group>"; };
@@ -222,6 +230,10 @@
 				B00000000000000000000008 /* StoreSelectView.swift */,
 				B00000000000000000000009 /* MenuDiscoveryView.swift */,
 				B0000000000000000000000A /* OrderFlowView.swift */,
+				B0000000000000000000003D /* OrderFlowCustomizationComponents.swift */,
+				B0000000000000000000003E /* SavedCombosView.swift */,
+				B0000000000000000000003F /* OrderReviewView.swift */,
+				B00000000000000000000040 /* OrderCompleteView.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -431,6 +443,10 @@
 				A00000000000000000000008 /* StoreSelectView.swift in Sources */,
 				A00000000000000000000009 /* MenuDiscoveryView.swift in Sources */,
 				A0000000000000000000000A /* OrderFlowView.swift in Sources */,
+				A0000000000000000000003D /* OrderFlowCustomizationComponents.swift in Sources */,
+				A0000000000000000000003E /* SavedCombosView.swift in Sources */,
+				A0000000000000000000003F /* OrderReviewView.swift in Sources */,
+				A00000000000000000000040 /* OrderCompleteView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
