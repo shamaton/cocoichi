@@ -339,8 +339,12 @@ struct CurryDetailHeroCard: View {
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
+            Color.white
+
             artwork
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                .padding(.horizontal, CurryDetailHeroLayout.imageHorizontalInset)
+                .padding(.vertical, CurryDetailHeroLayout.imageVerticalInset)
 
             LinearGradient(
                 colors: [Color.black.opacity(0.02), Color.black.opacity(0.62)],
@@ -380,7 +384,8 @@ struct CurryDetailHeroCard: View {
             .padding(POCSpacing.m)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .aspectRatio(heroAspectRatio, contentMode: .fit)
+        .frame(height: CurryDetailHeroLayout.height)
+        .clipped()
         .overlay(
             Rectangle()
                 .stroke(Color.white.opacity(0.18), lineWidth: 1)
@@ -394,23 +399,12 @@ struct CurryDetailHeroCard: View {
             : "選択内容を反映"
     }
 
-    private var heroAspectRatio: CGFloat {
-        guard let menuImage, menuImage.size.height > 0 else { return 370.0 / 247.0 }
-        return menuImage.size.width / menuImage.size.height
-    }
-
     @ViewBuilder
     private var artwork: some View {
         if let menuImage {
             Image(uiImage: menuImage)
                 .resizable()
-                .scaledToFill()
-        } else {
-            LinearGradient(
-                colors: draft.menuItem.accentColors + [POCColor.elevatedStrong],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+                .scaledToFit()
         }
     }
 
@@ -426,6 +420,12 @@ struct CurryDetailHeroCard: View {
         guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else { return nil }
         return UIImage(contentsOfFile: url.path)
     }
+}
+
+private enum CurryDetailHeroLayout {
+    static let height: CGFloat = 160
+    static let imageHorizontalInset: CGFloat = 10
+    static let imageVerticalInset: CGFloat = 6
 }
 
 struct CompactCurryDetailHeader: View {
