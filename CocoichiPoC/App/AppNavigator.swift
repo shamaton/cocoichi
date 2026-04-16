@@ -58,6 +58,22 @@ final class AppNavigator: ObservableObject {
         path.removeLast()
     }
 
+    func popToCurryDetail() {
+        guard let detailIndex = path.lastIndex(of: .curryDetail) else {
+            pop()
+            return
+        }
+        path = Array(path.prefix(through: detailIndex))
+    }
+
+    func popToCurryToppings() {
+        guard let toppingsIndex = path.lastIndex(of: .curryToppings) else {
+            popToCurryDetail()
+            return
+        }
+        path = Array(path.prefix(through: toppingsIndex))
+    }
+
     func popToMenuDiscovery() {
         selectedTab = .menu
         path = []

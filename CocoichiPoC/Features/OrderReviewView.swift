@@ -119,8 +119,8 @@ struct OrderReviewView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button("Customize") {
-                    navigator.pop()
+                Button("基本設定") {
+                    navigator.popToCurryDetail()
                 }
             }
         }
@@ -128,6 +128,8 @@ struct OrderReviewView: View {
 }
 
 private struct ReviewCartCard: View {
+    @EnvironmentObject private var navigator: AppNavigator
+
     let cartItems: [CartLineItem]
     let pendingItem: CartLineItem?
 
@@ -147,7 +149,13 @@ private struct ReviewCartCard: View {
                 CartLineSummaryCard(
                     title: cartItems.isEmpty ? "この注文" : "追加中の1皿",
                     draft: pendingItem.draft,
-                    badgeText: "まだ調整に戻れます"
+                    badgeText: "まだ調整に戻れます",
+                    onChangeBasics: {
+                        navigator.popToCurryDetail()
+                    },
+                    onChangeToppings: {
+                        navigator.popToCurryToppings()
+                    }
                 )
             }
         }
@@ -160,9 +168,11 @@ private struct CartLineSummaryCard: View {
     let title: String
     let draft: DraftOrder
     let badgeText: String
+    var onChangeBasics: (() -> Void)? = nil
+    var onChangeToppings: (() -> Void)? = nil
 
     var body: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.xs) {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
             HStack {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
@@ -174,18 +184,69 @@ private struct CartLineSummaryCard: View {
 
             Text(draft.menuItem.name)
                 .font(.headline.weight(.semibold))
-            Text("\(draft.spiceLevelText) / \(draft.riceGrams)g / \(draft.sauceAmount.rawValue)")
-                .font(.subheadline)
-                .foregroundStyle(POCColor.textSecondary)
-            Text(draft.toppings.isEmpty ? "トッピングなし" : draft.toppings.map(\.name).joined(separator: " / "))
-                .font(.subheadline)
-                .foregroundStyle(POCColor.textSecondary)
+
+            OrderDetailGroupRow(
+                title: "ベース",
+                value: baseSummary,
+                action: onChangeBasics
+            )
+
+            OrderDetailGroupRow(
+                title: "トッピング",
+                value: toppingSummary,
+                action: onChangeToppings
+            )
+
             SummaryRow(title: "Line Total", value: draft.subtotal.yenText)
         }
         .padding(POCSpacing.m)
         .background(
             RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
                 .fill(POCColor.elevatedStrong)
+        )
+    }
+
+    private var baseSummary: String {
+        "\(draft.currySauce.rawValue) / \(draft.riceGrams)g / \(draft.spiceLevelText)"
+    }
+
+    private var toppingSummary: String {
+        draft.toppings.isEmpty ? "なし" : draft.toppings.map(\.name).joined(separator: " / ")
+    }
+}
+
+private struct OrderDetailGroupRow: View {
+    let title: String
+    let value: String
+    var action: (() -> Void)? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.xs) {
+            HStack(alignment: .firstTextBaseline, spacing: POCSpacing.s) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+
+                Spacer()
+
+                if let action {
+                    Button("変更") {
+                        action()
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(POCColor.curry)
+                }
+            }
+
+            Text(value)
+                .font(.subheadline)
+                .foregroundStyle(POCColor.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(POCSpacing.s)
+        .background(
+            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                .fill(POCColor.elevated.opacity(0.85))
         )
     }
 }
