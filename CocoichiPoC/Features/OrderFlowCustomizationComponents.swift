@@ -704,6 +704,7 @@ private struct RiceArtworkCarousel: View {
     private let artworkHeight: CGFloat = 134
     private let slideDistance: CGFloat = 236
     private let animationDuration = 0.24
+    private let artworkVerticalOffset: CGFloat = 10
 
     init(selectedOption: RiceSelectionOption, direction: RiceArtworkTransitionDirection) {
         self.selectedOption = selectedOption
@@ -743,6 +744,7 @@ private struct RiceArtworkCarousel: View {
                 RiceGramsBadge(title: option.title)
                     .padding(.top, POCSpacing.s)
             }
+            .offset(y: artworkVerticalOffset)
             .frame(width: artworkWidth, height: artworkHeight)
     }
 
