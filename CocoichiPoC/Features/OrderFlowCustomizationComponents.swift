@@ -186,27 +186,25 @@ private struct StickyToppingGroupHeader: View {
                 .fill(group.discoveryCardBackground)
 
             HStack(spacing: POCSpacing.s) {
-                Group {
-                    if let uiImage = genreImage {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFill()
-                    } else {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(Color.white.opacity(0.3))
-                            .overlay {
-                                Image(systemName: group.symbolName)
-                                    .font(.headline)
-                                    .foregroundStyle(.white.opacity(0.92))
-                            }
-                    }
-                }
-                .frame(width: 40, height: 40)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .overlay(
+                if let uiImage = genreImage {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 40, height: 40)
+                } else {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(Color.white.opacity(0.28), lineWidth: 1)
-                )
+                        .fill(Color.white.opacity(0.3))
+                        .overlay {
+                            Image(systemName: group.symbolName)
+                                .font(.headline)
+                                .foregroundStyle(.white.opacity(0.92))
+                        }
+                        .frame(width: 40, height: 40)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(Color.white.opacity(0.28), lineWidth: 1)
+                        )
+                }
 
                 Text(group.rawValue)
                     .font(.title3.weight(.semibold))
