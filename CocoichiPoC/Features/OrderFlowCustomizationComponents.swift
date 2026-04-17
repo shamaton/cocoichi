@@ -335,68 +335,26 @@ private enum ToppingRowLayout {
 
 struct CurryDetailHeroCard: View {
     let draft: DraftOrder
-    let phase: CustomizationPhase
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            Color.white
+        VStack(spacing: 0) {
+            ZStack {
+                Color.white
 
-            artwork
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                .padding(.horizontal, CurryDetailHeroLayout.imageHorizontalInset)
-                .padding(.vertical, CurryDetailHeroLayout.imageVerticalInset)
-
-            LinearGradient(
-                colors: [Color.black.opacity(0.02), Color.black.opacity(0.62)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                Text(phase.eyebrow.uppercased())
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.white.opacity(0.84))
-
-                Text(draft.store.name)
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(Color.white.opacity(0.92))
-
-                Text(draft.menuItem.name)
-                    .font(.title.weight(.bold))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-
-                Text(draft.menuItem.subtitle)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.white.opacity(0.92))
-                    .lineLimit(2)
-
-                HStack(alignment: .lastTextBaseline, spacing: POCSpacing.s) {
-                    Text(draft.total.yenText)
-                        .font(.title3.weight(.bold))
-                        .foregroundStyle(.white)
-                    Text(currentPriceCaption)
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(Color.white.opacity(0.84))
-                }
+                artwork
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    .padding(.horizontal, CurryDetailHeroLayout.imageHorizontalInset)
+                    .padding(.vertical, CurryDetailHeroLayout.imageVerticalInset)
             }
-            .padding(POCSpacing.m)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(height: CurryDetailHeroLayout.height)
-        .clipped()
-        .overlay(
-            Rectangle()
-                .stroke(Color.white.opacity(0.18), lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 10)
-    }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(height: CurryDetailHeroLayout.height)
+            .clipped()
 
-    private var currentPriceCaption: String {
-        draft.toppings.isEmpty && draft.currySauce.priceDelta == 0 && draft.ricePriceDelta == 0 && draft.spicePriceDelta == 0 && draft.sauceAmount.priceDelta == 0
-            ? "ベース価格"
-            : "選択内容を反映"
+            Rectangle()
+                .fill(POCColor.line)
+                .frame(height: 1)
+        }
+        .background(Color.white)
     }
 
     @ViewBuilder

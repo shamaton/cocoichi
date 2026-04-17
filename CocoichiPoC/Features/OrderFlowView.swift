@@ -57,7 +57,7 @@ struct CurryDetailView: View {
             if let draft = orderStore.draftOrder {
                 ScrollView {
                     VStack(alignment: .leading, spacing: POCSpacing.m) {
-                        CurryDetailHeroCard(draft: draft, phase: .basics)
+                        CurryDetailHeroCard(draft: draft)
                             .padding(.horizontal, -POCSpacing.l)
                             .background {
                                 GeometryReader { proxy in
@@ -77,7 +77,8 @@ struct CurryDetailView: View {
                             )
                         }
                     }
-                    .padding(POCSpacing.l)
+                    .padding(.horizontal, POCSpacing.l)
+                    .padding(.top, 0)
                     .padding(.bottom, POCSpacing.xl)
                 }
                 .coordinateSpace(name: "curryDetailScroll")
@@ -112,7 +113,7 @@ struct CurryDetailView: View {
                     .padding(POCSpacing.l)
             }
         }
-        .navigationTitle("ソース・ライス・辛さ")
+        .navigationTitle(orderStore.draftOrder?.menuItem.name ?? "カレー")
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -142,7 +143,7 @@ struct CurryToppingsView: View {
             if let draft = orderStore.draftOrder {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: POCSpacing.m, pinnedViews: [.sectionHeaders]) {
-                        CurryDetailHeroCard(draft: draft, phase: .toppings)
+                        CurryDetailHeroCard(draft: draft)
                             .padding(.horizontal, -POCSpacing.l)
                             .background {
                                 GeometryReader { proxy in
@@ -159,7 +160,8 @@ struct CurryToppingsView: View {
 
                         CurryToppingSectionList(draft: draft)
                     }
-                    .padding(POCSpacing.l)
+                    .padding(.horizontal, POCSpacing.l)
+                    .padding(.top, 0)
                     .padding(.bottom, POCSpacing.xl)
                 }
                 .coordinateSpace(name: "curryToppingsScroll")
@@ -191,7 +193,7 @@ struct CurryToppingsView: View {
                     .padding(POCSpacing.l)
             }
         }
-        .navigationTitle("トッピング")
+        .navigationTitle(orderStore.draftOrder?.menuItem.name ?? "カレー")
         .navigationBarTitleDisplayMode(.inline)
     }
 
