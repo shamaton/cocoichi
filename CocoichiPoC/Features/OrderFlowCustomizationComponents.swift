@@ -459,21 +459,25 @@ private struct SauceFlavorCard: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(sauce.priceBadgeTitle)
                                     .font(.headline.weight(.heavy))
-                                    .foregroundStyle(sauce.accentColor)
+                                    .foregroundStyle(isSelected ? .white : sauce.accentColor)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.72)
 
                                 if let badgeSubtitle = sauce.priceBadgeSubtitle {
                                     Text(badgeSubtitle)
                                         .font(.caption2.weight(.bold))
-                                        .foregroundStyle(POCColor.textSecondary)
+                                        .foregroundStyle(isSelected ? Color.white.opacity(0.82) : POCColor.textSecondary)
                                 }
                             }
                             .padding(.horizontal, POCSpacing.s)
                             .padding(.vertical, 8)
                             .background(
                                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                    .fill(Color.white.opacity(0.96))
+                                    .fill(isSelected ? sauce.accentColor.opacity(0.92) : Color.white.opacity(0.96))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .stroke(isSelected ? Color.white.opacity(0.34) : Color.clear, lineWidth: 1)
                             )
 
                             Text(sauce.subtitle)
@@ -493,7 +497,13 @@ private struct SauceFlavorCard: View {
                 }
 
                 RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                    .stroke(isSelected ? sauce.accentColor : POCColor.line, lineWidth: isSelected ? 2 : 1)
+                    .stroke(isSelected ? sauce.accentColor : POCColor.line, lineWidth: isSelected ? 3 : 1)
+
+                if isSelected {
+                    RoundedRectangle(cornerRadius: POCRadius.card - 2, style: .continuous)
+                        .stroke(Color.white.opacity(0.48), lineWidth: 1)
+                        .padding(3)
+                }
 
                 if isSelected {
                     RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
@@ -513,16 +523,7 @@ private struct SauceFlavorCard: View {
             .clipShape(RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous))
             .overlay(alignment: .topTrailing) {
                 if isSelected {
-                    Label("選択中", systemImage: "checkmark.circle.fill")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(POCColor.textPrimary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 7)
-                        .background(.ultraThinMaterial, in: Capsule())
-                        .overlay(
-                            Capsule()
-                                .stroke(Color.white.opacity(0.72), lineWidth: 1)
-                        )
+                    SauceSelectionBadge(accentColor: sauce.accentColor)
                         .padding(POCSpacing.s)
                 }
             }
@@ -570,14 +571,48 @@ private struct SauceFlavorCard: View {
     }
 }
 
+private struct SauceSelectionBadge: View {
+    let accentColor: Color
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(Color.white)
+
+                Image(systemName: "checkmark")
+                    .font(.caption.weight(.black))
+                    .foregroundStyle(accentColor)
+            }
+            .frame(width: 22, height: 22)
+
+            Text("選択中")
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(.white)
+        }
+        .padding(.leading, 8)
+        .padding(.trailing, 11)
+        .padding(.vertical, 8)
+        .background(
+            Capsule(style: .continuous)
+                .fill(accentColor.opacity(0.92))
+        )
+        .overlay(
+            Capsule(style: .continuous)
+                .stroke(Color.white.opacity(0.36), lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.14), radius: 10, x: 0, y: 6)
+    }
+}
+
 private struct SauceFlavorCardButtonStyle: ButtonStyle {
     let isSelected: Bool
     let accentColor: Color
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.984 : 1)
-            .offset(y: configuration.isPressed ? 1 : 0)
+            .scaleEffect(configuration.isPressed ? 0.984 : (isSelected ? 1.01 : 1))
+            .offset(y: configuration.isPressed ? 1 : (isSelected ? -1 : 0))
             .overlay {
                 RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                     .fill(accentColor.opacity(configuration.isPressed ? 0.08 : 0))
@@ -587,7 +622,7 @@ private struct SauceFlavorCardButtonStyle: ButtonStyle {
                 color: Color.black.opacity(shadowOpacity(isPressed: configuration.isPressed)),
                 radius: shadowRadius(isPressed: configuration.isPressed),
                 x: 0,
-                y: configuration.isPressed ? 4 : 8
+                y: configuration.isPressed ? 4 : (isSelected ? 12 : 8)
             )
             .animation(.easeInOut(duration: 0.16), value: configuration.isPressed)
             .animation(.easeInOut(duration: 0.22), value: isSelected)
@@ -604,7 +639,7 @@ private struct SauceFlavorCardButtonStyle: ButtonStyle {
         if isPressed {
             return isSelected ? 10 : 8
         }
-        return isSelected ? 18 : 12
+        return isSelected ? 22 : 12
     }
 }
 
