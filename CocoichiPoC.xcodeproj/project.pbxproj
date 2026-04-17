@@ -21,8 +21,6 @@
 		A0000000000000000000003E /* SavedCombosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003E /* SavedCombosView.swift */; };
 		A0000000000000000000003F /* OrderReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003F /* OrderReviewView.swift */; };
 		A00000000000000000000040 /* OrderCompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000040 /* OrderCompleteView.swift */; };
-		A00000000000000000000042 /* POCRippleEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000042 /* POCRippleEffect.swift */; };
-		A00000000000000000000043 /* POCRipple.metal in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000043 /* POCRipple.metal */; };
 		A0000000000000000000000B /* curry-menu-master.yaml in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000000C /* curry-menu-master.yaml */; };
 		A0000000000000000000003B /* topping-menu-master.yaml in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003B /* topping-menu-master.yaml */; };
 		A0000000000000000000003C /* ToppingImages in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003C /* ToppingImages */; };
@@ -89,8 +87,6 @@
 		B0000000000000000000003E /* SavedCombosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCombosView.swift; sourceTree = "<group>"; };
 		B0000000000000000000003F /* OrderReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderReviewView.swift; sourceTree = "<group>"; };
 		B00000000000000000000040 /* OrderCompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderCompleteView.swift; sourceTree = "<group>"; };
-		B00000000000000000000042 /* POCRippleEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = POCRippleEffect.swift; sourceTree = "<group>"; };
-		B00000000000000000000043 /* POCRipple.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = POCRipple.metal; sourceTree = "<group>"; };
 		B0000000000000000000000C /* curry-menu-master.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = "curry-menu-master.yaml"; sourceTree = "<group>"; };
 		B0000000000000000000003B /* topping-menu-master.yaml */ = {isa = PBXFileReference; lastKnownFileType = text; path = "topping-menu-master.yaml"; sourceTree = "<group>"; };
 		B0000000000000000000000D /* pork-curry.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-curry.png"; sourceTree = "<group>"; };
@@ -197,8 +193,6 @@
 			isa = PBXGroup;
 			children = (
 				B00000000000000000000003 /* POCDesignSystem.swift */,
-				B00000000000000000000043 /* POCRipple.metal */,
-				B00000000000000000000042 /* POCRippleEffect.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -442,8 +436,6 @@
 				A00000000000000000000001 /* CocoichiPoCApp.swift in Sources */,
 				A00000000000000000000002 /* AppNavigator.swift in Sources */,
 				A00000000000000000000003 /* POCDesignSystem.swift in Sources */,
-				A00000000000000000000043 /* POCRipple.metal in Sources */,
-				A00000000000000000000042 /* POCRippleEffect.swift in Sources */,
 				A00000000000000000000004 /* POCModels.swift in Sources */,
 				A00000000000000000000005 /* MockCatalog.swift in Sources */,
 				A00000000000000000000006 /* OrderStore.swift in Sources */,

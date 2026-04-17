@@ -438,12 +438,12 @@ private struct SauceFlavorCard: View {
     let isSelected: Bool
     let action: () -> Void
 
-    @State private var rippleOrigin: CGPoint = .zero
-    @State private var rippleTrigger = 0
-
     var body: some View {
         Button(action: action) {
             ZStack {
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .fill(sauce.accentColor)
+
                 GeometryReader { proxy in
                     let leftPaneWidth = max(proxy.size.width * 0.43, 158)
 
@@ -511,7 +511,6 @@ private struct SauceFlavorCard: View {
             }
             .frame(height: 160)
             .clipShape(RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous))
-            .modifier(POCRippleEffect(at: rippleOrigin, trigger: rippleTrigger))
             .overlay(alignment: .topTrailing) {
                 if isSelected {
                     Label("選択中", systemImage: "checkmark.circle.fill")
@@ -527,15 +526,9 @@ private struct SauceFlavorCard: View {
                         .padding(POCSpacing.s)
                 }
             }
-            .shadow(color: Color.black.opacity(isSelected ? 0.12 : 0.06), radius: isSelected ? 18 : 12, x: 0, y: 8)
         }
-        .onPOCPressingChanged { location in
-            guard let location else { return }
-            rippleOrigin = location
-            rippleTrigger += 1
-        }
-        .buttonStyle(.plain)
-        .animation(.spring(response: 0.3, dampingFraction: 0.84), value: isSelected)
+        .buttonStyle(SauceFlavorCardButtonStyle(isSelected: isSelected, accentColor: sauce.accentColor))
+        .animation(.easeInOut(duration: 0.22), value: isSelected)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(sauce.cardTitle)、\(sauce.priceBadgeTitle)、\(isSelected ? "選択中" : "未選択")")
     }
@@ -574,6 +567,44 @@ private struct SauceFlavorCard: View {
         let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
         guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else { return nil }
         return UIImage(contentsOfFile: url.path)
+    }
+}
+
+private struct SauceFlavorCardButtonStyle: ButtonStyle {
+    let isSelected: Bool
+    let accentColor: Color
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.984 : 1)
+            .offset(y: configuration.isPressed ? 1 : 0)
+            .overlay {
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .fill(accentColor.opacity(configuration.isPressed ? 0.08 : 0))
+            }
+            .saturation(configuration.isPressed ? 0.96 : 1)
+            .shadow(
+                color: Color.black.opacity(shadowOpacity(isPressed: configuration.isPressed)),
+                radius: shadowRadius(isPressed: configuration.isPressed),
+                x: 0,
+                y: configuration.isPressed ? 4 : 8
+            )
+            .animation(.easeInOut(duration: 0.16), value: configuration.isPressed)
+            .animation(.easeInOut(duration: 0.22), value: isSelected)
+    }
+
+    private func shadowOpacity(isPressed: Bool) -> Double {
+        if isPressed {
+            return isSelected ? 0.08 : 0.04
+        }
+        return isSelected ? 0.12 : 0.06
+    }
+
+    private func shadowRadius(isPressed: Bool) -> CGFloat {
+        if isPressed {
+            return isSelected ? 10 : 8
+        }
+        return isSelected ? 18 : 12
     }
 }
 
