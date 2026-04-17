@@ -224,6 +224,8 @@ private struct OrderFlowFooterBar: View {
                 .font(.title3.weight(.bold))
                 .foregroundStyle(POCColor.textPrimary)
                 .monospacedDigit()
+                .contentTransition(.numericText(value: Double(total)))
+                .animation(.snappy(duration: 0.28, extraBounce: 0), value: total)
                 .padding(.trailing, POCSpacing.xs)
                 .frame(maxWidth: .infinity, alignment: .trailing)
 
