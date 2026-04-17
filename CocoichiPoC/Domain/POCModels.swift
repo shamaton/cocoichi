@@ -121,7 +121,7 @@ enum ToppingGroup: String, CaseIterable, Codable, Hashable {
         case .vegetable:
             return "curry-vegetables.png"
         case .other:
-            return "curry-kikan.png"
+            return "curry-others.png"
         }
     }
 

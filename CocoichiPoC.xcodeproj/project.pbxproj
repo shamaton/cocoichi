@@ -64,6 +64,7 @@
 			A00000000000000000000032 /* curry-meats.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000032 /* curry-meats.png */; };
 			A00000000000000000000033 /* curry-seafoods.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000033 /* curry-seafoods.png */; };
 			A00000000000000000000034 /* curry-vegetables.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000034 /* curry-vegetables.png */; };
+			A00000000000000000000041 /* curry-others.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000041 /* curry-others.png */; };
 			A00000000000000000000035 /* beef-source.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000035 /* beef-source.png */; };
 			A00000000000000000000037 /* pork-source.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000037 /* pork-source.png */; };
 			A00000000000000000000038 /* vege-source.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000038 /* vege-source.png */; };
@@ -128,6 +129,7 @@
 			B00000000000000000000032 /* curry-meats.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "curry-meats.png"; sourceTree = "<group>"; };
 			B00000000000000000000033 /* curry-seafoods.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "curry-seafoods.png"; sourceTree = "<group>"; };
 			B00000000000000000000034 /* curry-vegetables.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "curry-vegetables.png"; sourceTree = "<group>"; };
+			B00000000000000000000041 /* curry-others.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "curry-others.png"; sourceTree = "<group>"; };
 			B00000000000000000000035 /* beef-source.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "beef-source.png"; sourceTree = "<group>"; };
 			B00000000000000000000037 /* pork-source.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pork-source.png"; sourceTree = "<group>"; };
 			B00000000000000000000038 /* vege-source.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "vege-source.png"; sourceTree = "<group>"; };
@@ -299,6 +301,7 @@
 					B00000000000000000000032 /* curry-meats.png */,
 					B00000000000000000000033 /* curry-seafoods.png */,
 					B00000000000000000000034 /* curry-vegetables.png */,
+					B00000000000000000000041 /* curry-others.png */,
 				);
 				path = CurryGenreImages;
 				sourceTree = "<group>";
@@ -411,6 +414,7 @@
 					A00000000000000000000032 /* curry-meats.png in Resources */,
 					A00000000000000000000033 /* curry-seafoods.png in Resources */,
 					A00000000000000000000034 /* curry-vegetables.png in Resources */,
+					A00000000000000000000041 /* curry-others.png in Resources */,
 					A00000000000000000000035 /* beef-source.png in Resources */,
 					A00000000000000000000037 /* pork-source.png in Resources */,
 					A00000000000000000000038 /* vege-source.png in Resources */,
