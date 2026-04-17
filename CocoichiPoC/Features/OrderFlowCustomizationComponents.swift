@@ -438,75 +438,106 @@ private struct SauceFlavorCard: View {
     let isSelected: Bool
     let action: () -> Void
 
+    @State private var rippleOrigin: CGPoint = .zero
+    @State private var rippleTrigger = 0
+
     var body: some View {
         Button(action: action) {
-            GeometryReader { proxy in
-                let leftPaneWidth = max(proxy.size.width * 0.43, 158)
+            ZStack {
+                GeometryReader { proxy in
+                    let leftPaneWidth = max(proxy.size.width * 0.43, 158)
 
-                HStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(sauce.cardTitle)
-                            .font(.system(size: 17, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.leading)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.74)
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(sauce.priceBadgeTitle)
-                                .font(.headline.weight(.heavy))
-                                .foregroundStyle(sauce.accentColor)
+                    HStack(spacing: 0) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(sauce.cardTitle)
+                                .font(.system(size: 17, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .multilineTextAlignment(.leading)
                                 .lineLimit(1)
-                                .minimumScaleFactor(0.72)
+                                .minimumScaleFactor(0.74)
 
-                            if let badgeSubtitle = sauce.priceBadgeSubtitle {
-                                Text(badgeSubtitle)
-                                    .font(.caption2.weight(.bold))
-                                    .foregroundStyle(POCColor.textSecondary)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(sauce.priceBadgeTitle)
+                                    .font(.headline.weight(.heavy))
+                                    .foregroundStyle(sauce.accentColor)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.72)
+
+                                if let badgeSubtitle = sauce.priceBadgeSubtitle {
+                                    Text(badgeSubtitle)
+                                        .font(.caption2.weight(.bold))
+                                        .foregroundStyle(POCColor.textSecondary)
+                                }
                             }
+                            .padding(.horizontal, POCSpacing.s)
+                            .padding(.vertical, 8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                    .fill(Color.white.opacity(0.96))
+                            )
+
+                            Text(sauce.subtitle)
+                                .font(.caption2.weight(.medium))
+                                .foregroundStyle(Color.white.opacity(0.96))
+                                .lineLimit(3)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
-                        .padding(.horizontal, POCSpacing.s)
-                        .padding(.vertical, 8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .fill(Color.white.opacity(0.96))
-                        )
+                        .padding(.horizontal, POCSpacing.m)
+                        .padding(.vertical, 12)
+                        .frame(width: leftPaneWidth, height: proxy.size.height, alignment: .leading)
+                        .background(sauce.accentColor)
 
-                        Text(sauce.subtitle)
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(Color.white.opacity(0.96))
-                            .lineLimit(3)
-                            .fixedSize(horizontal: false, vertical: true)
+                        artwork
+                            .frame(width: proxy.size.width - leftPaneWidth, height: proxy.size.height)
                     }
-                    .padding(.horizontal, POCSpacing.m)
-                    .padding(.vertical, 12)
-                    .frame(width: leftPaneWidth, height: proxy.size.height, alignment: .leading)
-                    .background(sauce.accentColor)
+                }
 
-                    artwork
-                        .frame(width: proxy.size.width - leftPaneWidth, height: proxy.size.height)
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .stroke(isSelected ? sauce.accentColor : POCColor.line, lineWidth: isSelected ? 2 : 1)
+
+                if isSelected {
+                    RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.08),
+                                    sauce.accentColor.opacity(0.18)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
                 }
             }
             .frame(height: 160)
             .clipShape(RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                    .stroke(isSelected ? sauce.accentColor : POCColor.line, lineWidth: isSelected ? 2 : 1)
-            )
-            .overlay {
+            .modifier(POCRippleEffect(at: rippleOrigin, trigger: rippleTrigger))
+            .overlay(alignment: .topTrailing) {
                 if isSelected {
-                    RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                        .fill(Color.black.opacity(0.42))
-                        .overlay {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 60, weight: .bold))
-                                .foregroundStyle(.white)
-                        }
+                    Label("選択中", systemImage: "checkmark.circle.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(POCColor.textPrimary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.white.opacity(0.72), lineWidth: 1)
+                        )
+                        .padding(POCSpacing.s)
                 }
             }
             .shadow(color: Color.black.opacity(isSelected ? 0.12 : 0.06), radius: isSelected ? 18 : 12, x: 0, y: 8)
         }
+        .onPOCPressingChanged { location in
+            guard let location else { return }
+            rippleOrigin = location
+            rippleTrigger += 1
+        }
         .buttonStyle(.plain)
+        .animation(.spring(response: 0.3, dampingFraction: 0.84), value: isSelected)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(sauce.cardTitle)、\(sauce.priceBadgeTitle)、\(isSelected ? "選択中" : "未選択")")
     }
 
     @ViewBuilder
