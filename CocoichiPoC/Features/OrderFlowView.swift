@@ -94,13 +94,15 @@ struct CurryDetailView: View {
                 }
                 .animation(.snappy(duration: 0.24), value: showsCompactHeader)
                 .safeAreaInset(edge: .bottom) {
-                    PrimaryCTAButton(title: "\(CustomizationPhase.basics.actionTitle) \(draft.total.yenText)", systemImage: "arrow.right") {
-                        showToppings()
-                    }
-                    .padding(.horizontal, POCSpacing.l)
-                    .padding(.top, POCSpacing.s)
-                    .padding(.bottom, POCSpacing.s)
-                    .background(.ultraThinMaterial)
+                    OrderFlowFooterBar(
+                        total: draft.total,
+                        secondaryTitle: "トッピング",
+                        secondarySystemImage: "arrow.right",
+                        secondaryAction: showToppings,
+                        primaryTitle: "注文確認",
+                        primarySystemImage: "cart",
+                        primaryAction: showOrderReview
+                    )
                 }
                 .task(id: draft.id) {
                     isSauceAmountExpanded = false
@@ -121,6 +123,11 @@ struct CurryDetailView: View {
     private func showToppings() {
         guard navigator.path.last != .curryToppings else { return }
         navigator.push(.curryToppings)
+    }
+
+    private func showOrderReview() {
+        guard navigator.path.last != .orderReview else { return }
+        navigator.push(.orderReview)
     }
 }
 
@@ -169,13 +176,15 @@ struct CurryToppingsView: View {
                 }
                 .animation(.snappy(duration: 0.24), value: showsCompactHeader)
                 .safeAreaInset(edge: .bottom) {
-                    PrimaryCTAButton(title: "\(CustomizationPhase.toppings.actionTitle) \(draft.total.yenText)", systemImage: "cart") {
-                        showOrderReview()
-                    }
-                    .padding(.horizontal, POCSpacing.l)
-                    .padding(.top, POCSpacing.s)
-                    .padding(.bottom, POCSpacing.s)
-                    .background(.ultraThinMaterial)
+                    OrderFlowFooterBar(
+                        total: draft.total,
+                        secondaryTitle: "ベース設定",
+                        secondarySystemImage: "arrow.uturn.backward",
+                        secondaryAction: showBasics,
+                        primaryTitle: "注文確認",
+                        primarySystemImage: "cart",
+                        primaryAction: showOrderReview
+                    )
                 }
             } else {
                 EmptyStateCard(title: "選択中の商品がありません", message: "メニュー一覧から商品を選んでください。")
@@ -190,8 +199,51 @@ struct CurryToppingsView: View {
         heroMinY < -96
     }
 
+    private func showBasics() {
+        navigator.popToCurryDetail()
+    }
+
     private func showOrderReview() {
         guard navigator.path.last != .orderReview else { return }
         navigator.push(.orderReview)
+    }
+}
+
+private struct OrderFlowFooterBar: View {
+    let total: Int
+    let secondaryTitle: String
+    let secondarySystemImage: String?
+    let secondaryAction: () -> Void
+    let primaryTitle: String
+    let primarySystemImage: String?
+    let primaryAction: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            Text(footerPriceText)
+                .font(.title3.weight(.bold))
+                .foregroundStyle(POCColor.textPrimary)
+                .monospacedDigit()
+                .padding(.trailing, POCSpacing.xs)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+
+            HStack(spacing: POCSpacing.s) {
+                SecondaryCTAButton(title: secondaryTitle, systemImage: secondarySystemImage) {
+                    secondaryAction()
+                }
+
+                PrimaryCTAButton(title: primaryTitle, systemImage: primarySystemImage) {
+                    primaryAction()
+                }
+            }
+        }
+        .padding(.horizontal, POCSpacing.l)
+        .padding(.top, POCSpacing.s)
+        .padding(.bottom, POCSpacing.s)
+        .background(.ultraThinMaterial)
+    }
+
+    private var footerPriceText: String {
+        "￥\(total.formatted(.number.grouping(.automatic)))"
     }
 }
