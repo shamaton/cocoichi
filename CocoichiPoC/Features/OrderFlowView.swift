@@ -316,6 +316,7 @@ private struct OrderFlowFooterBar: View {
                     Text(summaryPriceText(for: item.subtotal))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(POCColor.textSecondary)
+                        .monospacedDigit()
                 }
             }
         }
