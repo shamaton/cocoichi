@@ -239,25 +239,13 @@ private struct OrderFlowFooterBar: View {
                             .foregroundStyle(POCColor.textTertiary)
                             .fixedSize(horizontal: false, vertical: true)
                     } else {
-                        ForEach(displayedSummaryItems) { item in
-                            HStack(alignment: .firstTextBaseline, spacing: POCSpacing.s) {
-                                Text(item.summaryLabel)
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(POCColor.textPrimary)
-                                    .lineLimit(1)
-
-                                Spacer(minLength: 0)
-
-                                Text("+\(item.subtotal.yenText)")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(POCColor.textSecondary)
+                        if usesScrollableSummary {
+                            ScrollView(.vertical, showsIndicators: true) {
+                                summaryItemList
                             }
-                        }
-
-                        if hiddenSummaryCount > 0 {
-                            Text("ほか \(hiddenSummaryCount) 種類")
-                                .font(.caption)
-                                .foregroundStyle(POCColor.textTertiary)
+                            .frame(height: summaryContentHeight)
+                        } else {
+                            summaryItemList
                         }
                     }
                 }
@@ -303,11 +291,39 @@ private struct OrderFlowFooterBar: View {
         "￥\(total.formatted(.number.grouping(.automatic)))"
     }
 
-    private var displayedSummaryItems: [DraftToppingSelection] {
-        Array(summaryItems.prefix(3))
+    private var usesScrollableSummary: Bool {
+        summaryItems.count >= FooterLayout.scrollActivationCount
     }
 
-    private var hiddenSummaryCount: Int {
-        max(summaryItems.count - displayedSummaryItems.count, 0)
+    private var summaryContentHeight: CGFloat {
+        let visibleRowCount = min(summaryItems.count, FooterLayout.maxVisibleRows)
+        let rowCount = CGFloat(visibleRowCount)
+        let spacingCount = CGFloat(max(visibleRowCount - 1, 0))
+        return rowCount * FooterLayout.summaryRowHeight + spacingCount * POCSpacing.xs
     }
+
+    private var summaryItemList: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.xs) {
+            ForEach(summaryItems) { item in
+                HStack(alignment: .firstTextBaseline, spacing: POCSpacing.s) {
+                    Text(item.summaryLabel)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+                        .lineLimit(1)
+
+                    Spacer(minLength: 0)
+
+                    Text("+\(item.subtotal.yenText)")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(POCColor.textSecondary)
+                }
+            }
+        }
+    }
+}
+
+private enum FooterLayout {
+    static let summaryRowHeight: CGFloat = 22
+    static let maxVisibleRows = 4
+    static let scrollActivationCount = 5
 }
