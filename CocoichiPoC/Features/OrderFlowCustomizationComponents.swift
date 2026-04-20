@@ -319,7 +319,7 @@ private struct CompactToppingRow: View {
                     onDecrease: onDecrease,
                     onIncrease: onAdd
                 )
-                .padding(.trailing, ToppingRowLayout.horizontalPadding)
+                .padding(.trailing, ToppingRowLayout.quantityControlTrailingInset)
             }
         }
         .shadow(color: isSelected ? topping.accentColor.opacity(0.14) : .clear, radius: 12, x: 0, y: 8)
@@ -433,8 +433,8 @@ private struct ToppingQuantityControl: View {
             .opacity(isAtMaximum ? 0.6 : 1)
             .accessibilityLabel("\(toppingName)を1個増やす")
         }
-        .padding(.horizontal, 4)
-        .padding(.vertical, 4)
+        .padding(.horizontal, 1)
+        .padding(.vertical, 2)
         .background(
             Capsule()
                 .fill(Color.white.opacity(0.7))
@@ -458,6 +458,7 @@ private enum ToppingRowLayout {
     static let horizontalPadding: CGFloat = POCSpacing.s
     static let verticalPadding: CGFloat = POCSpacing.xs
     static let quantityControlReservedWidth: CGFloat = 108
+    static let quantityControlTrailingInset: CGFloat = 6
     static let minHeight: CGFloat = 86
     static let maximumQuantity: Int = 3
 }
