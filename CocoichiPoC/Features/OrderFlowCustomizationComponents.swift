@@ -242,6 +242,7 @@ private struct CompactToppingRow: View {
             if isSelected {
                 rowContent
                     .accessibilityElement(children: .contain)
+                    .accessibilityLabel("\(topping.name)、\(topping.price.yenText)、\(quantity)個")
             } else {
                 Button(action: onAdd) {
                     rowContent
@@ -267,6 +268,14 @@ private struct CompactToppingRow: View {
                     toppingArtwork
                         .padding(ToppingRowLayout.imagePadding)
                 }
+                .overlay(alignment: .bottom) {
+                    ToppingPriceBadge(
+                        priceText: toppingPriceText,
+                        accentColor: topping.accentColor
+                    )
+                    .padding(.horizontal, 6)
+                    .padding(.bottom, 6)
+                }
 
             VStack(alignment: .leading, spacing: ToppingRowLayout.contentSpacing) {
                 HStack(alignment: .top, spacing: POCSpacing.xs) {
@@ -286,33 +295,13 @@ private struct CompactToppingRow: View {
                             )
                     }
                 }
-
-                if isSelected {
-                    Text("現在 \(quantity)個")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(topping.accentColor)
-                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-
-            VStack(alignment: .trailing, spacing: POCSpacing.xs) {
-                Text("+\(topping.price.yenText)")
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(POCColor.textPrimary)
-
-                if isSelected {
-                    ToppingQuantityControl(
-                        toppingName: topping.name,
-                        quantity: quantity,
-                        accentColor: topping.accentColor,
-                        onDecrease: onDecrease,
-                        onIncrease: onAdd
-                    )
-                }
-            }
+            .padding(.trailing, ToppingRowLayout.quantityControlReservedWidth)
         }
         .padding(.horizontal, ToppingRowLayout.horizontalPadding)
         .padding(.vertical, ToppingRowLayout.verticalPadding)
+        .frame(minHeight: ToppingRowLayout.minHeight)
         .background(
             RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                 .fill(topping.group.discoveryCardBackground)
@@ -321,6 +310,18 @@ private struct CompactToppingRow: View {
             RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                 .stroke(isSelected ? topping.accentColor : POCColor.line, lineWidth: isSelected ? 2 : 1)
         )
+        .overlay(alignment: .trailing) {
+            if isSelected {
+                ToppingQuantityControl(
+                    toppingName: topping.name,
+                    quantity: quantity,
+                    accentColor: topping.accentColor,
+                    onDecrease: onDecrease,
+                    onIncrease: onAdd
+                )
+                .padding(.trailing, ToppingRowLayout.horizontalPadding)
+            }
+        }
         .shadow(color: isSelected ? topping.accentColor.opacity(0.14) : .clear, radius: 12, x: 0, y: 8)
     }
 
@@ -351,6 +352,32 @@ private struct CompactToppingRow: View {
         guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension, subdirectory: "ToppingImages") else { return nil }
         return UIImage(contentsOfFile: url.path)
     }
+
+    private var toppingPriceText: String {
+        "+￥\(topping.price)"
+    }
+}
+
+private struct ToppingPriceBadge: View {
+    let priceText: String
+    let accentColor: Color
+
+    var body: some View {
+        Text(priceText)
+            .font(.caption2.weight(.heavy))
+            .foregroundStyle(.white)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 4)
+            .background(
+                Capsule()
+                    .fill(accentColor.opacity(0.92))
+            )
+            .overlay(
+                Capsule()
+                    .stroke(Color.white.opacity(0.28), lineWidth: 1)
+            )
+    }
 }
 
 private struct ToppingQuantityControl: View {
@@ -361,15 +388,15 @@ private struct ToppingQuantityControl: View {
     let onIncrease: () -> Void
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 2) {
             Button(action: onDecrease) {
                 ZStack {
                     Circle()
                         .fill(Color.white.opacity(0.92))
-                        .frame(width: 28, height: 28)
+                        .frame(width: 24, height: 24)
 
                     Image(systemName: "minus")
-                        .font(.caption.weight(.bold))
+                        .font(.caption2.weight(.bold))
                         .foregroundStyle(accentColor)
                 }
                 .frame(width: 44, height: 44)
@@ -378,30 +405,32 @@ private struct ToppingQuantityControl: View {
             .buttonStyle(.plain)
             .accessibilityLabel("\(toppingName)を1個減らす")
 
-            Text("x\(quantity)")
+            Text("\(quantity)")
                 .font(.subheadline.weight(.bold))
                 .foregroundStyle(POCColor.textPrimary)
                 .monospacedDigit()
-                .frame(minWidth: 34)
+                .frame(minWidth: 16)
 
             Button(action: onIncrease) {
                 ZStack {
                     Circle()
                         .fill(accentColor)
-                        .frame(width: 28, height: 28)
+                        .frame(width: 24, height: 24)
 
                     Image(systemName: "plus")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.white)
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(isAtMaximum ? Color.white.opacity(0.75) : .white)
                 }
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .disabled(isAtMaximum)
+            .opacity(isAtMaximum ? 0.6 : 1)
             .accessibilityLabel("\(toppingName)を1個増やす")
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 4)
+        .padding(.vertical, 4)
         .background(
             Capsule()
                 .fill(Color.white.opacity(0.7))
@@ -410,6 +439,10 @@ private struct ToppingQuantityControl: View {
             Capsule()
                 .stroke(accentColor.opacity(0.35), lineWidth: 1)
         )
+    }
+
+    private var isAtMaximum: Bool {
+        quantity >= ToppingRowLayout.maximumQuantity
     }
 }
 
@@ -420,6 +453,9 @@ private enum ToppingRowLayout {
     static let contentSpacing: CGFloat = 6
     static let horizontalPadding: CGFloat = POCSpacing.s
     static let verticalPadding: CGFloat = POCSpacing.xs
+    static let quantityControlReservedWidth: CGFloat = 108
+    static let minHeight: CGFloat = 86
+    static let maximumQuantity: Int = 3
 }
 
 struct CurryDetailHeroCard: View {
