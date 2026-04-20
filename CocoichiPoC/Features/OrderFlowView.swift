@@ -182,7 +182,6 @@ struct CurryToppingsView: View {
                     OrderFlowFooterBar(
                         total: draft.total,
                         summaryItems: draft.toppingSelections,
-                        summaryPlaceholder: "選択したトッピングがここに表示されます。",
                         secondaryTitle: "ベース設定",
                         secondarySystemImage: "arrow.uturn.backward",
                         secondaryAction: showBasics,
@@ -217,7 +216,6 @@ struct CurryToppingsView: View {
 private struct OrderFlowFooterBar: View {
     let total: Int
     let summaryItems: [DraftToppingSelection]
-    var summaryPlaceholder: String? = nil
     let secondaryTitle: String
     let secondarySystemImage: String?
     let secondaryAction: () -> Void
@@ -227,26 +225,19 @@ private struct OrderFlowFooterBar: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.xs) {
-            if !summaryItems.isEmpty || summaryPlaceholder != nil {
+            if !summaryItems.isEmpty {
                 VStack(alignment: .leading, spacing: POCSpacing.xs) {
                     Text("選択中のトッピング")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(POCColor.textSecondary)
 
-                    if summaryItems.isEmpty {
-                        Text(summaryPlaceholder ?? "")
-                            .font(.subheadline)
-                            .foregroundStyle(POCColor.textTertiary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    } else {
-                        if usesScrollableSummary {
-                            ScrollView(.vertical, showsIndicators: true) {
-                                summaryItemList
-                            }
-                            .frame(height: summaryContentHeight)
-                        } else {
+                    if usesScrollableSummary {
+                        ScrollView(.vertical, showsIndicators: true) {
                             summaryItemList
                         }
+                        .frame(height: summaryContentHeight)
+                    } else {
+                        summaryItemList
                     }
                 }
                 .padding(.horizontal, POCSpacing.m)
