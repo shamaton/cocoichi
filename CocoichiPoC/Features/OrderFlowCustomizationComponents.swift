@@ -271,7 +271,7 @@ private struct CompactToppingRow: View {
                 .overlay(alignment: .bottom) {
                     ToppingPriceBadge(
                         priceText: toppingPriceText,
-                        accentColor: topping.accentColor
+                        accentColor: priceBadgeAccentColor
                     )
                     .padding(.horizontal, 6)
                     .padding(.bottom, 6)
@@ -355,6 +355,10 @@ private struct CompactToppingRow: View {
 
     private var toppingPriceText: String {
         "+￥\(topping.price)"
+    }
+
+    private var priceBadgeAccentColor: Color {
+        Color(hex: topping.group.priceBadgeAccentHex)
     }
 }
 

@@ -138,6 +138,15 @@ enum ToppingGroup: String, CaseIterable, Codable, Hashable {
         }
     }
 
+    var priceBadgeAccentHex: UInt {
+        switch self {
+        case .seafood:
+            return 0x6F97C7
+        default:
+            return accentHex
+        }
+    }
+
     var discoveryCardBackground: LinearGradient {
         switch self {
         case .meat:
