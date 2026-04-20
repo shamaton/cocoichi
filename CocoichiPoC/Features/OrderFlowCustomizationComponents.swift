@@ -98,25 +98,12 @@ struct CurryBasicsContent: View {
 }
 
 struct CurryToppingsContent: View {
-    let draft: DraftOrder
-
     var body: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.xs) {
-            SectionHeader("トッピングの選び方")
-            Text(helperMessage)
-                .font(.subheadline)
-                .foregroundStyle(POCColor.textSecondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(POCSpacing.m)
-        .pocCard(fill: POCColor.elevated)
-    }
-
-    private var helperMessage: String {
-        if draft.toppingSelections.isEmpty {
-            return "気になるトッピングを追加すると、下のバーに内容と合計が表示されます。"
-        }
-        return "\(draft.toppingSelections.count)種類を選択中です。個数はカード内の - / + で調整できます。"
+        Text("タップでトッピングが追加できます")
+            .font(.subheadline)
+            .foregroundStyle(POCColor.textSecondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -321,16 +308,6 @@ private struct CompactToppingRow: View {
                         onDecrease: onDecrease,
                         onIncrease: onAdd
                     )
-                } else {
-                    Text("追加")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(POCColor.curry)
-                        .padding(.horizontal, POCSpacing.s)
-                        .padding(.vertical, 8)
-                        .background(
-                            Capsule()
-                                .fill(Color.white.opacity(0.88))
-                        )
                 }
             }
         }

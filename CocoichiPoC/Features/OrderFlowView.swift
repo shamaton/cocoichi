@@ -156,7 +156,7 @@ struct CurryToppingsView: View {
                             }
 
                         VStack(alignment: .leading, spacing: POCSpacing.m) {
-                            CurryToppingsContent(draft: draft)
+                            CurryToppingsContent()
                         }
 
                         CurryToppingSectionList(draft: draft)
