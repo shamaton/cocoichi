@@ -183,8 +183,16 @@ final class OrderStore: ObservableObject {
         updateDraft { $0.with(sauceAmount: amount) }
     }
 
-    func toggleTopping(_ topping: Topping) {
-        updateDraft { $0.toggling(topping: topping) }
+    func addTopping(_ topping: Topping) {
+        updateDraft { $0.adding(topping: topping) }
+    }
+
+    func removeTopping(_ topping: Topping) {
+        updateDraft { $0.removingOne(topping: topping) }
+    }
+
+    func clearTopping(_ topping: Topping) {
+        updateDraft { $0.removingAll(topping: topping) }
     }
 
     func applyCoupon(_ coupon: Coupon) {

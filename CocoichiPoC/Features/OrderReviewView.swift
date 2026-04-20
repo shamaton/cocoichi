@@ -211,7 +211,7 @@ private struct CartLineSummaryCard: View {
     }
 
     private var toppingSummary: String {
-        draft.toppings.isEmpty ? "なし" : draft.toppings.map(\.name).joined(separator: " / ")
+        draft.toppings.isEmpty ? "なし" : draft.toppingsSummary
     }
 }
 

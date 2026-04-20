@@ -684,20 +684,50 @@ struct DraftOrder: Identifiable, Hashable, Codable {
         "\(menuItem.name) \(spiceLevelText)"
     }
 
-    var toppingsSummary: String {
-        if toppings.isEmpty {
-            return "トッピングなし"
+    var toppingSelections: [DraftToppingSelection] {
+        var orderedIDs: [String] = []
+        var grouped: [String: DraftToppingSelection] = [:]
+
+        for topping in toppings {
+            if let current = grouped[topping.id] {
+                grouped[topping.id] = DraftToppingSelection(topping: current.topping, quantity: current.quantity + 1)
+            } else {
+                orderedIDs.append(topping.id)
+                grouped[topping.id] = DraftToppingSelection(topping: topping, quantity: 1)
+            }
         }
-        return toppings.map(\.name).joined(separator: " / ")
+
+        return orderedIDs.compactMap { grouped[$0] }
     }
 
-    func toggling(topping: Topping) -> DraftOrder {
-        var next = self
-        if next.toppings.contains(where: { $0.id == topping.id }) {
-            next.toppings.removeAll { $0.id == topping.id }
-        } else {
-            next.toppings.append(topping)
+    var toppingsSummary: String {
+        if toppingSelections.isEmpty {
+            return "トッピングなし"
         }
+        return toppingSelections.map(\.summaryLabel).joined(separator: " / ")
+    }
+
+    func quantity(for toppingID: String) -> Int {
+        toppingSelections.first(where: { $0.id == toppingID })?.quantity ?? 0
+    }
+
+    func adding(topping: Topping) -> DraftOrder {
+        var next = self
+        next.toppings.append(topping)
+        return next.normalizedCoupon()
+    }
+
+    func removingOne(topping: Topping) -> DraftOrder {
+        var next = self
+        if let index = next.toppings.lastIndex(where: { $0.id == topping.id }) {
+            next.toppings.remove(at: index)
+        }
+        return next.normalizedCoupon()
+    }
+
+    func removingAll(topping: Topping) -> DraftOrder {
+        var next = self
+        next.toppings.removeAll { $0.id == topping.id }
         return next.normalizedCoupon()
     }
 
@@ -742,6 +772,21 @@ struct DraftOrder: Identifiable, Hashable, Codable {
         var next = self
         next.appliedCoupon = nil
         return next
+    }
+}
+
+struct DraftToppingSelection: Identifiable, Hashable {
+    let topping: Topping
+    let quantity: Int
+
+    var id: String { topping.id }
+
+    var summaryLabel: String {
+        "\(topping.name) x \(quantity)"
+    }
+
+    var subtotal: Int {
+        topping.price * quantity
     }
 }
 

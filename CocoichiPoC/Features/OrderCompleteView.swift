@@ -231,7 +231,7 @@ struct DraftSnapshotCard: View {
             SummaryRow(title: "Spice", value: draft.spiceLevelText)
             SummaryRow(title: "Rice", value: "\(draft.riceGrams)g")
             SummaryRow(title: "Sauce Amount", value: draft.sauceAmount.rawValue)
-            SummaryRow(title: "Topping", value: draft.toppings.isEmpty ? "なし" : draft.toppings.map(\.name).joined(separator: " / "))
+            SummaryRow(title: "Topping", value: draft.toppings.isEmpty ? "なし" : draft.toppingsSummary)
             if showsCoupon {
                 SummaryRow(title: "Coupon", value: draft.appliedCoupon?.displayTitle ?? "-")
             }
@@ -262,7 +262,7 @@ private struct CompletedOrderCard: View {
             SectionHeader("Your Order")
             ForEach(Array(order.cartItems.enumerated()), id: \.element.id) { index, item in
                 SummaryRow(title: "\(index + 1)皿目", value: item.draft.menuItem.name)
-                SummaryRow(title: "内容", value: "\(item.draft.spiceLevelText) / \(item.draft.riceGrams)g / \(item.draft.toppings.isEmpty ? "トッピングなし" : item.draft.toppings.map(\.name).joined(separator: " / "))")
+                SummaryRow(title: "内容", value: "\(item.draft.spiceLevelText) / \(item.draft.riceGrams)g / \(item.draft.toppingsSummary)")
                 SummaryRow(title: "小計", value: item.subtotal.yenText)
             }
             SummaryRow(title: "Coupon", value: order.appliedCoupon?.displayTitle ?? "-")

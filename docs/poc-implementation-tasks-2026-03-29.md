@@ -97,7 +97,7 @@
 | T02 | Theme / Design Tokens | color, spacing, radius, typography, motion, haptics の foundation と semantic token を定義する | T01 | 画面実装が token 経由で色と CTA を参照できる |
 | T03 | Mock Domain Models | Store, MenuItem, CurrySauceOption, RicePortion, SpiceLevel, SauceAmountOption, Topping, CartLineItem, FavoriteCombo, Coupon, DraftOrder, CompletedOrder のモデルを作る | T01 | 主要画面に必要なローカルデータ構造が揃う |
 | T04 | Seed Data / Mock Rules | 店舗一覧、商品一覧、店舗限定メニュー可否、カレーソース候補、ライス量、辛さ、ソース量、トッピング、サイドメニュー、クーポン候補、モック受取時間算出を用意する | T03 | 画面間をまたいで同じデータで表示でき、店舗設定時だけ限定メニューを返せる |
-| T05 | Order State Store | 選択店舗、受取モード、商品、カレーソース、ライス量、辛さ、ソース量、トッピング、価格、pending draft、カート、適用クーポン、保存状態を持つ状態管理を作る | T03,T04 | 画面をまたいでも注文状態が崩れず、S3 から S5 に pending draft を渡せる。pending draft は常に1件だけ保持され、トッピングは一意管理され、重複タップは no-op になる。店舗変更時は store-scoped state をまとめて破棄できる |
+| T05 | Order State Store | 選択店舗、受取モード、商品、カレーソース、ライス量、辛さ、ソース量、トッピング、価格、pending draft、カート、適用クーポン、保存状態を持つ状態管理を作る | T03,T04 | 画面をまたいでも注文状態が崩れず、S3 から S5 に pending draft を渡せる。pending draft は常に1件だけ保持され、同一トッピングは数量として複数保持できる。店舗変更時は store-scoped state をまとめて破棄できる |
 | T06 | Shared UI Components | Primary/Secondary CTA、chip、card、price row、store header、sheet header を共通化する | T02,T05 | S2-S8 で共通UIを使い回せる |
 | T07 | S1 Store Select | 注文開始や店舗変更時に呼び出せる店舗選択ゲート、`現在地 / 駅名 / 郵便番号 / 店名` の検索入口、受取目安表示、`保存済みから始める` 導線を実装する | T04,T05,T06 | 店舗選択後に S2 へ進める。GPS 失敗時も手入力検索で継続できる |
 | T08 | Home / S2 MenuDiscovery Layout | Home の受取先カード、期間限定バナー、おすすめ、他タブ導線と、S2 の店舗ヘッダー、検索欄、quick filters、For You、Popular、Menu List、下部導線を実装する。S2 では店舗限定メニューをヘッダー直下または一覧バッジで自然に混ぜる | T04,T05,T06,T07 | Home から受取先設定やメニュー閲覧へ進め、S2 では商品カードから S3 へ遷移できる。店舗設定済み時だけ限定メニューを表示できる。限定商品が 0 件の店舗では無理にセクションを出さない。S3 から戻って別メニューを選んだ時は pending draft が新しい選択で置き換わる |
@@ -106,7 +106,7 @@
 | T11 | S4 Saved Combos Minimal Screen | 保存済み構成一覧、再開、メニューへ戻る、店舗変更の最低限 UI を作る | T05,T06,T07 | S1/S2/S8 から S4 に入り S3 へ進める |
 | T12 | S3 Two-Phase Base Layout | Hero image、商品情報、Order Snapshot card、phase switcher、基本設定 area、トッピング area、下部 CTA を実装する。店舗限定商品では `この店舗限定` の補助表示も持つ | T05,T06,T08 | 初期状態の S3 が 2 phase 前提で表示される。店舗限定商品から入った時も限定文脈を落とさない |
 | T13 | S3 Basics To Toppings Flow | `基本設定 -> トッピング` の進行、戻る/進む、進捗表示、`Review Order` CTA から pending draft のまま S5 に渡す遷移を実装する | T05,T12 | 現在地と残り工程が崩れず進行できる |
-| T14 | S3 Customization Logic | 基本設定 phase の選択、ソース量折りたたみ、トッピング追加削除、価格再計算、Order Snapshot 更新、軽い反応を実装する | T05,T12,T13 | 変更が即時に価格とサマリーへ反映され、S5 では pending draft を review 用に受け取れる。選択済みトッピングは Added または非表示で扱い、重複追加できない |
+| T14 | S3 Customization Logic | 基本設定 phase の選択、ソース量折りたたみ、トッピング追加削除、価格再計算、Order Snapshot 更新、軽い反応を実装する | T05,T12,T13 | 変更が即時に価格とサマリーへ反映され、S5 では pending draft を review 用に受け取れる。トッピングはカード内で数量増減でき、選択済み一覧は下部 summary で確認できる |
 | T15 | S7 Save Favorite Sheet | 完了済み注文の名前入力、注文サマリー、保存/キャンセルを持つ modal sheet を実装する | T05,T06,T22,T23 | S8 から保存 sheet を呼べ、保存後に S8 へ戻れる |
 | T16 | Favorite Persistence / Resume | 保存済み構成のローカル保存、再編集前提の復元、For You 反映を実装する | T05,T11,T15 | 保存後に S4 と S2 の再利用導線へ反映される |
 | T17 | S5 Order Review Layout | Pickup card、pending draft を含む cart summary、Suggested Savings、Price Summary、下部 CTA を実装する。店舗限定商品では order card に短い補助ラベルを残す | T05,T06,T14 | pending draft と cart line item の見せ分けができ、`内容を修正` は pending draft のみに対して表示される。初版 PoC では cart line item は read-only として扱い、クーポン適用後でも Add More を残す。店舗限定文脈を落とさない |

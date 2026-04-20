@@ -101,3 +101,14 @@
    Done by: CODEX
    Done at: 2026-04-15T06:10:01Z
 
+10. topping-selection-quantity-and-footer-summary
+   Id: 10-topping-selection-quantity-and-footer-summary
+   Scope: Now / M2-M3
+   Files: docs/poc-wireframes-s2-s3-2026-03-28.md, docs/poc-implementation-tasks-2026-03-29.md, CocoichiPoC/Domain/POCModels.swift, CocoichiPoC/State/OrderStore.swift, CocoichiPoC/Features/OrderFlowView.swift, CocoichiPoC/Features/OrderFlowCustomizationComponents.swift, CocoichiPoC/Features/OrderReviewView.swift
+   Note: S3トッピングを数量選択対応へ更新。上部チップを下部サマリーへ置換、S5/S8/保存済み表示を x N 表記へ統一。make build成功、make testはschemeにtest action未設定、subagent review ok
+   Detail: tasks/details/10-topping-selection-quantity-and-footer-summary.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-19T23:11:31Z
+   Done by: CODEX
+   Done at: 2026-04-19T23:26:59Z
+

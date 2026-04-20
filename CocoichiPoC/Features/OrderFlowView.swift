@@ -97,6 +97,7 @@ struct CurryDetailView: View {
                 .safeAreaInset(edge: .bottom) {
                     OrderFlowFooterBar(
                         total: draft.total,
+                        summaryItems: [],
                         secondaryTitle: "トッピング",
                         secondarySystemImage: "arrow.right",
                         secondaryAction: showToppings,
@@ -180,6 +181,8 @@ struct CurryToppingsView: View {
                 .safeAreaInset(edge: .bottom) {
                     OrderFlowFooterBar(
                         total: draft.total,
+                        summaryItems: draft.toppingSelections,
+                        summaryPlaceholder: "選択したトッピングがここに表示されます。",
                         secondaryTitle: "ベース設定",
                         secondarySystemImage: "arrow.uturn.backward",
                         secondaryAction: showBasics,
@@ -213,6 +216,8 @@ struct CurryToppingsView: View {
 
 private struct OrderFlowFooterBar: View {
     let total: Int
+    let summaryItems: [DraftToppingSelection]
+    var summaryPlaceholder: String? = nil
     let secondaryTitle: String
     let secondarySystemImage: String?
     let secondaryAction: () -> Void
@@ -222,6 +227,53 @@ private struct OrderFlowFooterBar: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
+            if !summaryItems.isEmpty || summaryPlaceholder != nil {
+                VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                    Text("選択中のトッピング")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(POCColor.textSecondary)
+
+                    if summaryItems.isEmpty {
+                        Text(summaryPlaceholder ?? "")
+                            .font(.subheadline)
+                            .foregroundStyle(POCColor.textTertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } else {
+                        ForEach(displayedSummaryItems) { item in
+                            HStack(alignment: .firstTextBaseline, spacing: POCSpacing.s) {
+                                Text(item.summaryLabel)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(POCColor.textPrimary)
+                                    .lineLimit(1)
+
+                                Spacer(minLength: 0)
+
+                                Text("+\(item.subtotal.yenText)")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(POCColor.textSecondary)
+                            }
+                        }
+
+                        if hiddenSummaryCount > 0 {
+                            Text("ほか \(hiddenSummaryCount) 種類")
+                                .font(.caption)
+                                .foregroundStyle(POCColor.textTertiary)
+                        }
+                    }
+                }
+                .padding(.horizontal, POCSpacing.m)
+                .padding(.vertical, POCSpacing.s)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                        .fill(Color.white.opacity(0.58))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                        .stroke(POCColor.line, lineWidth: 1)
+                )
+            }
+
             Text(footerPriceText)
                 .font(.title3.weight(.bold))
                 .foregroundStyle(POCColor.textPrimary)
@@ -249,5 +301,13 @@ private struct OrderFlowFooterBar: View {
 
     private var footerPriceText: String {
         "￥\(total.formatted(.number.grouping(.automatic)))"
+    }
+
+    private var displayedSummaryItems: [DraftToppingSelection] {
+        Array(summaryItems.prefix(3))
+    }
+
+    private var hiddenSummaryCount: Int {
+        max(summaryItems.count - displayedSummaryItems.count, 0)
     }
 }

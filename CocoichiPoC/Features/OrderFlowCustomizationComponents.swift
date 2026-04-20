@@ -98,19 +98,25 @@ struct CurryBasicsContent: View {
 }
 
 struct CurryToppingsContent: View {
-    @EnvironmentObject private var orderStore: OrderStore
-
     let draft: DraftOrder
 
     var body: some View {
-        if !draft.toppings.isEmpty {
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                SectionHeader("Selected Toppings")
-                FlexibleChipGroup(items: draft.toppings) { topping in
-                    orderStore.toggleTopping(topping)
-                }
-            }
+        VStack(alignment: .leading, spacing: POCSpacing.xs) {
+            SectionHeader("トッピングの選び方")
+            Text(helperMessage)
+                .font(.subheadline)
+                .foregroundStyle(POCColor.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .padding(POCSpacing.m)
+        .pocCard(fill: POCColor.elevated)
+    }
+
+    private var helperMessage: String {
+        if draft.toppingSelections.isEmpty {
+            return "気になるトッピングを追加すると、下のバーに内容と合計が表示されます。"
+        }
+        return "\(draft.toppingSelections.count)種類を選択中です。個数はカード内の - / + で調整できます。"
     }
 }
 
@@ -126,10 +132,12 @@ struct CurryToppingSectionList: View {
                     ForEach(section.items) { topping in
                         CompactToppingRow(
                             topping: topping,
-                            isSelected: selectedToppingIDs.contains(topping.id),
+                            quantity: toppingQuantities[topping.id] ?? 0,
                             isRecommended: recommendedToppingIDs.contains(topping.id)
                         ) {
-                            orderStore.toggleTopping(topping)
+                            orderStore.addTopping(topping)
+                        } onDecrease: {
+                            orderStore.removeTopping(topping)
                         }
                     }
                 }
@@ -139,8 +147,8 @@ struct CurryToppingSectionList: View {
         }
     }
 
-    private var selectedToppingIDs: Set<String> {
-        Set(draft.toppings.map(\.id))
+    private var toppingQuantities: [String: Int] {
+        Dictionary(uniqueKeysWithValues: draft.toppingSelections.map { ($0.id, $0.quantity) })
     }
 
     private var recommendedToppingIDs: Set<String> {
@@ -237,60 +245,106 @@ private struct StickyToppingGroupHeader: View {
 
 private struct CompactToppingRow: View {
     let topping: Topping
-    let isSelected: Bool
+    let quantity: Int
     let isRecommended: Bool
-    let action: () -> Void
+    let onAdd: () -> Void
+    let onDecrease: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: POCSpacing.m) {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(Color.white.opacity(0.32))
-                    .frame(width: ToppingRowLayout.iconWidth, height: ToppingRowLayout.iconHeight)
-                    .overlay {
-                        toppingArtwork
-                            .padding(ToppingRowLayout.imagePadding)
-                    }
+        Group {
+            if isSelected {
+                rowContent
+                    .accessibilityElement(children: .contain)
+            } else {
+                Button(action: onAdd) {
+                    rowContent
+                }
+                .buttonStyle(.plain)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(topping.name)、\(topping.price.yenText)、未追加")
+            }
+        }
+        .animation(.snappy(duration: 0.22), value: quantity)
+    }
 
-                VStack(alignment: .leading, spacing: ToppingRowLayout.contentSpacing) {
-                    HStack(alignment: .top, spacing: POCSpacing.xs) {
-                        Text(topping.name)
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(POCColor.textPrimary)
-                            .lineLimit(2)
+    private var isSelected: Bool {
+        quantity > 0
+    }
 
-                        if isRecommended {
-                            Text("おすすめ")
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(POCColor.curry)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(
-                                    Capsule().fill(Color.white.opacity(0.9))
-                                )
-                        }
+    private var rowContent: some View {
+        HStack(spacing: POCSpacing.m) {
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Color.white.opacity(0.32))
+                .frame(width: ToppingRowLayout.iconWidth, height: ToppingRowLayout.iconHeight)
+                .overlay {
+                    toppingArtwork
+                        .padding(ToppingRowLayout.imagePadding)
+                }
+
+            VStack(alignment: .leading, spacing: ToppingRowLayout.contentSpacing) {
+                HStack(alignment: .top, spacing: POCSpacing.xs) {
+                    Text(topping.name)
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+                        .lineLimit(2)
+
+                    if isRecommended {
+                        Text("おすすめ")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(POCColor.curry)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule().fill(Color.white.opacity(0.9))
+                            )
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
 
+                if isSelected {
+                    Text("現在 \(quantity)個")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(topping.accentColor)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            VStack(alignment: .trailing, spacing: POCSpacing.xs) {
                 Text("+\(topping.price.yenText)")
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(POCColor.textPrimary)
+
+                if isSelected {
+                    ToppingQuantityControl(
+                        toppingName: topping.name,
+                        quantity: quantity,
+                        accentColor: topping.accentColor,
+                        onDecrease: onDecrease,
+                        onIncrease: onAdd
+                    )
+                } else {
+                    Text("追加")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(POCColor.curry)
+                        .padding(.horizontal, POCSpacing.s)
+                        .padding(.vertical, 8)
+                        .background(
+                            Capsule()
+                                .fill(Color.white.opacity(0.88))
+                        )
+                }
             }
-            .padding(.horizontal, ToppingRowLayout.horizontalPadding)
-            .padding(.vertical, ToppingRowLayout.verticalPadding)
-            .background(
-                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                    .fill(topping.group.discoveryCardBackground)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                    .stroke(isSelected ? topping.accentColor : POCColor.line, lineWidth: 1)
-            )
         }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(topping.name)、\(topping.price.yenText)、\(isSelected ? "追加済み" : "未追加")")
+        .padding(.horizontal, ToppingRowLayout.horizontalPadding)
+        .padding(.vertical, ToppingRowLayout.verticalPadding)
+        .background(
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .fill(topping.group.discoveryCardBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .stroke(isSelected ? topping.accentColor : POCColor.line, lineWidth: isSelected ? 2 : 1)
+        )
+        .shadow(color: isSelected ? topping.accentColor.opacity(0.14) : .clear, radius: 12, x: 0, y: 8)
     }
 
     @ViewBuilder
@@ -319,6 +373,66 @@ private struct CompactToppingRow: View {
         }
         guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension, subdirectory: "ToppingImages") else { return nil }
         return UIImage(contentsOfFile: url.path)
+    }
+}
+
+private struct ToppingQuantityControl: View {
+    let toppingName: String
+    let quantity: Int
+    let accentColor: Color
+    let onDecrease: () -> Void
+    let onIncrease: () -> Void
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Button(action: onDecrease) {
+                ZStack {
+                    Circle()
+                        .fill(Color.white.opacity(0.92))
+                        .frame(width: 28, height: 28)
+
+                    Image(systemName: "minus")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(accentColor)
+                }
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(toppingName)を1個減らす")
+
+            Text("x\(quantity)")
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(POCColor.textPrimary)
+                .monospacedDigit()
+                .frame(minWidth: 34)
+
+            Button(action: onIncrease) {
+                ZStack {
+                    Circle()
+                        .fill(accentColor)
+                        .frame(width: 28, height: 28)
+
+                    Image(systemName: "plus")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white)
+                }
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(toppingName)を1個増やす")
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(
+            Capsule()
+                .fill(Color.white.opacity(0.7))
+        )
+        .overlay(
+            Capsule()
+                .stroke(accentColor.opacity(0.35), lineWidth: 1)
+        )
     }
 }
 
@@ -1489,51 +1603,5 @@ private struct SelectionCard: View {
             )
         }
         .buttonStyle(.plain)
-    }
-}
-
-private struct FlexibleChipGroup: View {
-    let items: [Topping]
-    let onRemove: (Topping) -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.xs) {
-            ForEach(chunked(items, size: 2), id: \.self) { row in
-                HStack(spacing: POCSpacing.xs) {
-                    ForEach(row) { topping in
-                        Button {
-                            onRemove(topping)
-                        } label: {
-                            HStack(spacing: POCSpacing.xs) {
-                                Text(topping.name)
-                                Image(systemName: "xmark")
-                                    .font(.caption.weight(.bold))
-                            }
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(POCColor.textPrimary)
-                            .padding(.horizontal, POCSpacing.s)
-                            .padding(.vertical, POCSpacing.xs)
-                            .background(
-                                Capsule()
-                                    .fill(topping.accentColor.opacity(0.18))
-                            )
-                            .overlay(
-                                Capsule()
-                                    .stroke(topping.accentColor.opacity(0.5), lineWidth: 1)
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    }
-
-                    Spacer(minLength: 0)
-                }
-            }
-        }
-    }
-
-    private func chunked(_ toppings: [Topping], size: Int) -> [[Topping]] {
-        stride(from: 0, to: toppings.count, by: size).map { index in
-            Array(toppings[index..<min(index + size, toppings.count)])
-        }
     }
 }
