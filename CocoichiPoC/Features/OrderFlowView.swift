@@ -313,12 +313,16 @@ private struct OrderFlowFooterBar: View {
 
                     Spacer(minLength: 0)
 
-                    Text("+\(item.subtotal.yenText)")
+                    Text(summaryPriceText(for: item.subtotal))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(POCColor.textSecondary)
                 }
             }
         }
+    }
+
+    private func summaryPriceText(for amount: Int) -> String {
+        "+￥\(amount.formatted(.number.grouping(.automatic)))"
     }
 }
 
