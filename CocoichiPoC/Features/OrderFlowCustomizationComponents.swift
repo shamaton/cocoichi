@@ -278,23 +278,10 @@ private struct CompactToppingRow: View {
                 }
 
             VStack(alignment: .leading, spacing: ToppingRowLayout.contentSpacing) {
-                HStack(alignment: .top, spacing: POCSpacing.xs) {
-                    Text(topping.name)
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(POCColor.textPrimary)
-                        .lineLimit(2)
-
-                    if isRecommended {
-                        Text("おすすめ")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(POCColor.curry)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(
-                                Capsule().fill(Color.white.opacity(0.9))
-                            )
-                    }
-                }
+                Text(topping.name)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .lineLimit(2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.trailing, ToppingRowLayout.quantityControlReservedWidth)
@@ -310,6 +297,12 @@ private struct CompactToppingRow: View {
             RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                 .stroke(isSelected ? topping.accentColor : POCColor.line, lineWidth: isSelected ? 2 : 1)
         )
+        .overlay(alignment: .topTrailing) {
+            if isRecommended {
+                ToppingRecommendationBadge()
+                    .offset(x: 6, y: -6)
+            }
+        }
         .overlay(alignment: .trailing) {
             if isSelected {
                 ToppingQuantityControl(
@@ -380,6 +373,24 @@ private struct ToppingPriceBadge: View {
             .overlay(
                 Capsule()
                     .stroke(Color.white.opacity(0.28), lineWidth: 1)
+            )
+    }
+}
+
+private struct ToppingRecommendationBadge: View {
+    var body: some View {
+        Text("オススメ！")
+            .font(.system(size: 10, weight: .bold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(
+                Capsule()
+                    .fill(POCColor.curry.opacity(0.92))
+            )
+            .overlay(
+                Capsule()
+                    .stroke(Color.white.opacity(0.25), lineWidth: 1)
             )
     }
 }
