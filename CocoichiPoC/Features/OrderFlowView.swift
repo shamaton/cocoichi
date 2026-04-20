@@ -226,7 +226,7 @@ private struct OrderFlowFooterBar: View {
     let primaryAction: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
+        VStack(alignment: .leading, spacing: POCSpacing.xs) {
             if !summaryItems.isEmpty || summaryPlaceholder != nil {
                 VStack(alignment: .leading, spacing: POCSpacing.xs) {
                     Text("選択中のトッピング")
@@ -250,7 +250,7 @@ private struct OrderFlowFooterBar: View {
                     }
                 }
                 .padding(.horizontal, POCSpacing.m)
-                .padding(.vertical, POCSpacing.s)
+                .padding(.vertical, POCSpacing.xs)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(
                     RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
@@ -282,8 +282,8 @@ private struct OrderFlowFooterBar: View {
             }
         }
         .padding(.horizontal, POCSpacing.l)
-        .padding(.top, POCSpacing.s)
-        .padding(.bottom, POCSpacing.s)
+        .padding(.top, POCSpacing.xs)
+        .padding(.bottom, POCSpacing.xs)
         .background(.ultraThinMaterial)
     }
 
@@ -299,7 +299,11 @@ private struct OrderFlowFooterBar: View {
         let visibleRowCount = min(summaryItems.count, FooterLayout.maxVisibleRows)
         let rowCount = CGFloat(visibleRowCount)
         let spacingCount = CGFloat(max(visibleRowCount - 1, 0))
-        return rowCount * FooterLayout.summaryRowHeight + spacingCount * POCSpacing.xs
+        let baseHeight = rowCount * FooterLayout.summaryRowHeight + spacingCount * POCSpacing.xs
+        if usesScrollableSummary {
+            return baseHeight + FooterLayout.summaryPeekHeight
+        }
+        return baseHeight
     }
 
     private var summaryItemList: some View {
@@ -328,7 +332,8 @@ private struct OrderFlowFooterBar: View {
 }
 
 private enum FooterLayout {
-    static let summaryRowHeight: CGFloat = 22
-    static let maxVisibleRows = 4
-    static let scrollActivationCount = 5
+    static let summaryRowHeight: CGFloat = 20
+    static let maxVisibleRows = 3
+    static let scrollActivationCount = 4
+    static let summaryPeekHeight: CGFloat = 12
 }
