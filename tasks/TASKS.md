@@ -145,3 +145,25 @@
    Done by: CODEX
    Done at: 2026-04-21T09:03:42Z
 
+14. s3-toppings-base-summary
+   Id: 14-s3-toppings-base-summary
+   Scope: Now / M2-M3
+   Files: CocoichiPoC/Features/OrderFlowView.swift, CocoichiPoC/Features/OrderFlowCustomizationComponents.swift
+   Note: S3トッピング画面にベース設定の簡易箇条書きを追加。make build成功、git diff --check問題なし
+   Detail: tasks/details/14-s3-toppings-base-summary.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-21T11:53:43Z
+   Done by: CODEX
+   Done at: 2026-04-21T11:59:35Z
+
+15. s3-toppings-base-summary-plain-frame
+   Id: 15-s3-toppings-base-summary-plain-frame
+   Scope: Now / M2-M3
+   Files: CocoichiPoC/Features/OrderFlowCustomizationComponents.swift
+   Note: S3ベース箇条書きをプレーンな枠で囲う表示に調整。make build成功、git diff --check問題なし
+   Detail: tasks/details/15-s3-toppings-base-summary-plain-frame.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-21T12:00:46Z
+   Done by: CODEX
+   Done at: 2026-04-21T12:01:20Z
+

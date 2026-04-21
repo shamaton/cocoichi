@@ -98,12 +98,56 @@ struct CurryBasicsContent: View {
 }
 
 struct CurryToppingsContent: View {
+    let draft: DraftOrder
+
     var body: some View {
-        Text("タップでトッピングが追加できます")
-            .font(.subheadline)
-            .foregroundStyle(POCColor.textSecondary)
-            .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            VStack(alignment: .leading, spacing: POCSpacing.xxs) {
+                ForEach(summaryItems, id: \.self) { item in
+                    HStack(alignment: .top, spacing: POCSpacing.xs) {
+                        Text("•")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(POCColor.textSecondary)
+
+                        Text(item)
+                            .font(.subheadline)
+                            .foregroundStyle(POCColor.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+            .padding(POCSpacing.s)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                    .fill(POCColor.elevated.opacity(0.55))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                    .stroke(POCColor.line, lineWidth: 1)
+            )
+
+            Text("タップでトッピングが追加できます")
+                .font(.subheadline)
+                .foregroundStyle(POCColor.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var summaryItems: [String] {
+        var items = [
+            draft.currySauce.rawValue,
+            "ライス \(draft.riceGrams)g",
+            "辛さ \(draft.spiceLevelText)"
+        ]
+
+        if draft.sauceAmount != .regular {
+            items.append("ソース増し")
+        }
+
+        return items
     }
 }
 
