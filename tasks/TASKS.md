@@ -112,3 +112,14 @@
    Done by: CODEX
    Done at: 2026-04-19T23:26:59Z
 
+11. s5-review-footer-two-cta
+   Id: 11-s5-review-footer-two-cta
+   Scope: Now / M3
+   Files: docs/poc-screen-flow-2026-03-28.md, docs/poc-wireframes-s5-s6-2026-03-28.md, docs/poc-implementation-tasks-2026-03-29.md, DESIGN.md, CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5の合計表示付き2CTAフッターを実装。make build成功、git diff --check問題なし
+   Detail: tasks/details/11-s5-review-footer-two-cta.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-21T08:18:33Z
+   Done by: CODEX
+   Done at: 2026-04-21T08:37:31Z
+

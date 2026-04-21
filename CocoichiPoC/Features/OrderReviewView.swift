@@ -64,21 +64,6 @@ struct OrderReviewView: View {
                         }
 
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("Add More")
-
-                            HStack(spacing: POCSpacing.s) {
-                                SecondaryCTAButton(title: "2皿目のカレー", systemImage: "plus.circle") {
-                                    orderStore.moveCurrentDraftToCart()
-                                    navigator.popToMenuDiscovery()
-                                }
-                                SecondaryCTAButton(title: "サイドメニュー追加", systemImage: "takeoutbag.and.cup.and.straw") {
-                                    orderStore.moveCurrentDraftToCart()
-                                    navigator.popToMenuDiscovery()
-                                }
-                            }
-                        }
-
-                        VStack(alignment: .leading, spacing: POCSpacing.s) {
                             SectionHeader("Price Summary")
                             SummaryRow(title: "Subtotal", value: orderStore.reviewSubtotal.yenText)
                             SummaryRow(title: "Coupon", value: orderStore.reviewDiscount == 0 ? "-" : "-\(orderStore.reviewDiscount.yenText)")
@@ -95,14 +80,12 @@ struct OrderReviewView: View {
                     .padding(POCSpacing.l)
                 }
                 .safeAreaInset(edge: .bottom) {
-                    PrimaryCTAButton(title: "注文する \(orderStore.reviewTotal.yenText)", systemImage: "checkmark", isDisabled: !orderStore.hasReviewItems) {
-                        orderStore.placeOrder()
-                        navigator.push(.orderComplete)
-                    }
-                    .padding(.horizontal, POCSpacing.l)
-                    .padding(.top, POCSpacing.s)
-                    .padding(.bottom, POCSpacing.s)
-                    .background(.ultraThinMaterial)
+                    ReviewFooterBar(
+                        total: orderStore.reviewTotal,
+                        isDisabled: !orderStore.hasReviewItems,
+                        continueAction: continueOrdering,
+                        confirmAction: confirmOrder
+                    )
                 }
                 .task {
                     if !orderStore.hasPresentedCouponSuggestion, !orderStore.availableCoupons.isEmpty {
@@ -124,6 +107,16 @@ struct OrderReviewView: View {
                 }
             }
         }
+    }
+
+    private func continueOrdering() {
+        orderStore.moveCurrentDraftToCart()
+        navigator.popToMenuDiscovery()
+    }
+
+    private func confirmOrder() {
+        orderStore.placeOrder()
+        navigator.push(.orderComplete)
     }
 }
 
@@ -248,5 +241,44 @@ private struct OrderDetailGroupRow: View {
             RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
                 .fill(POCColor.elevated.opacity(0.85))
         )
+    }
+}
+
+private struct ReviewFooterBar: View {
+    let total: Int
+    let isDisabled: Bool
+    let continueAction: () -> Void
+    let confirmAction: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            VStack(alignment: .leading, spacing: POCSpacing.xxs) {
+                Text("合計")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(POCColor.textSecondary)
+
+                Text(total.yenText)
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .monospacedDigit()
+                    .contentTransition(.numericText(value: Double(total)))
+                    .animation(.snappy(duration: 0.28, extraBounce: 0), value: total)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+
+            HStack(spacing: POCSpacing.s) {
+                SecondaryCTAButton(title: "続けて注文", systemImage: "plus.circle", isDisabled: isDisabled) {
+                    continueAction()
+                }
+
+                PrimaryCTAButton(title: "注文を確定", systemImage: "checkmark", isDisabled: isDisabled) {
+                    confirmAction()
+                }
+            }
+        }
+        .padding(.horizontal, POCSpacing.l)
+        .padding(.top, POCSpacing.xs)
+        .padding(.bottom, POCSpacing.xs)
+        .background(.ultraThinMaterial)
     }
 }
