@@ -5,6 +5,17 @@ enum FavoriteResumeState: Equatable {
     case needsReview(message: String)
 }
 
+enum ReviewLineItemSource: Hashable {
+    case cart(CartLineItem.ID)
+    case pendingDraft
+}
+
+struct ReviewLineItem: Identifiable, Hashable {
+    let id: UUID
+    let draft: DraftOrder
+    let source: ReviewLineItemSource
+}
+
 @MainActor
 final class OrderStore: ObservableObject {
     @Published private(set) var stores = MockCatalog.stores
@@ -15,6 +26,7 @@ final class OrderStore: ObservableObject {
     @Published var selectedFulfillmentMode: FulfillmentMode = .pickup
     @Published var cartItems: [CartLineItem] = []
     @Published var draftOrder: DraftOrder?
+    @Published private(set) var pendingReviewInsertionIndex: Int?
     @Published var isDraftConfirmedForReview = false
     @Published var appliedCoupon: Coupon?
     @Published var favoriteCombos: [FavoriteCombo]
@@ -83,6 +95,20 @@ final class OrderStore: ObservableObject {
         return CartLineItem(id: draftOrder.id, draft: draftOrder)
     }
 
+    var reviewLineItems: [ReviewLineItem] {
+        var items = cartItems.map { item in
+            ReviewLineItem(id: item.id, draft: item.draft, source: .cart(item.id))
+        }
+
+        guard let draftOrder else { return items }
+
+        items.insert(
+            ReviewLineItem(id: draftOrder.id, draft: draftOrder, source: .pendingDraft),
+            at: resolvedPendingReviewInsertionIndex(forCartCount: items.count)
+        )
+        return items
+    }
+
     var favoriteSaveCandidate: DraftOrder? {
         if let completedDraft = completedOrder?.cartItems.last?.draft {
             return completedDraft.sanitizedForFavorite()
@@ -107,6 +133,7 @@ final class OrderStore: ObservableObject {
         selectedFulfillmentMode = .pickup
         cartItems = []
         draftOrder = nil
+        pendingReviewInsertionIndex = nil
         isDraftConfirmedForReview = false
         appliedCoupon = nil
         completedOrder = nil
@@ -126,6 +153,7 @@ final class OrderStore: ObservableObject {
             toppings: [],
             appliedCoupon: nil
         )
+        pendingReviewInsertionIndex = nil
         isDraftConfirmedForReview = false
         completedOrder = nil
         recentlySavedFavoriteName = nil
@@ -142,6 +170,7 @@ final class OrderStore: ObservableObject {
         resumedDraft.store = resumeStore
         selectedStore = resumeStore
         draftOrder = resumedDraft
+        pendingReviewInsertionIndex = nil
         isDraftConfirmedForReview = false
         completedOrder = nil
         recentlySavedFavoriteName = nil
@@ -229,27 +258,44 @@ final class OrderStore: ObservableObject {
 
     func moveCurrentDraftToCart() {
         guard let draftOrder else { return }
-        cartItems.append(CartLineItem(draft: draftOrder.sanitizedForFavorite()))
+        cartItems.insert(
+            CartLineItem(draft: draftOrder.sanitizedForFavorite()),
+            at: resolvedPendingReviewInsertionIndex(forCartCount: cartItems.count)
+        )
         self.draftOrder = nil
+        pendingReviewInsertionIndex = nil
         isDraftConfirmedForReview = false
         normalizeAppliedCoupon()
     }
 
-    func beginEditingCartItem(_ lineItemID: CartLineItem.ID) {
+    func beginEditingCartItem(_ lineItemID: CartLineItem.ID, reviewIndex: Int) {
         guard let index = cartItems.firstIndex(where: { $0.id == lineItemID }) else { return }
 
+        let currentPendingIndex = pendingReviewInsertionIndex
         let selectedItem = cartItems.remove(at: index)
         if let draftOrder {
-            cartItems.insert(CartLineItem(draft: draftOrder.sanitizedForFavorite()), at: index)
+            let targetIndex = adjustedCartInsertionIndex(
+                originalPendingIndex: currentPendingIndex,
+                selectedReviewIndex: reviewIndex,
+                cartCountAfterRemoval: cartItems.count
+            )
+            cartItems.insert(CartLineItem(draft: draftOrder.sanitizedForFavorite()), at: targetIndex)
         }
 
         selectedStore = selectedItem.draft.store
         draftOrder = selectedItem.draft.sanitizedForFavorite()
+        pendingReviewInsertionIndex = reviewIndex
         normalizeAppliedCoupon()
     }
 
     func placeOrder() {
-        let finalizedItems = cartItems + (draftOrder.map { [CartLineItem(draft: $0.sanitizedForFavorite())] } ?? [])
+        var finalizedItems = cartItems
+        if let draftOrder {
+            finalizedItems.insert(
+                CartLineItem(draft: draftOrder.sanitizedForFavorite()),
+                at: resolvedPendingReviewInsertionIndex(forCartCount: finalizedItems.count)
+            )
+        }
         guard let store = reviewStore, !finalizedItems.isEmpty else { return }
         let placedAt = Date()
         let pickupStart = Calendar.current.date(byAdding: .minute, value: store.pickupLeadTimeMin, to: placedAt) ?? placedAt
@@ -273,6 +319,7 @@ final class OrderStore: ObservableObject {
         let store = selectedStore
         cartItems = []
         draftOrder = nil
+        pendingReviewInsertionIndex = nil
         isDraftConfirmedForReview = false
         appliedCoupon = nil
         completedOrder = nil
@@ -311,6 +358,26 @@ final class OrderStore: ObservableObject {
         if !appliedCoupon.isApplicable(to: reviewDrafts) {
             self.appliedCoupon = nil
         }
+    }
+
+    private func resolvedPendingReviewInsertionIndex(forCartCount cartCount: Int) -> Int {
+        min(max(pendingReviewInsertionIndex ?? cartCount, 0), cartCount)
+    }
+
+    private func adjustedCartInsertionIndex(
+        originalPendingIndex: Int?,
+        selectedReviewIndex: Int,
+        cartCountAfterRemoval: Int
+    ) -> Int {
+        guard var originalPendingIndex else {
+            return cartCountAfterRemoval
+        }
+
+        if selectedReviewIndex < originalPendingIndex {
+            originalPendingIndex -= 1
+        }
+
+        return min(max(originalPendingIndex, 0), cartCountAfterRemoval)
     }
 
     private func persistFavorites() {

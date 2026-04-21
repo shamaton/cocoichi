@@ -189,3 +189,14 @@
    Done by: CODEX
    Done at: 2026-04-21T23:17:18Z
 
+18. preserve-order-when-editing-review-items
+   Id: 18-preserve-order-when-editing-review-items
+   Scope: Now / M3
+   Files: CocoichiPoC/State/OrderStore.swift, CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5編集後も注文リストの順番を維持するよう修正。review用の挿入位置を保持し、続けて注文/注文確定でも同順序を反映。make build成功、git diff --check問題なし
+   Detail: tasks/details/18-preserve-order-when-editing-review-items.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-21T23:26:40Z
+   Done by: CODEX
+   Done at: 2026-04-21T23:27:44Z
+

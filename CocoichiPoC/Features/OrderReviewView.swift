@@ -26,8 +26,7 @@ struct OrderReviewView: View {
                         }
 
                         ReviewCartCard(
-                            cartItems: orderStore.cartItems,
-                            pendingItem: orderStore.pendingReviewLineItem
+                            lineItems: orderStore.reviewLineItems
                         )
 
                         if let appliedCoupon = orderStore.appliedCoupon {
@@ -118,34 +117,21 @@ private struct ReviewCartCard: View {
     @EnvironmentObject private var navigator: AppNavigator
     @EnvironmentObject private var orderStore: OrderStore
 
-    let cartItems: [CartLineItem]
-    let pendingItem: CartLineItem?
+    let lineItems: [ReviewLineItem]
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
             SectionHeader("ご注文内容の確認")
 
-            ForEach(cartItems, id: \.id) { item in
+            ForEach(Array(lineItems.enumerated()), id: \.element.id) { index, item in
                 CartLineSummaryCard(
                     draft: item.draft,
                     onChangeBasics: {
-                        orderStore.beginEditingCartItem(item.id)
+                        beginEditing(item, reviewIndex: index)
                         navigator.showCurryDetail()
                     },
                     onChangeToppings: {
-                        orderStore.beginEditingCartItem(item.id)
-                        navigator.showCurryToppings()
-                    }
-                )
-            }
-
-            if let pendingItem {
-                CartLineSummaryCard(
-                    draft: pendingItem.draft,
-                    onChangeBasics: {
-                        navigator.showCurryDetail()
-                    },
-                    onChangeToppings: {
+                        beginEditing(item, reviewIndex: index)
                         navigator.showCurryToppings()
                     }
                 )
@@ -153,6 +139,15 @@ private struct ReviewCartCard: View {
         }
         .padding(POCSpacing.m)
         .pocCard(fill: POCColor.elevated)
+    }
+
+    private func beginEditing(_ item: ReviewLineItem, reviewIndex: Int) {
+        switch item.source {
+        case let .cart(lineItemID):
+            orderStore.beginEditingCartItem(lineItemID, reviewIndex: reviewIndex)
+        case .pendingDraft:
+            break
+        }
     }
 }
 
