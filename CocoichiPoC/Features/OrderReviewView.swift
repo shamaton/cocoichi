@@ -128,11 +128,10 @@ private struct ReviewCartCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Your Order")
+            SectionHeader("ご注文内容の確認")
 
-            ForEach(Array(cartItems.enumerated()), id: \.element.id) { index, item in
+            ForEach(cartItems, id: \.id) { item in
                 CartLineSummaryCard(
-                    title: "\(index + 1)皿目",
                     draft: item.draft,
                     badgeText: "カート追加済み"
                 )
@@ -140,7 +139,6 @@ private struct ReviewCartCard: View {
 
             if let pendingItem {
                 CartLineSummaryCard(
-                    title: cartItems.isEmpty ? "この注文" : "追加中の1皿",
                     draft: pendingItem.draft,
                     badgeText: "まだ調整に戻れます",
                     onChangeBasics: {
@@ -158,7 +156,6 @@ private struct ReviewCartCard: View {
 }
 
 private struct CartLineSummaryCard: View {
-    let title: String
     let draft: DraftOrder
     let badgeText: String
     var onChangeBasics: (() -> Void)? = nil
@@ -167,26 +164,23 @@ private struct CartLineSummaryCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
             HStack {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
+                Text(draft.menuItem.name)
+                    .font(.headline.weight(.semibold))
                 Spacer()
                 Text(badgeText)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(POCColor.curry)
             }
 
-            Text(draft.menuItem.name)
-                .font(.headline.weight(.semibold))
-
-            OrderDetailGroupRow(
+            OrderDetailBulletGroup(
                 title: "ベース",
-                value: baseSummary,
+                items: baseSummaryItems,
                 action: onChangeBasics
             )
 
-            OrderDetailGroupRow(
+            OrderDetailBulletGroup(
                 title: "トッピング",
-                value: toppingSummary,
+                items: toppingSummaryItems,
                 action: onChangeToppings
             )
 
@@ -199,18 +193,22 @@ private struct CartLineSummaryCard: View {
         )
     }
 
-    private var baseSummary: String {
-        "\(draft.currySauce.rawValue) / \(draft.riceGrams)g / \(draft.spiceLevelText)"
+    private var baseSummaryItems: [String] {
+        [
+            draft.currySauce.rawValue,
+            "ライス \(draft.riceGrams)g",
+            "辛さ \(draft.spiceLevelText)"
+        ]
     }
 
-    private var toppingSummary: String {
-        draft.toppings.isEmpty ? "なし" : draft.toppingsSummary
+    private var toppingSummaryItems: [String] {
+        draft.toppings.isEmpty ? ["なし"] : draft.toppingsSummary.components(separatedBy: " / ")
     }
 }
 
-private struct OrderDetailGroupRow: View {
+private struct OrderDetailBulletGroup: View {
     let title: String
-    let value: String
+    let items: [String]
     var action: (() -> Void)? = nil
 
     var body: some View {
@@ -231,10 +229,20 @@ private struct OrderDetailGroupRow: View {
                 }
             }
 
-            Text(value)
-                .font(.subheadline)
-                .foregroundStyle(POCColor.textSecondary)
-                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: POCSpacing.xxs) {
+                ForEach(items, id: \.self) { item in
+                    HStack(alignment: .top, spacing: POCSpacing.xs) {
+                        Text("•")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(POCColor.textSecondary)
+
+                        Text(item)
+                            .font(.subheadline)
+                            .foregroundStyle(POCColor.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
         }
         .padding(POCSpacing.s)
         .background(

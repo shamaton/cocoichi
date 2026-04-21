@@ -123,3 +123,25 @@
    Done by: CODEX
    Done at: 2026-04-21T08:37:31Z
 
+12. s5-order-summary-copy-and-bullets
+   Id: 12-s5-order-summary-copy-and-bullets
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5の注文確認カード文言と箇条書き表示を更新。make build成功、git diff --check問題なし
+   Detail: tasks/details/12-s5-order-summary-copy-and-bullets.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-21T08:47:35Z
+   Done by: CODEX
+   Done at: 2026-04-21T08:49:19Z
+
+13. s5-order-summary-base-labels
+   Id: 13-s5-order-summary-base-labels
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5ベース箇条書きのライス/辛さ表記をラベル付きに更新。make build成功、git diff --check問題なし
+   Detail: tasks/details/13-s5-order-summary-base-labels.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-21T08:52:04Z
+   Done by: CODEX
+   Done at: 2026-04-21T09:03:42Z
+
