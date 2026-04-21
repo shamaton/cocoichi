@@ -167,3 +167,14 @@
    Done by: CODEX
    Done at: 2026-04-21T12:01:20Z
 
+16. s3-decision-lock-flow
+   Id: 16-s3-decision-lock-flow
+   Scope: Now / M2-M3
+   Files: CocoichiPoC/State/OrderStore.swift, CocoichiPoC/Features/OrderFlowView.swift, CocoichiPoC/Features/OrderReviewView.swift
+   Note: S3の主CTAを『決定する』へ変更。決定後は draft をレビュー固定状態にして S3/S5 の戻る導線を隠し、変更は注文リスト内の『変更』だけに集約。make build成功、git diff --check問題なし
+   Detail: tasks/details/16-s3-decision-lock-flow.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-21T14:15:54Z
+   Done by: CODEX
+   Done at: 2026-04-21T14:17:34Z
+

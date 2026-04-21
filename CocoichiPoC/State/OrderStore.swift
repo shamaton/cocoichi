@@ -15,6 +15,7 @@ final class OrderStore: ObservableObject {
     @Published var selectedFulfillmentMode: FulfillmentMode = .pickup
     @Published var cartItems: [CartLineItem] = []
     @Published var draftOrder: DraftOrder?
+    @Published var isDraftConfirmedForReview = false
     @Published var appliedCoupon: Coupon?
     @Published var favoriteCombos: [FavoriteCombo]
     @Published var completedOrder: CompletedOrder?
@@ -106,6 +107,7 @@ final class OrderStore: ObservableObject {
         selectedFulfillmentMode = .pickup
         cartItems = []
         draftOrder = nil
+        isDraftConfirmedForReview = false
         appliedCoupon = nil
         completedOrder = nil
         recentlySavedFavoriteName = nil
@@ -124,6 +126,7 @@ final class OrderStore: ObservableObject {
             toppings: [],
             appliedCoupon: nil
         )
+        isDraftConfirmedForReview = false
         completedOrder = nil
         recentlySavedFavoriteName = nil
         if cartItems.isEmpty {
@@ -139,6 +142,7 @@ final class OrderStore: ObservableObject {
         resumedDraft.store = resumeStore
         selectedStore = resumeStore
         draftOrder = resumedDraft
+        isDraftConfirmedForReview = false
         completedOrder = nil
         recentlySavedFavoriteName = nil
         if cartItems.isEmpty {
@@ -200,6 +204,11 @@ final class OrderStore: ObservableObject {
         appliedCoupon = coupon
     }
 
+    func confirmCurrentDraftForReview() {
+        guard draftOrder != nil else { return }
+        isDraftConfirmedForReview = true
+    }
+
     func removeCoupon() {
         appliedCoupon = nil
     }
@@ -222,6 +231,7 @@ final class OrderStore: ObservableObject {
         guard let draftOrder else { return }
         cartItems.append(CartLineItem(draft: draftOrder.sanitizedForFavorite()))
         self.draftOrder = nil
+        isDraftConfirmedForReview = false
         normalizeAppliedCoupon()
     }
 
@@ -250,6 +260,7 @@ final class OrderStore: ObservableObject {
         let store = selectedStore
         cartItems = []
         draftOrder = nil
+        isDraftConfirmedForReview = false
         appliedCoupon = nil
         completedOrder = nil
         recentlySavedFavoriteName = nil

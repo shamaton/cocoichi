@@ -101,9 +101,9 @@ struct CurryDetailView: View {
                         secondaryTitle: "トッピング",
                         secondarySystemImage: "arrow.right",
                         secondaryAction: showToppings,
-                        primaryTitle: "注文確認",
-                        primarySystemImage: "cart",
-                        primaryAction: showOrderReview
+                        primaryTitle: "決定する",
+                        primarySystemImage: "checkmark.circle.fill",
+                        primaryAction: confirmDraft
                     )
                 }
                 .task(id: draft.id) {
@@ -116,6 +116,7 @@ struct CurryDetailView: View {
         }
         .navigationTitle(orderStore.draftOrder?.menuItem.name ?? "カレー")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(orderStore.isDraftConfirmedForReview)
     }
 
     private var showsCompactHeader: Bool {
@@ -130,6 +131,11 @@ struct CurryDetailView: View {
     private func showOrderReview() {
         guard navigator.path.last != .orderReview else { return }
         navigator.push(.orderReview)
+    }
+
+    private func confirmDraft() {
+        orderStore.confirmCurrentDraftForReview()
+        showOrderReview()
     }
 }
 
@@ -185,9 +191,9 @@ struct CurryToppingsView: View {
                         secondaryTitle: "ベース設定",
                         secondarySystemImage: "arrow.uturn.backward",
                         secondaryAction: showBasics,
-                        primaryTitle: "注文確認",
-                        primarySystemImage: "cart",
-                        primaryAction: showOrderReview
+                        primaryTitle: "決定する",
+                        primarySystemImage: "checkmark.circle.fill",
+                        primaryAction: confirmDraft
                     )
                 }
             } else {
@@ -197,6 +203,7 @@ struct CurryToppingsView: View {
         }
         .navigationTitle(orderStore.draftOrder?.menuItem.name ?? "カレー")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(orderStore.isDraftConfirmedForReview)
     }
 
     private var showsCompactHeader: Bool {
@@ -210,6 +217,11 @@ struct CurryToppingsView: View {
     private func showOrderReview() {
         guard navigator.path.last != .orderReview else { return }
         navigator.push(.orderReview)
+    }
+
+    private func confirmDraft() {
+        orderStore.confirmCurrentDraftForReview()
+        showOrderReview()
     }
 }
 

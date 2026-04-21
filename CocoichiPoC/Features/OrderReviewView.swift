@@ -100,13 +100,7 @@ struct OrderReviewView: View {
         }
         .navigationTitle("Order Review")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button("基本設定") {
-                    navigator.popToCurryDetail()
-                }
-            }
-        }
+        .navigationBarBackButtonHidden(orderStore.isDraftConfirmedForReview)
     }
 
     private func continueOrdering() {
@@ -122,6 +116,7 @@ struct OrderReviewView: View {
 
 private struct ReviewCartCard: View {
     @EnvironmentObject private var navigator: AppNavigator
+    @EnvironmentObject private var orderStore: OrderStore
 
     let cartItems: [CartLineItem]
     let pendingItem: CartLineItem?
@@ -140,7 +135,7 @@ private struct ReviewCartCard: View {
             if let pendingItem {
                 CartLineSummaryCard(
                     draft: pendingItem.draft,
-                    badgeText: "まだ調整に戻れます",
+                    badgeText: orderStore.isDraftConfirmedForReview ? "決定済み" : "この注文",
                     onChangeBasics: {
                         navigator.popToCurryDetail()
                     },
