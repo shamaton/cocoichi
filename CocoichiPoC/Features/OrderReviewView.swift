@@ -33,9 +33,9 @@ struct OrderReviewView: View {
                         if let appliedCoupon = orderStore.appliedCoupon {
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
                                 SectionHeader("Applied Coupon")
-                                Text(appliedCoupon.displayTitle)
+                                Text(appliedCoupon.displayTitle.reviewCurrencyText)
                                     .font(.headline.weight(.semibold))
-                                Text(appliedCoupon.displaySummary)
+                                Text(appliedCoupon.displaySummary.reviewCurrencyText)
                                     .font(.subheadline)
                                     .foregroundStyle(POCColor.textSecondary)
                                 Button("Remove") {
@@ -50,7 +50,7 @@ struct OrderReviewView: View {
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
                                 Text("この注文に使えるクーポンがあります")
                                     .font(.headline.weight(.semibold))
-                                Text(suggestedCoupon.displayTitle)
+                                Text(suggestedCoupon.displayTitle.reviewCurrencyText)
                                     .font(.subheadline)
                                     .foregroundStyle(POCColor.textSecondary)
                                 Button("View Coupon") {
@@ -65,9 +65,9 @@ struct OrderReviewView: View {
 
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
                             SectionHeader("Price Summary")
-                            SummaryRow(title: "Subtotal", value: orderStore.reviewSubtotal.yenText)
-                            SummaryRow(title: "Coupon", value: orderStore.reviewDiscount == 0 ? "-" : "-\(orderStore.reviewDiscount.yenText)")
-                            SummaryRow(title: "Total", value: orderStore.reviewTotal.yenText)
+                            SummaryRow(title: "Subtotal", value: orderStore.reviewSubtotal.reviewYenText)
+                            SummaryRow(title: "Coupon", value: orderStore.reviewDiscount == 0 ? "-" : "-\(orderStore.reviewDiscount.reviewYenText)")
+                            SummaryRow(title: "Total", value: orderStore.reviewTotal.reviewYenText)
                         }
                         .padding(POCSpacing.m)
                         .pocCard(fill: POCColor.elevatedStrong)
@@ -98,7 +98,7 @@ struct OrderReviewView: View {
                     .padding(POCSpacing.l)
             }
         }
-        .navigationTitle("Order Review")
+        .navigationTitle("ご注文内容の確認")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(orderStore.isDraftConfirmedForReview)
     }
@@ -128,19 +128,25 @@ private struct ReviewCartCard: View {
             ForEach(cartItems, id: \.id) { item in
                 CartLineSummaryCard(
                     draft: item.draft,
-                    badgeText: "カート追加済み"
+                    onChangeBasics: {
+                        orderStore.beginEditingCartItem(item.id)
+                        navigator.showCurryDetail()
+                    },
+                    onChangeToppings: {
+                        orderStore.beginEditingCartItem(item.id)
+                        navigator.showCurryToppings()
+                    }
                 )
             }
 
             if let pendingItem {
                 CartLineSummaryCard(
                     draft: pendingItem.draft,
-                    badgeText: orderStore.isDraftConfirmedForReview ? "決定済み" : "この注文",
                     onChangeBasics: {
-                        navigator.popToCurryDetail()
+                        navigator.showCurryDetail()
                     },
                     onChangeToppings: {
-                        navigator.popToCurryToppings()
+                        navigator.showCurryToppings()
                     }
                 )
             }
@@ -152,7 +158,6 @@ private struct ReviewCartCard: View {
 
 private struct CartLineSummaryCard: View {
     let draft: DraftOrder
-    let badgeText: String
     var onChangeBasics: (() -> Void)? = nil
     var onChangeToppings: (() -> Void)? = nil
 
@@ -162,9 +167,6 @@ private struct CartLineSummaryCard: View {
                 Text(draft.menuItem.name)
                     .font(.headline.weight(.semibold))
                 Spacer()
-                Text(badgeText)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(POCColor.curry)
             }
 
             OrderDetailBulletGroup(
@@ -179,7 +181,7 @@ private struct CartLineSummaryCard: View {
                 action: onChangeToppings
             )
 
-            SummaryRow(title: "Line Total", value: draft.subtotal.yenText)
+            SummaryRow(title: "Line Total", value: draft.subtotal.reviewYenText)
         }
         .padding(POCSpacing.m)
         .background(
@@ -260,7 +262,7 @@ private struct ReviewFooterBar: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(POCColor.textSecondary)
 
-                Text(total.yenText)
+                Text(total.reviewYenText)
                     .font(.title2.weight(.bold))
                     .foregroundStyle(POCColor.textPrimary)
                     .monospacedDigit()
@@ -283,5 +285,19 @@ private struct ReviewFooterBar: View {
         .padding(.top, POCSpacing.xs)
         .padding(.bottom, POCSpacing.xs)
         .background(.ultraThinMaterial)
+    }
+}
+
+private extension Int {
+    var reviewYenText: String {
+        "￥\(formatted(.number.grouping(.automatic)))"
+    }
+}
+
+private extension String {
+    var reviewCurrencyText: String {
+        guard let regex = try? NSRegularExpression(pattern: #"([0-9,]+)円"#) else { return self }
+        let range = NSRange(startIndex..<endIndex, in: self)
+        return regex.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: "￥$1")
     }
 }

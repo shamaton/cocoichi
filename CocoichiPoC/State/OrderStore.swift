@@ -235,6 +235,19 @@ final class OrderStore: ObservableObject {
         normalizeAppliedCoupon()
     }
 
+    func beginEditingCartItem(_ lineItemID: CartLineItem.ID) {
+        guard let index = cartItems.firstIndex(where: { $0.id == lineItemID }) else { return }
+
+        let selectedItem = cartItems.remove(at: index)
+        if let draftOrder {
+            cartItems.insert(CartLineItem(draft: draftOrder.sanitizedForFavorite()), at: index)
+        }
+
+        selectedStore = selectedItem.draft.store
+        draftOrder = selectedItem.draft.sanitizedForFavorite()
+        normalizeAppliedCoupon()
+    }
+
     func placeOrder() {
         let finalizedItems = cartItems + (draftOrder.map { [CartLineItem(draft: $0.sanitizedForFavorite())] } ?? [])
         guard let store = reviewStore, !finalizedItems.isEmpty else { return }

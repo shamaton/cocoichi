@@ -178,3 +178,14 @@
    Done by: CODEX
    Done at: 2026-04-21T14:17:34Z
 
+17. order-review-copy-edit-and-yen-format
+   Id: 17-order-review-copy-edit-and-yen-format
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderReviewView.swift, CocoichiPoC/App/AppNavigator.swift, CocoichiPoC/State/OrderStore.swift
+   Note: S5のタイトルを『ご注文内容の確認』へ変更。ステータス表示を撤去し、cart/pending を問わず変更可能に更新。価格表記をOrder Review内で ￥ 形式へ統一。make build成功、git diff --check問題なし
+   Detail: tasks/details/17-order-review-copy-edit-and-yen-format.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-21T23:14:10Z
+   Done by: CODEX
+   Done at: 2026-04-21T23:17:18Z
+

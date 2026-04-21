@@ -53,6 +53,16 @@ final class AppNavigator: ObservableObject {
         path.append(screen)
     }
 
+    func showCurryDetail() {
+        selectedTab = .menu
+        path = [.curryDetail]
+    }
+
+    func showCurryToppings() {
+        selectedTab = .menu
+        path = [.curryDetail, .curryToppings]
+    }
+
     func pop() {
         guard !path.isEmpty else { return }
         path.removeLast()
