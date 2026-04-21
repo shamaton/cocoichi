@@ -109,12 +109,12 @@
 | T14 | S3 Customization Logic | 基本設定 phase の選択、ソース量折りたたみ、トッピング追加削除、価格再計算、Order Snapshot 更新、軽い反応を実装する | T05,T12,T13 | 変更が即時に価格とサマリーへ反映され、S5 では pending draft を review 用に受け取れる。トッピングはカード内で数量増減でき、選択済み一覧は下部 summary で確認できる |
 | T15 | S7 Save Favorite Sheet | 完了済み注文の名前入力、注文サマリー、保存/キャンセルを持つ modal sheet を実装する | T05,T06,T22,T23 | S8 から保存 sheet を呼べ、保存後に S8 へ戻れる |
 | T16 | Favorite Persistence / Resume | 保存済み構成のローカル保存、再編集前提の復元、For You 反映を実装する | T05,T11,T15 | 保存後に S4 と S2 の再利用導線へ反映される |
-| T17 | S5 Order Review Layout | Pickup card、pending draft を含む cart summary、Suggested Savings、Price Summary、下部 CTA を実装する。店舗限定商品では order card に短い補助ラベルを残す | T05,T06,T14 | pending draft と cart line item の見せ分けができ、`内容を修正` は pending draft のみに対して表示される。初版 PoC では cart line item は read-only として扱い、クーポン適用後でも Add More を残す。店舗限定文脈を落とさない |
+| T17 | S5 Order Review Layout | Pickup card、pending draft を含む cart summary、Suggested Savings、Price Summary、footer の合計表示と `続けて注文` / `注文を確定` の 2CTA を実装する。店舗限定商品では order card に短い補助ラベルを残す | T05,T06,T14 | pending draft と cart line item の見せ分けができ、`内容を修正` は pending draft のみに対して表示される。初版 PoC では cart line item は read-only として扱い、クーポン適用後でも footer に `続けて注文` を残す。店舗限定文脈を落とさない |
 | T18 | Coupon Matching Engine | 現在注文に対して適用可能クーポンだけを返すローカル判定を作る | T03,T04,T05 | S5 で提案対象を算出できる |
-| T19 | S5 Continue Shopping Loop | `2皿目のカレー` と `サイドメニュー追加` の導線で `pending draft` を cart に昇格させてから S2 に戻り、カート保持のまま再度 S5 に戻れるようにする | T05,T08,T14,T17 | 追加注文ループ時に pending draft と cart の境界が崩れない |
+| T19 | S5 Continue Shopping Loop | footer の `続けて注文` から `pending draft` を cart に昇格させて S2 に戻り、`2皿目のカレー` または `サイドメニュー追加` を選んだ後にカート保持のまま再度 S5 に戻れるようにする | T05,T08,T14,T17 | 追加注文ループ時に pending draft と cart の境界が崩れない |
 | T20 | S6 Coupon Suggestion Sheet | best match、適用後状態、Maybe Later、価格差分更新を持つ bottom sheet を実装する | T17,T18 | 適用/非適用で S5 の金額が更新される |
 | T21 | S5 First-Arrival Behavior | 初回到達時のみ S6 をハーフオープンし、以後は CTA 起点に戻す制御を入れる | T17,T20 | 強制感なく `自然に提案される` を再現できる |
-| T22 | Mock Place Order Flow | `Place Order` 押下、`cartItems + pending draft` の統合確定、短い処理演出、モック注文確定、参照番号生成を実装する | T05,T17,T19,T20 | S5 から S8 へ注文確定として遷移できる。確定後は active order state が初期化される |
+| T22 | Mock Confirm Order Flow | `注文を確定` 押下、`cartItems + pending draft` の統合確定、短い処理演出、モック注文確定、参照番号生成を実装する | T05,T17,T19,T20 | S5 から S8 へ注文確定として遷移できる。確定後は active order state が初期化される |
 | T23 | S8 Complete Screen | 成功演出、受取情報、注文サマリー、保存提案、次アクション CTA を実装する | T22,T06 | 完了状態が一画面で明確に分かり、保存提案が主CTAを邪魔しない |
 | T24 | Post-Complete Navigation | `Browse Menu Again`、`View Saved Combos`、`Change Store` と `S7` 呼び出しを含む再訪導線を整理する | T23,T11 | 完了後の再利用導線が破綻しない。`Change Store` では cartItems / pending draft / applied coupon を全て破棄して S1 に戻る |
 | T25 | Motion / Haptics Pass | phase 遷移、トッピング追加、クーポン適用、完了後保存、注文完了の反応を最小限の気持ちよさに整える | T15,T20,T23 | 動きが長すぎず、主要反応が揃う |

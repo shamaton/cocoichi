@@ -188,7 +188,7 @@ Avoid:
 Use for:
 
 - `Review Order`
-- `Place Order`
+- `Confirm Order`
 - `Browse Menu Again`
 
 When a screen has a primary CTA, keep its styling visually consistent across the order flow.
@@ -202,6 +202,7 @@ When a screen has a primary CTA, keep its styling visually consistent across the
 
 Use for:
 
+- `Continue Ordering`
 - `Save This Order`
 - `View Saved Combos`
 - `Change Store`
@@ -368,7 +369,9 @@ Use an 8pt grid with 4pt support steps.
 #### S5 Order Review
 
 - Keep pickup information and pending draft easy to scan
-- `Place Order` must dominate the footer
+- Show `Total` above the footer actions
+- `Confirm Order` should remain the strongest action in the footer
+- `Continue Ordering` should stay visible as a secondary action without competing with confirmation
 - If the order includes a store-only item, preserve that information as supporting context inside the order card
 - Coupon entry should feel like a helpful savings suggestion, not a detour
 

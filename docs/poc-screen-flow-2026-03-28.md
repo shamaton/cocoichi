@@ -93,8 +93,8 @@ S1 Store Select
 補足:
 
 - `S3 -> S5` 到達時点では現在の注文は `pending draft` として保持し、まだ cart line item へ昇格させない
-- `商品を追加する` を押した時に `pending draft` を cart line item に昇格させ、`S5 -> S2 -> S3 -> S5` のループで 2皿目やサイド追加へ戻れるようにする
-- `注文する` では `cartItems + pending draft` をまとめて確定対象に含める
+- `続けて注文` を押した時に `pending draft` を cart line item に昇格させ、`S5 -> S2 -> S3 -> S5` のループで 2皿目やサイド追加へ戻れるようにする
+- `注文を確定` では `cartItems + pending draft` をまとめて確定対象に含める
 - PoC 初版では `pending draft` は常に 1 件だけ保持する
 - `S5 -> S3` の `内容を修正` では `pending draft` を保持したまま編集に戻る
 - `S3 -> S2` で戻った時も `pending draft` は保持するが、別メニューを選んだ時点で新しい選択に置き換える
@@ -228,9 +228,9 @@ UIメモ:
 
 遷移:
 
-- `商品を追加する` -> `S2 Menu Discovery`
+- `続けて注文` -> `S2 Menu Discovery`
 - `クーポンを見る` -> `S6 Coupon Suggestion Sheet`
-- `注文する` -> `S8 Order Complete`
+- `注文を確定` -> `S8 Order Complete`
 - `内容を修正` -> `S3 Curry Detail / Customize`
 
 UIメモ:
@@ -238,12 +238,12 @@ UIメモ:
 - 合計、内容、受取店舗が一画面で確認できる
 - 初回到達時は `pending draft` のみを見せ、まだ追加注文へ戻れる 1皿として扱う
 - `内容を修正` で S3 に戻す対象は `pending draft` のみとし、既に cart line item 化した皿は初版 PoC では個別編集対象に含めない
-- `商品を追加する` を押した時にだけ `pending draft` を cart line item に昇格させる
-- `注文する` では残っている `pending draft` も cart と一緒に確定対象へ含める
+- `続けて注文` を押した時にだけ `pending draft` を cart line item に昇格させる
+- `注文を確定` では残っている `pending draft` も cart と一緒に確定対象へ含める
 - 1皿目追加後に `2皿目のカレー` または `サイドメニュー` へ戻る導線を持つ
 - クーポンは独立画面へ飛ばさず sheet で補助表示する
 - お気に入り保存はここでは出さず、完了後の `S8` で提案する
-- 注文ボタンは強い主要CTAとして固定配置する
+- フッターは `合計金額` の上に `続けて注文` と `注文を確定` を並べ、`注文を確定` を強い主要CTAとして固定配置する
 
 ### S6. Coupon Suggestion Sheet
 
