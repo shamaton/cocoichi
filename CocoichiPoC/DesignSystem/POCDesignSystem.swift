@@ -100,8 +100,8 @@ struct POCWaveAccentBackground: View {
         ZStack {
             LinearGradient(
                 colors: [
-                    Color.white.opacity(0.14),
-                    POCColor.elevatedStrong.opacity(0.16),
+                    Color.white.opacity(0.1),
+                    POCColor.cream.opacity(0.14),
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -407,9 +407,9 @@ private struct WaterWaveFallbackView: View {
                     liquid.closeSubpath()
 
                     let liquidGradient = Gradient(colors: [
-                        Color(red: 0.90, green: 0.96, blue: 0.98, opacity: Double(opacity)),
-                        Color(red: 0.70, green: 0.84, blue: 0.88, opacity: Double(opacity)),
-                        Color(red: 0.52, green: 0.73, blue: 0.76, opacity: Double(opacity)),
+                        Color(red: 0.99, green: 0.97, blue: 0.93, opacity: Double(opacity)),
+                        Color(red: 0.95, green: 0.89, blue: 0.78, opacity: Double(opacity)),
+                        Color(red: 0.89, green: 0.79, blue: 0.62, opacity: Double(opacity)),
                     ])
                     context.fill(
                         liquid,
@@ -436,7 +436,7 @@ private struct WaterWaveFallbackView: View {
                     context.addFilter(.blur(radius: 7))
                     context.stroke(
                         highlight,
-                        with: .color(Color(red: 0.82, green: 0.92, blue: 0.95, opacity: 0.38)),
+                        with: .color(Color(red: 0.95, green: 0.88, blue: 0.76, opacity: 0.42)),
                         style: StrokeStyle(lineWidth: 12, lineCap: .round, lineJoin: .round)
                     )
                 }
@@ -666,15 +666,15 @@ private final class WaterWaveRenderer: NSObject, MTKViewDelegate {
         float surfaceBand = 1.0 - smoothstep(0.0, 0.012, abs(uv.y - surfaceY));
         float undersideGlow = (1.0 - smoothstep(0.0, 0.08, uv.y - surfaceY)) * liquidMask;
 
-        float3 topColor = float3(0.90, 0.96, 0.98);
-        float3 bottomColor = float3(0.44, 0.66, 0.70);
-        float3 warmTint = float3(0.93, 0.84, 0.68);
+        float3 topColor = float3(0.99, 0.97, 0.93);
+        float3 bottomColor = float3(0.89, 0.79, 0.62);
+        float3 warmTint = float3(0.95, 0.87, 0.72);
         float3 bodyColor = mix(topColor, bottomColor, depth);
-        bodyColor = mix(bodyColor, warmTint, depth * 0.24);
-        bodyColor += (0.06 * shimmer) * (1.0 - depth);
+        bodyColor = mix(bodyColor, warmTint, depth * 0.28);
+        bodyColor += (0.045 * shimmer) * (1.0 - depth);
         bodyColor += 0.28 * highlight;
         bodyColor += 0.16 * surfaceBand;
-        bodyColor += 0.12 * undersideGlow;
+        bodyColor += 0.1 * undersideGlow;
 
         float alpha = liquidMask * opacity;
         alpha += highlight * 0.2 * opacity;
