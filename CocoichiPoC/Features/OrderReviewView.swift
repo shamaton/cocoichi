@@ -91,6 +91,7 @@ struct OrderReviewView: View {
         .navigationTitle("ご注文内容の確認")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(orderStore.isDraftConfirmedForReview)
+        .pocProgressWaveBackground(.review)
     }
 
     private func continueOrdering() {

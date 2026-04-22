@@ -1,3 +1,4 @@
+import MetalKit
 import SwiftUI
 
 enum POCColor {
@@ -48,21 +49,107 @@ extension Color {
 struct POCBackground: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .background(
-                LinearGradient(
-                    colors: [POCColor.background, Color.white.opacity(0.65)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-            )
+            .background(POCBackgroundLayer())
             .foregroundStyle(POCColor.textPrimary)
+    }
+}
+
+struct POCBackgroundLayer: View {
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [POCColor.background, Color.white.opacity(0.65)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+            LinearGradient(
+                colors: [
+                    Color.white.opacity(0.12),
+                    POCColor.background.opacity(0.12),
+                    POCColor.elevatedStrong.opacity(0.28),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+
+            WaterWaveBackground(
+                fillLevel: 0.16,
+                amplitude: 0.045,
+                frequency: 8.4,
+                speed: 0.95,
+                detailAmplitude: 0.016,
+                detailFrequency: 21,
+                opacity: 0.98
+            )
         }
+        .ignoresSafeArea()
+    }
+}
+
+struct POCWaveAccentBackground: View {
+    var fillLevel: Float = 0.82
+    var amplitude: Float = 0.018
+    var frequency: Float = 7.2
+    var speed: Float = 1.05
+    var detailAmplitude: Float = 0.007
+    var detailFrequency: Float = 19
+    var opacity: Float = 1
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    Color.white.opacity(0.14),
+                    POCColor.elevatedStrong.opacity(0.16),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+
+            WaterWaveBackground(
+                fillLevel: fillLevel,
+                amplitude: amplitude,
+                frequency: frequency,
+                speed: speed,
+                detailAmplitude: detailAmplitude,
+                detailFrequency: detailFrequency,
+                opacity: opacity
+            )
+        }
+    }
+}
+
+enum POCProgressWaveStage {
+    case menuDiscovery
+    case basics
+    case toppings
+    case review
+
+    var fillLevel: Float {
+        switch self {
+        case .menuDiscovery:
+            return 0.82
+        case .basics:
+            return 0.72
+        case .toppings:
+            return 0.6
+        case .review:
+            return 0.46
+        }
+    }
 }
 
 extension View {
     func pocBackground() -> some View {
         modifier(POCBackground())
+    }
+
+    func pocProgressWaveBackground(_ stage: POCProgressWaveStage) -> some View {
+        background {
+            POCWaveAccentBackground(fillLevel: stage.fillLevel)
+                .ignoresSafeArea()
+        }
     }
 
     func pocCard() -> some View {
@@ -239,6 +326,364 @@ struct SummaryRow: View {
                 .fontWeight(.semibold)
         }
     }
+}
+
+private struct WaterWaveBackground: View {
+    let fillLevel: Float
+    let amplitude: Float
+    let frequency: Float
+    let speed: Float
+    let detailAmplitude: Float
+    let detailFrequency: Float
+    let opacity: Float
+
+    var body: some View {
+        Group {
+            #if targetEnvironment(simulator)
+            WaterWaveFallbackView(
+                fillLevel: fillLevel,
+                amplitude: amplitude,
+                frequency: frequency,
+                speed: speed,
+                detailAmplitude: detailAmplitude,
+                detailFrequency: detailFrequency,
+                opacity: opacity
+            )
+            #else
+            WaterWaveMetalView(
+                fillLevel: fillLevel,
+                amplitude: amplitude,
+                frequency: frequency,
+                speed: speed,
+                detailAmplitude: detailAmplitude,
+                detailFrequency: detailFrequency,
+                opacity: opacity
+            )
+            #endif
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
+
+private struct WaterWaveFallbackView: View {
+    let fillLevel: Float
+    let amplitude: Float
+    let frequency: Float
+    let speed: Float
+    let detailAmplitude: Float
+    let detailFrequency: Float
+    let opacity: Float
+
+    var body: some View {
+        GeometryReader { proxy in
+            TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+                Canvas { context, size in
+                    let time = timeline.date.timeIntervalSinceReferenceDate
+                    let width = size.width
+                    let height = size.height
+                    let mainAmplitude = CGFloat(amplitude) * height
+                    let fineAmplitude = CGFloat(detailAmplitude) * height
+
+                    func surfaceY(at x: CGFloat) -> CGFloat {
+                        let normalizedX = max(0, min(1, x / max(width, 1)))
+                        let primary = sin((normalizedX * CGFloat(frequency)) + (time * CGFloat(speed))) * mainAmplitude
+                        let secondary = sin((normalizedX * CGFloat(detailFrequency)) - (time * CGFloat(speed) * 1.35)) * fineAmplitude
+                        return (CGFloat(fillLevel) * height) + primary + secondary
+                    }
+
+                    var liquid = Path()
+                    liquid.move(to: CGPoint(x: 0, y: surfaceY(at: 0)))
+
+                    let stepCount = max(Int(width / 8), 48)
+                    for step in 1...stepCount {
+                        let x = width * CGFloat(step) / CGFloat(stepCount)
+                        liquid.addLine(to: CGPoint(x: x, y: surfaceY(at: x)))
+                    }
+
+                    liquid.addLine(to: CGPoint(x: width, y: height))
+                    liquid.addLine(to: CGPoint(x: 0, y: height))
+                    liquid.closeSubpath()
+
+                    let liquidGradient = Gradient(colors: [
+                        Color(red: 0.90, green: 0.96, blue: 0.98, opacity: Double(opacity)),
+                        Color(red: 0.70, green: 0.84, blue: 0.88, opacity: Double(opacity)),
+                        Color(red: 0.52, green: 0.73, blue: 0.76, opacity: Double(opacity)),
+                    ])
+                    context.fill(
+                        liquid,
+                        with: .linearGradient(
+                            liquidGradient,
+                            startPoint: CGPoint(x: width * 0.5, y: height * CGFloat(fillLevel) * 0.8),
+                            endPoint: CGPoint(x: width * 0.5, y: height)
+                        )
+                    )
+
+                    var highlight = Path()
+                    highlight.move(to: CGPoint(x: 0, y: surfaceY(at: 0)))
+                    for step in 1...stepCount {
+                        let x = width * CGFloat(step) / CGFloat(stepCount)
+                        highlight.addLine(to: CGPoint(x: x, y: surfaceY(at: x)))
+                    }
+
+                    context.stroke(
+                        highlight,
+                        with: .color(Color.white.opacity(0.92)),
+                        style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
+                    )
+
+                    context.addFilter(.blur(radius: 7))
+                    context.stroke(
+                        highlight,
+                        with: .color(Color(red: 0.82, green: 0.92, blue: 0.95, opacity: 0.38)),
+                        style: StrokeStyle(lineWidth: 12, lineCap: .round, lineJoin: .round)
+                    )
+                }
+            }
+            .frame(width: proxy.size.width, height: proxy.size.height)
+        }
+    }
+}
+
+private struct WaterWaveMetalView: UIViewRepresentable {
+    let fillLevel: Float
+    let amplitude: Float
+    let frequency: Float
+    let speed: Float
+    let detailAmplitude: Float
+    let detailFrequency: Float
+    let opacity: Float
+
+    func makeCoordinator() -> WaterWaveRenderer {
+        WaterWaveRenderer()
+    }
+
+    func makeUIView(context: Context) -> MTKView {
+        let metalView = MTKView(frame: .zero, device: context.coordinator.device)
+        metalView.delegate = context.coordinator
+        metalView.backgroundColor = .clear
+        metalView.clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
+        metalView.colorPixelFormat = .bgra8Unorm
+        metalView.enableSetNeedsDisplay = false
+        metalView.isPaused = false
+        metalView.isOpaque = false
+        metalView.preferredFramesPerSecond = 30
+        metalView.framebufferOnly = true
+        context.coordinator.update(
+            fillLevel: fillLevel,
+            amplitude: amplitude,
+            frequency: frequency,
+            speed: speed,
+            detailAmplitude: detailAmplitude,
+            detailFrequency: detailFrequency,
+            opacity: opacity
+        )
+        return metalView
+    }
+
+    func updateUIView(_ uiView: MTKView, context: Context) {
+        context.coordinator.update(
+            fillLevel: fillLevel,
+            amplitude: amplitude,
+            frequency: frequency,
+            speed: speed,
+            detailAmplitude: detailAmplitude,
+            detailFrequency: detailFrequency,
+            opacity: opacity
+        )
+    }
+}
+
+private final class WaterWaveRenderer: NSObject, MTKViewDelegate {
+    private struct Uniforms {
+        var viewport: SIMD4<Float> = .zero
+        var wave: SIMD4<Float> = .zero
+        var appearance: SIMD4<Float> = .zero
+    }
+
+    let device: MTLDevice?
+
+    private let commandQueue: MTLCommandQueue?
+    private let pipelineState: MTLRenderPipelineState?
+    private let startTime = CACurrentMediaTime()
+
+    private var fillLevel: Float = 0.16
+    private var amplitude: Float = 0.045
+    private var frequency: Float = 8.4
+    private var speed: Float = 0.95
+    private var detailAmplitude: Float = 0.016
+    private var detailFrequency: Float = 21
+    private var opacity: Float = 0.98
+
+    override init() {
+        let resolvedDevice = MTLCreateSystemDefaultDevice()
+        device = resolvedDevice
+
+        if let resolvedDevice {
+            commandQueue = resolvedDevice.makeCommandQueue()
+            pipelineState = WaterWaveRenderer.makePipelineState(device: resolvedDevice)
+        } else {
+            commandQueue = nil
+            pipelineState = nil
+        }
+
+        super.init()
+    }
+
+    func update(
+        fillLevel: Float,
+        amplitude: Float,
+        frequency: Float,
+        speed: Float,
+        detailAmplitude: Float,
+        detailFrequency: Float,
+        opacity: Float
+    ) {
+        self.fillLevel = fillLevel
+        self.amplitude = amplitude
+        self.frequency = frequency
+        self.speed = speed
+        self.detailAmplitude = detailAmplitude
+        self.detailFrequency = detailFrequency
+        self.opacity = opacity
+    }
+
+    func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {}
+
+    func draw(in view: MTKView) {
+        guard
+            let commandQueue,
+            let pipelineState,
+            let descriptor = view.currentRenderPassDescriptor,
+            let drawable = view.currentDrawable
+        else {
+            return
+        }
+
+        var uniforms = Uniforms(
+            viewport: SIMD4(
+                Float(view.drawableSize.width),
+                Float(view.drawableSize.height),
+                Float(CACurrentMediaTime() - startTime),
+                fillLevel
+            ),
+            wave: SIMD4(amplitude, frequency, speed, detailAmplitude),
+            appearance: SIMD4(detailFrequency, opacity, 0, 0)
+        )
+
+        guard let commandBuffer = commandQueue.makeCommandBuffer(),
+              let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor) else {
+            return
+        }
+
+        encoder.setRenderPipelineState(pipelineState)
+        encoder.setFragmentBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 0)
+        encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
+        encoder.endEncoding()
+
+        commandBuffer.present(drawable)
+        commandBuffer.commit()
+    }
+
+    private static func makePipelineState(device: MTLDevice) -> MTLRenderPipelineState? {
+        do {
+            let library = try device.makeLibrary(source: shaderSource, options: nil)
+            guard let vertexFunction = library.makeFunction(name: "waterVertex"),
+                  let fragmentFunction = library.makeFunction(name: "waterFragment") else {
+                return nil
+            }
+
+            let descriptor = MTLRenderPipelineDescriptor()
+            descriptor.vertexFunction = vertexFunction
+            descriptor.fragmentFunction = fragmentFunction
+            descriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+
+            return try device.makeRenderPipelineState(descriptor: descriptor)
+        } catch {
+            print("Metal water background setup failed: \(error)")
+            return nil
+        }
+    }
+
+    private static let shaderSource = """
+    #include <metal_stdlib>
+    using namespace metal;
+
+    struct Uniforms {
+        float4 viewport;
+        float4 wave;
+        float4 appearance;
+    };
+
+    struct RasterizerData {
+        float4 position [[position]];
+        float2 uv;
+    };
+
+    vertex RasterizerData waterVertex(uint vertexID [[vertex_id]]) {
+        const float2 positions[4] = {
+            float2(-1.0, -1.0),
+            float2( 1.0, -1.0),
+            float2(-1.0,  1.0),
+            float2( 1.0,  1.0)
+        };
+
+        const float2 uvs[4] = {
+            float2(0.0, 1.0),
+            float2(1.0, 1.0),
+            float2(0.0, 0.0),
+            float2(1.0, 0.0)
+        };
+
+        RasterizerData out;
+        out.position = float4(positions[vertexID], 0.0, 1.0);
+        out.uv = uvs[vertexID];
+        return out;
+    }
+
+    fragment float4 waterFragment(RasterizerData in [[stage_in]], constant Uniforms& uniforms [[buffer(0)]]) {
+        float2 uv = in.uv;
+        float time = uniforms.viewport.z;
+        float fillLevel = uniforms.viewport.w;
+
+        float amplitude = uniforms.wave.x;
+        float frequency = uniforms.wave.y;
+        float speed = uniforms.wave.z;
+        float detailAmplitude = uniforms.wave.w;
+
+        float detailFrequency = uniforms.appearance.x;
+        float opacity = uniforms.appearance.y;
+
+        float primaryWave = sin((uv.x * frequency) + (time * speed)) * amplitude;
+        float secondaryWave = sin((uv.x * detailFrequency) - (time * speed * 1.35)) * detailAmplitude;
+        float surfaceY = fillLevel + primaryWave + secondaryWave;
+
+        float liquidMask = smoothstep(surfaceY - 0.004, surfaceY + 0.06, uv.y);
+        float depth = saturate((uv.y - surfaceY) / max(1.0 - surfaceY, 0.001));
+        float shimmer = 0.5 + 0.5 * sin((uv.x * 18.0) - (time * 0.7) + (uv.y * 10.0));
+        float highlight = 1.0 - smoothstep(0.001, 0.02, abs(uv.y - surfaceY));
+        float surfaceBand = 1.0 - smoothstep(0.0, 0.012, abs(uv.y - surfaceY));
+        float undersideGlow = (1.0 - smoothstep(0.0, 0.08, uv.y - surfaceY)) * liquidMask;
+
+        float3 topColor = float3(0.90, 0.96, 0.98);
+        float3 bottomColor = float3(0.44, 0.66, 0.70);
+        float3 warmTint = float3(0.93, 0.84, 0.68);
+        float3 bodyColor = mix(topColor, bottomColor, depth);
+        bodyColor = mix(bodyColor, warmTint, depth * 0.24);
+        bodyColor += (0.06 * shimmer) * (1.0 - depth);
+        bodyColor += 0.28 * highlight;
+        bodyColor += 0.16 * surfaceBand;
+        bodyColor += 0.12 * undersideGlow;
+
+        float alpha = liquidMask * opacity;
+        alpha += highlight * 0.2 * opacity;
+        alpha += surfaceBand * 0.14;
+        alpha = min(alpha, 1.0);
+
+        return float4(bodyColor, alpha);
+    }
+    """
 }
 
 struct EmptyStateCard: View {

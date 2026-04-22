@@ -4,16 +4,20 @@ struct AppRootView: View {
     @EnvironmentObject private var navigator: AppNavigator
 
     var body: some View {
-        NavigationStack(
-            path: Binding(
-                get: { navigator.path },
-                set: { navigator.path = $0 }
-            )
-        ) {
-            AppTabShellView()
-                .navigationDestination(for: AppScreen.self) { screen in
-                    destination(for: screen)
-                }
+        ZStack {
+            POCBackgroundLayer()
+
+            NavigationStack(
+                path: Binding(
+                    get: { navigator.path },
+                    set: { navigator.path = $0 }
+                )
+            ) {
+                AppTabShellView()
+                    .navigationDestination(for: AppScreen.self) { screen in
+                        destination(for: screen)
+                    }
+            }
         }
         .sheet(item: Binding(
             get: { navigator.presentedSheet },
@@ -23,7 +27,6 @@ struct AppRootView: View {
                 .presentationDetents(sheet == .couponSuggestion ? [.medium, .large] : [.medium])
                 .presentationDragIndicator(.visible)
         }
-        .pocBackground()
     }
 
     @ViewBuilder
@@ -59,30 +62,34 @@ private struct AppTabShellView: View {
     @EnvironmentObject private var navigator: AppNavigator
 
     var body: some View {
-        TabView(selection: $navigator.selectedTab) {
-            HomeView()
-                .tag(AppTab.home)
-                .tabItem {
-                    Label("ホーム", systemImage: "house.fill")
-                }
+        ZStack {
+            POCBackgroundLayer()
 
-            MenuDiscoveryView()
-                .tag(AppTab.menu)
-                .tabItem {
-                    Label("メニュー", systemImage: "fork.knife")
-                }
+            TabView(selection: $navigator.selectedTab) {
+                HomeView()
+                    .tag(AppTab.home)
+                    .tabItem {
+                        Label("ホーム", systemImage: "house.fill")
+                    }
 
-            OrderTabView()
-                .tag(AppTab.order)
-                .tabItem {
-                    Label("オーダー", systemImage: "cart.fill")
-                }
+                MenuDiscoveryView()
+                    .tag(AppTab.menu)
+                    .tabItem {
+                        Label("メニュー", systemImage: "fork.knife")
+                    }
 
-            RewardsPlaceholderView()
-                .tag(AppTab.rewards)
-                .tabItem {
-                    Label("リワード", systemImage: "seal.fill")
-                }
+                OrderTabView()
+                    .tag(AppTab.order)
+                    .tabItem {
+                        Label("オーダー", systemImage: "cart.fill")
+                    }
+
+                RewardsPlaceholderView()
+                    .tag(AppTab.rewards)
+                    .tabItem {
+                        Label("リワード", systemImage: "seal.fill")
+                    }
+            }
         }
         .toolbarBackground(.visible, for: .tabBar)
         .toolbarBackground(.thinMaterial, for: .tabBar)

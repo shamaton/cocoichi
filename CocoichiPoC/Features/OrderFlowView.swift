@@ -117,6 +117,7 @@ struct CurryDetailView: View {
         .navigationTitle(orderStore.draftOrder?.menuItem.name ?? "カレー")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(orderStore.isDraftConfirmedForReview)
+        .pocProgressWaveBackground(.basics)
     }
 
     private var showsCompactHeader: Bool {
@@ -204,6 +205,7 @@ struct CurryToppingsView: View {
         .navigationTitle(orderStore.draftOrder?.menuItem.name ?? "カレー")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(orderStore.isDraftConfirmedForReview)
+        .pocProgressWaveBackground(.toppings)
     }
 
     private var showsCompactHeader: Bool {

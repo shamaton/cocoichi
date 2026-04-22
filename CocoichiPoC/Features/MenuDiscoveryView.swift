@@ -157,6 +157,7 @@ struct MenuDiscoveryView: View {
             }
             .navigationTitle("Menu Discovery")
             .navigationBarTitleDisplayMode(.inline)
+            .pocProgressWaveBackground(.menuDiscovery)
         }
     }
 
