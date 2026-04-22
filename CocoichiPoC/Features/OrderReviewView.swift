@@ -9,17 +9,11 @@ struct OrderReviewView: View {
             if orderStore.hasReviewItems {
                 ScrollView {
                     VStack(alignment: .leading, spacing: POCSpacing.l) {
-                        SectionHeader("Pickup")
+                        SectionHeader("受取情報")
 
                         if let store = orderStore.reviewStore {
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
                                 SummaryRow(title: store.name, value: store.pickupLeadTimeText)
-                                Button("Change store") {
-                                    orderStore.resetForNextOrder(keepingStore: false)
-                                    navigator.resetToStoreSelect()
-                                }
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(POCColor.curry)
                             }
                             .padding(POCSpacing.m)
                             .pocCard(fill: POCColor.elevated)
@@ -31,18 +25,19 @@ struct OrderReviewView: View {
 
                         if let appliedCoupon = orderStore.appliedCoupon {
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                SectionHeader("Applied Coupon")
+                                SectionHeader("適用中のクーポン")
                                 Text(appliedCoupon.displayTitle.reviewCurrencyText)
                                     .font(.headline.weight(.semibold))
                                 Text(appliedCoupon.displaySummary.reviewCurrencyText)
                                     .font(.subheadline)
                                     .foregroundStyle(POCColor.textSecondary)
-                                Button("Remove") {
+                                Button("外す") {
                                     orderStore.removeCoupon()
                                 }
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundStyle(POCColor.curry)
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(POCSpacing.m)
                             .pocCard(fill: POCColor.elevatedStrong)
                         } else if let suggestedCoupon = orderStore.availableCoupons.first {
@@ -52,29 +47,25 @@ struct OrderReviewView: View {
                                 Text(suggestedCoupon.displayTitle.reviewCurrencyText)
                                     .font(.subheadline)
                                     .foregroundStyle(POCColor.textSecondary)
-                                Button("View Coupon") {
+                                Button("クーポンを見る") {
                                     navigator.showSheet(.couponSuggestion)
                                 }
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundStyle(POCColor.curry)
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(POCSpacing.m)
                             .pocCard(fill: POCColor.elevatedStrong)
                         }
 
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("Price Summary")
-                            SummaryRow(title: "Subtotal", value: orderStore.reviewSubtotal.reviewYenText)
-                            SummaryRow(title: "Coupon", value: orderStore.reviewDiscount == 0 ? "-" : "-\(orderStore.reviewDiscount.reviewYenText)")
-                            SummaryRow(title: "Total", value: orderStore.reviewTotal.reviewYenText)
+                            SectionHeader("料金確認")
+                            SummaryRow(title: "小計", value: orderStore.reviewSubtotal.reviewYenText)
+                            SummaryRow(title: "クーポン", value: orderStore.reviewDiscount == 0 ? "-" : "-\(orderStore.reviewDiscount.reviewYenText)")
+                            SummaryRow(title: "合計", value: orderStore.reviewTotal.reviewYenText)
                         }
                         .padding(POCSpacing.m)
                         .pocCard(fill: POCColor.elevatedStrong)
-
-                        EmptyStateCard(
-                            title: "Notes",
-                            message: "mock order / native-only PoC"
-                        )
                     }
                     .padding(POCSpacing.l)
                 }
@@ -176,7 +167,14 @@ private struct CartLineSummaryCard: View {
                 action: onChangeToppings
             )
 
-            SummaryRow(title: "Line Total", value: draft.subtotal.reviewYenText)
+            HStack {
+                Spacer()
+
+                Text(draft.subtotal.reviewYenText)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .monospacedDigit()
+            }
         }
         .padding(POCSpacing.m)
         .background(

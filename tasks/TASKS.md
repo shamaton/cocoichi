@@ -200,3 +200,58 @@
    Done by: CODEX
    Done at: 2026-04-21T23:27:44Z
 
+19. remove-order-review-notes-card
+   Id: 19-remove-order-review-notes-card
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5最下部のNotesカードを削除。make build成功、git diff --check問題なし
+   Detail: tasks/details/19-remove-order-review-notes-card.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-22T13:28:29Z
+   Done by: CODEX
+   Done at: 2026-04-22T13:28:58Z
+
+20. remove-line-total-label-from-order-review
+   Id: 20-remove-line-total-label-from-order-review
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5注文カードのLine Totalラベルを削除し、金額のみの右寄せ表示へ変更。make build成功、git diff --check問題なし
+   Detail: tasks/details/20-remove-line-total-label-from-order-review.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-22T13:32:24Z
+   Done by: CODEX
+   Done at: 2026-04-22T13:32:51Z
+
+21. localize-order-review-copy-to-japanese
+   Id: 21-localize-order-review-copy-to-japanese
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5注文確認ページの英語文言を日本語へ統一。make build成功、git diff --check問題なし
+   Detail: tasks/details/21-localize-order-review-copy-to-japanese.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-22T13:35:04Z
+   Done by: CODEX
+   Done at: 2026-04-22T13:35:34Z
+
+22. remove-store-change-from-order-review
+   Id: 22-remove-store-change-from-order-review
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5注文確認ページの店舗変更導線を削除。make build成功、git diff --check問題なし
+   Detail: tasks/details/22-remove-store-change-from-order-review.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-22T13:40:59Z
+   Done by: CODEX
+   Done at: 2026-04-22T13:41:35Z
+
+23. widen-order-review-coupon-card
+   Id: 23-widen-order-review-coupon-card
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5クーポンカードの幅を他カードと揃えるよう修正。make build成功、git diff --check問題なし
+   Detail: tasks/details/23-widen-order-review-coupon-card.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-22T13:47:55Z
+   Done by: CODEX
+   Done at: 2026-04-22T13:48:31Z
+
