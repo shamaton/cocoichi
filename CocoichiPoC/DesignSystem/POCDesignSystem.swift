@@ -129,13 +129,13 @@ enum POCProgressWaveStage {
     var fillLevel: Float {
         switch self {
         case .menuDiscovery:
-            return 0.82
+            return 0.8
         case .basics:
-            return 0.72
-        case .toppings:
             return 0.6
+        case .toppings:
+            return 0.4
         case .review:
-            return 0.46
+            return 0.2
         }
     }
 }
