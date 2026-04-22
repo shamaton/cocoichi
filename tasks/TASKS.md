@@ -255,3 +255,14 @@
    Done by: CODEX
    Done at: 2026-04-22T13:48:31Z
 
+24. localize-coupon-list-ui-to-japanese
+   Id: 24-localize-coupon-list-ui-to-japanese
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderCompleteView.swift
+   Note: クーポンリストUIの英語文言を日本語へ統一。make build成功、git diff --check問題なし
+   Detail: tasks/details/24-localize-coupon-list-ui-to-japanese.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-22T13:53:37Z
+   Done by: CODEX
+   Done at: 2026-04-22T13:54:08Z
+

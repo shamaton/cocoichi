@@ -92,11 +92,11 @@ struct CouponSuggestionSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: POCSpacing.l) {
-                    SectionHeader("Grab a Saving")
+                    SectionHeader("使えるクーポン")
 
                     if let best = orderStore.availableCoupons.first {
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            Text("Best Match")
+                            Text("おすすめ")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(POCColor.textTertiary)
                             Text(best.displayTitle)
@@ -106,7 +106,7 @@ struct CouponSuggestionSheet: View {
                                 .foregroundStyle(POCColor.textSecondary)
                             Text("この注文なら \(orderStore.reviewSubtotal.yenText) -> \(orderStore.previewTotal(afterApplying: best).yenText)")
                                 .font(.subheadline.weight(.semibold))
-                            PrimaryCTAButton(title: "Apply This Coupon", systemImage: "tag") {
+                            PrimaryCTAButton(title: "このクーポンを使う", systemImage: "tag") {
                                 orderStore.applyCoupon(best)
                                 navigator.dismissSheet()
                             }
@@ -117,7 +117,7 @@ struct CouponSuggestionSheet: View {
 
                     if !orderStore.unavailableCoupons.isEmpty {
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("More Options")
+                            SectionHeader("その他のクーポン")
                             ForEach(orderStore.unavailableCoupons) { coupon in
                                 VStack(alignment: .leading, spacing: POCSpacing.xs) {
                                     Text(coupon.displayTitle)
@@ -140,7 +140,7 @@ struct CouponSuggestionSheet: View {
                 }
                 .padding(POCSpacing.l)
             }
-            .navigationTitle("Coupon")
+            .navigationTitle("クーポン")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
