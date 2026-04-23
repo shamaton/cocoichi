@@ -44,9 +44,9 @@ final class AppNavigator: ObservableObject {
         presentedSheet = nil
     }
 
-    func completeStoreSelection() {
+    func completeStoreSelection(pathOverride: [AppScreen]? = nil) {
         selectedTab = nextTabAfterStoreSelect
-        path = nextPathAfterStoreSelect
+        path = pathOverride ?? nextPathAfterStoreSelect
     }
 
     func push(_ screen: AppScreen) {

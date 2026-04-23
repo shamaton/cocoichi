@@ -53,6 +53,7 @@ final class OrderStore: ObservableObject {
     @Published var completedOrder: CompletedOrder?
     @Published var recentlySavedFavoriteName: String?
     @Published private(set) var pendingFavoriteResume: FavoriteCombo?
+    @Published private(set) var pendingMenuSelection: MenuItem?
     // S5 初回到達時だけクーポン sheet を自動表示し、その後は明示操作に戻すためのフラグ。
     @Published var hasPresentedCouponSuggestion = false
 
@@ -113,6 +114,10 @@ final class OrderStore: ObservableObject {
         !cartItems.isEmpty || draftOrder != nil
     }
 
+    var hasPendingMenuSelection: Bool {
+        pendingMenuSelection != nil
+    }
+
     var pendingReviewLineItem: CartLineItem? {
         guard let draftOrder else { return nil }
         return CartLineItem(id: draftOrder.id, draft: draftOrder)
@@ -162,6 +167,7 @@ final class OrderStore: ObservableObject {
         completedOrder = nil
         recentlySavedFavoriteName = nil
         pendingFavoriteResume = nil
+        pendingMenuSelection = nil
         hasPresentedCouponSuggestion = false
     }
 
@@ -182,9 +188,24 @@ final class OrderStore: ObservableObject {
         completedOrder = nil
         recentlySavedFavoriteName = nil
         pendingFavoriteResume = nil
+        pendingMenuSelection = nil
         if cartItems.isEmpty {
             hasPresentedCouponSuggestion = false
         }
+    }
+
+    func prepareMenuSelectionAfterStoreSelection(_ menuItem: MenuItem) {
+        pendingMenuSelection = menuItem
+        pendingFavoriteResume = nil
+    }
+
+    @discardableResult
+    func completePendingMenuSelectionIfNeeded(using store: Store) -> Bool {
+        guard let menuItem = pendingMenuSelection else { return false }
+        pendingMenuSelection = nil
+        guard menuItem.isAvailable(at: store) else { return false }
+        beginOrder(with: menuItem)
+        return true
     }
 
     func resumeFavorite(_ favorite: FavoriteCombo) {
@@ -195,6 +216,7 @@ final class OrderStore: ObservableObject {
 
     func prepareFavoriteResumeAfterStoreSelection(_ favorite: FavoriteCombo) {
         guard case .chooseStore = favoriteResumeState(for: favorite) else { return }
+        pendingMenuSelection = nil
         pendingFavoriteResume = favorite
     }
 
@@ -206,6 +228,10 @@ final class OrderStore: ObservableObject {
 
     func clearPendingFavoriteResume() {
         pendingFavoriteResume = nil
+    }
+
+    func clearPendingMenuSelection() {
+        pendingMenuSelection = nil
     }
 
     private func resumeFavorite(_ favorite: FavoriteCombo, using store: Store) {
@@ -220,6 +246,7 @@ final class OrderStore: ObservableObject {
         completedOrder = nil
         recentlySavedFavoriteName = nil
         pendingFavoriteResume = nil
+        pendingMenuSelection = nil
         if cartItems.isEmpty {
             hasPresentedCouponSuggestion = false
         }
@@ -378,6 +405,7 @@ final class OrderStore: ObservableObject {
         completedOrder = nil
         recentlySavedFavoriteName = nil
         pendingFavoriteResume = nil
+        pendingMenuSelection = nil
         hasPresentedCouponSuggestion = false
 
         // 完了後の再注文では店舗維持、店舗変更では完全リセットに分ける。

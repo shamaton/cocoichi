@@ -17,11 +17,13 @@ struct MenuDiscoveryView: View {
                         StoreContextCard(store: store) {
                             orderStore.resetForNextOrder(keepingStore: false)
                             orderStore.clearPendingFavoriteResume()
+                            orderStore.clearPendingMenuSelection()
                             navigator.presentStoreSelect()
                         }
                     } else {
                         MissingStoreCard {
                             orderStore.clearPendingFavoriteResume()
+                            orderStore.clearPendingMenuSelection()
                             navigator.presentStoreSelect(nextTab: .menu)
                         }
                     }
@@ -112,7 +114,8 @@ struct MenuDiscoveryView: View {
     private func startOrder(for item: MenuItem) {
         guard orderStore.selectedStore != nil else {
             orderStore.clearPendingFavoriteResume()
-            navigator.presentStoreSelect(nextTab: .menu)
+            orderStore.prepareMenuSelectionAfterStoreSelection(item)
+            navigator.presentStoreSelect(nextTab: .menu, nextPath: [.curryDetail])
             return
         }
         orderStore.beginOrder(with: item)

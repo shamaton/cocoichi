@@ -266,3 +266,14 @@
    Done by: CODEX
    Done at: 2026-04-22T13:54:08Z
 
+25. skip-store-confirmation-on-select
+   Id: 25-skip-store-confirmation-on-select
+   Scope: Now / M1-M2
+   Files: docs/poc-wireframes-s1-store-select-2026-04-12.md, CocoichiPoC/Features/StoreSelectView.swift, CocoichiPoC/App/AppNavigator.swift, CocoichiPoC/State/OrderStore.swift, CocoichiPoC/Features/MenuDiscoveryView.swift, CocoichiPoC/Features/AppRootView.swift
+   Note: S1確認画面を撤去し、店舗変更時のみ確認ダイアログを追加。未選択店舗で押した商品は店舗確定後にS3へ復帰。make build成功、git diff --check問題なし
+   Detail: tasks/details/25-skip-store-confirmation-on-select.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-23T22:56:25Z
+   Done by: CODEX
+   Done at: 2026-04-23T23:00:54Z
+

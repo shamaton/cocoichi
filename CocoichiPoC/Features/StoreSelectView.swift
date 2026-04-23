@@ -80,7 +80,7 @@ struct StoreSelectView: View {
 
     @State private var searchMethod: StoreSearchMethod = .currentLocation
     @State private var query = ""
-    @State private var selectedCandidate: Store?
+    @State private var pendingStoreChange: Store?
 
     var body: some View {
         ScrollView {
@@ -88,20 +88,12 @@ struct StoreSelectView: View {
                 header
                 fulfillmentModeSwitcher
 
-                if showsResetNotice {
-                    resetNotice
-                }
-
                 if orderStore.selectedFulfillmentMode == .pickup {
-                    if let selectedCandidate {
-                        confirmationCard(for: selectedCandidate)
-                    } else {
-                        quickStartSection
-                        searchMethodSection
-                        searchResultsSection
-                        recentlyUsedSection
-                        savedCombosSection
-                    }
+                    quickStartSection
+                    searchMethodSection
+                    searchResultsSection
+                    recentlyUsedSection
+                    savedCombosSection
                 } else {
                     deliveryEntrySection
                     savedCombosSection
@@ -113,11 +105,21 @@ struct StoreSelectView: View {
         .navigationTitle("受取先を選ぶ")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if let selectedStore = orderStore.selectedStore, selectedCandidate == nil {
-                selectedCandidate = nil
+            if let selectedStore = orderStore.selectedStore {
                 query = selectedStore.neighborhood
                 searchMethod = .station
             }
+        }
+        .alert("店舗を変更しますか？", isPresented: isShowingStoreChangeAlert, presenting: pendingStoreChange) { store in
+            Button("キャンセル", role: .cancel) {
+                pendingStoreChange = nil
+            }
+            Button("店舗を変更する", role: .destructive) {
+                pendingStoreChange = nil
+                commitStoreSelection(store, resetsOrder: true)
+            }
+        } message: { _ in
+            Text("現在のご注文内容はリセットされます。")
         }
     }
 
@@ -142,7 +144,6 @@ struct StoreSelectView: View {
     private func modeChip(mode: FulfillmentMode) -> some View {
         Button {
             orderStore.selectedFulfillmentMode = mode
-            selectedCandidate = nil
             if mode == .pickup {
                 searchMethod = .currentLocation
             }
@@ -162,19 +163,6 @@ struct StoreSelectView: View {
                 )
         }
         .buttonStyle(.plain)
-    }
-
-    private var resetNotice: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.xs) {
-            Text("店舗を変更すると現在の注文内容はリセットされます")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(POCColor.red)
-            Text("カート、追加中の1皿、適用クーポンを破棄して新しい受取先に切り替えます。")
-                .font(.caption)
-                .foregroundStyle(POCColor.textSecondary)
-        }
-        .padding(POCSpacing.m)
-        .pocCard(fill: POCColor.elevatedStrong)
     }
 
     private var quickStartSection: some View {
@@ -330,63 +318,9 @@ struct StoreSelectView: View {
         }
     }
 
-    private func confirmationCard(for store: Store) -> some View {
-        VStack(alignment: .leading, spacing: POCSpacing.l) {
-            SectionHeader("この店舗で始めますか？")
-
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                Text(store.name)
-                    .font(.headline.weight(.semibold))
-                Text(store.address)
-                    .font(.subheadline)
-                    .foregroundStyle(POCColor.textSecondary)
-                SummaryRow(title: "受取目安", value: store.pickupLeadTimeText)
-                SummaryRow(title: "受取方法", value: orderStore.selectedFulfillmentMode.label)
-            }
-            .padding(POCSpacing.m)
-            .pocCard(fill: POCColor.elevatedStrong)
-
-            if let pendingFavorite = orderStore.pendingFavoriteResume {
-                VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                    Text("再開するお気に入り")
-                        .font(.headline.weight(.semibold))
-                    Text(pendingFavorite.name)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(POCColor.textPrimary)
-                    Text("\(pendingFavorite.draft.menuItem.name) / \(pendingFavorite.draft.spiceLevelText) / \(pendingFavorite.draft.riceGrams)g")
-                        .font(.subheadline)
-                        .foregroundStyle(POCColor.textSecondary)
-                }
-                .padding(POCSpacing.m)
-                .pocCard(fill: POCColor.elevated)
-            }
-
-            VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                Text("Next")
-                    .font(.headline.weight(.semibold))
-                Text(nextStepMessage)
-                    .font(.subheadline)
-                    .foregroundStyle(POCColor.textSecondary)
-            }
-
-            PrimaryCTAButton(title: primaryConfirmationTitle, systemImage: "arrow.right") {
-                confirmStore(store)
-            }
-            if orderStore.pendingFavoriteResume == nil {
-                SecondaryCTAButton(title: "保存済みから始める", systemImage: "clock") {
-                    confirmStore(store)
-                    navigator.push(.savedCombos)
-                }
-            }
-            SecondaryCTAButton(title: "別の店舗を探す", systemImage: "arrow.uturn.left") {
-                selectedCandidate = nil
-            }
-        }
-    }
-
     private func storeRow(_ store: Store) -> some View {
         Button {
-            selectedCandidate = store
+            handleStoreSelection(store)
         } label: {
             VStack(alignment: .leading, spacing: POCSpacing.s) {
                 HStack(alignment: .top) {
@@ -419,27 +353,43 @@ struct StoreSelectView: View {
         .buttonStyle(.plain)
     }
 
-    private func confirmStore(_ store: Store) {
-        if orderStore.selectedStore?.id != store.id, orderStore.hasReviewItems {
+    private var isShowingStoreChangeAlert: Binding<Bool> {
+        Binding(
+            get: { pendingStoreChange != nil },
+            set: { isPresented in
+                if !isPresented {
+                    pendingStoreChange = nil
+                }
+            }
+        )
+    }
+
+    private func handleStoreSelection(_ store: Store) {
+        if shouldConfirmStoreChange(to: store) {
+            pendingStoreChange = store
+            return
+        }
+        commitStoreSelection(store, resetsOrder: false)
+    }
+
+    private func shouldConfirmStoreChange(to store: Store) -> Bool {
+        guard orderStore.selectedStore?.id != store.id else { return false }
+        return orderStore.selectedStore != nil && orderStore.hasReviewItems
+    }
+
+    private func commitStoreSelection(_ store: Store, resetsOrder: Bool) {
+        let hadPendingMenuSelection = orderStore.hasPendingMenuSelection
+        if resetsOrder {
             orderStore.resetForNextOrder(keepingStore: false)
         }
         orderStore.selectStore(store)
         orderStore.completePendingFavoriteResumeIfNeeded(using: store)
+        let startedPendingMenu = orderStore.completePendingMenuSelectionIfNeeded(using: store)
+        if hadPendingMenuSelection && !startedPendingMenu {
+            navigator.completeStoreSelection(pathOverride: [])
+            return
+        }
         navigator.completeStoreSelection()
-    }
-
-    private var nextStepMessage: String {
-        if orderStore.pendingFavoriteResume != nil {
-            return "この店舗でお気に入りを再開し、トッピング画面へ進みます。"
-        }
-        return "この店舗のメニューと限定商品を表示します。"
-    }
-
-    private var primaryConfirmationTitle: String {
-        if orderStore.pendingFavoriteResume != nil {
-            return "この店舗でお気に入りを再開"
-        }
-        return "この店舗でメニューを見る"
     }
 
     private var filteredStores: [Store] {
@@ -479,9 +429,5 @@ struct StoreSelectView: View {
         return stores.filter { store in
             seenIDs.insert(store.id).inserted
         }
-    }
-
-    private var showsResetNotice: Bool {
-        orderStore.selectedStore != nil || orderStore.hasReviewItems
     }
 }

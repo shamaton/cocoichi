@@ -66,11 +66,13 @@ struct SavedCombosView: View {
                     if orderStore.selectedStore != nil {
                         SecondaryCTAButton(title: "店舗を変更する", systemImage: "mappin.and.ellipse") {
                             orderStore.clearPendingFavoriteResume()
+                            orderStore.clearPendingMenuSelection()
                             navigator.resetToStoreSelect()
                         }
                     } else if !lockedFavorites.isEmpty {
                         SecondaryCTAButton(title: "店舗を選ぶ", systemImage: "mappin.and.ellipse") {
                             orderStore.clearPendingFavoriteResume()
+                            orderStore.clearPendingMenuSelection()
                             navigator.presentStoreSelect(nextTab: .menu, nextPath: [.savedCombos])
                         }
                     }
