@@ -3,6 +3,26 @@ import Foundation
 enum FavoriteResumeState: Equatable {
     case ready(message: String)
     case needsReview(message: String)
+    case chooseStore(message: String)
+    case storeSelectionRequired(message: String)
+}
+
+extension FavoriteResumeState {
+    var message: String {
+        switch self {
+        case let .ready(message), let .needsReview(message), let .chooseStore(message), let .storeSelectionRequired(message):
+            return message
+        }
+    }
+
+    var isSelectable: Bool {
+        switch self {
+        case .ready, .needsReview, .chooseStore:
+            return true
+        case .storeSelectionRequired:
+            return false
+        }
+    }
 }
 
 enum ReviewLineItemSource: Hashable {
@@ -32,6 +52,7 @@ final class OrderStore: ObservableObject {
     @Published var favoriteCombos: [FavoriteCombo]
     @Published var completedOrder: CompletedOrder?
     @Published var recentlySavedFavoriteName: String?
+    @Published private(set) var pendingFavoriteResume: FavoriteCombo?
     // S5 初回到達時だけクーポン sheet を自動表示し、その後は明示操作に戻すためのフラグ。
     @Published var hasPresentedCouponSuggestion = false
 
@@ -54,7 +75,9 @@ final class OrderStore: ObservableObject {
     }
 
     var featuredFavorite: FavoriteCombo? {
-        favoriteCombos.sorted(by: { $0.lastUsedAt > $1.lastUsedAt }).first
+        let sortedFavorites = favoriteCombos.sorted(by: { $0.lastUsedAt > $1.lastUsedAt })
+        guard selectedStore == nil else { return sortedFavorites.first }
+        return sortedFavorites.first(where: { !$0.draft.menuItem.isStoreLimited }) ?? sortedFavorites.first
     }
 
     var visibleMenuItems: [MenuItem] {
@@ -138,6 +161,7 @@ final class OrderStore: ObservableObject {
         appliedCoupon = nil
         completedOrder = nil
         recentlySavedFavoriteName = nil
+        pendingFavoriteResume = nil
         hasPresentedCouponSuggestion = false
     }
 
@@ -157,23 +181,45 @@ final class OrderStore: ObservableObject {
         isDraftConfirmedForReview = false
         completedOrder = nil
         recentlySavedFavoriteName = nil
+        pendingFavoriteResume = nil
         if cartItems.isEmpty {
             hasPresentedCouponSuggestion = false
         }
     }
 
     func resumeFavorite(_ favorite: FavoriteCombo) {
+        guard favoriteResumeState(for: favorite).isSelectable else { return }
         let resumeStore = selectedStore ?? favorite.draft.store
+        resumeFavorite(favorite, using: resumeStore)
+    }
+
+    func prepareFavoriteResumeAfterStoreSelection(_ favorite: FavoriteCombo) {
+        guard case .chooseStore = favoriteResumeState(for: favorite) else { return }
+        pendingFavoriteResume = favorite
+    }
+
+    func completePendingFavoriteResumeIfNeeded(using store: Store) {
+        guard let favorite = pendingFavoriteResume else { return }
+        pendingFavoriteResume = nil
+        resumeFavorite(favorite, using: store)
+    }
+
+    func clearPendingFavoriteResume() {
+        pendingFavoriteResume = nil
+    }
+
+    private func resumeFavorite(_ favorite: FavoriteCombo, using store: Store) {
         selectedFulfillmentMode = .pickup
         // 保存済み構成は再編集前提なので、クーポンは持ち越さず注文内容だけ再開する。
         var resumedDraft = favorite.draft.sanitizedForFavorite()
-        resumedDraft.store = resumeStore
-        selectedStore = resumeStore
+        resumedDraft.store = store
+        selectedStore = store
         draftOrder = resumedDraft
         pendingReviewInsertionIndex = nil
         isDraftConfirmedForReview = false
         completedOrder = nil
         recentlySavedFavoriteName = nil
+        pendingFavoriteResume = nil
         if cartItems.isEmpty {
             hasPresentedCouponSuggestion = false
         }
@@ -181,8 +227,15 @@ final class OrderStore: ObservableObject {
     }
 
     func favoriteResumeState(for favorite: FavoriteCombo) -> FavoriteResumeState {
+        if !favorite.draft.menuItem.isStoreLimited {
+            if selectedStore != nil {
+                return .ready(message: "店舗はそのままで、お気に入りを再開できます")
+            }
+            return .chooseStore(message: "店舗を選んでから、お気に入りを再開します")
+        }
+
         guard let selectedStore else {
-            return .ready(message: "保存時の店舗でそのまま再開します")
+            return .storeSelectionRequired(message: "限定メニューは店舗を選ぶと再開できます")
         }
 
         let savedStore = favorite.draft.store
@@ -197,7 +250,7 @@ final class OrderStore: ObservableObject {
             return .ready(message: "\(selectedStore.name)向けに受取時間を再計算して再開します")
         }
 
-        return .needsReview(message: "この店舗では限定商品がない可能性があります")
+        return .needsReview(message: "この店舗では内容調整が必要です")
     }
 
     func setSpiceLevel(_ level: Int) {
@@ -324,6 +377,7 @@ final class OrderStore: ObservableObject {
         appliedCoupon = nil
         completedOrder = nil
         recentlySavedFavoriteName = nil
+        pendingFavoriteResume = nil
         hasPresentedCouponSuggestion = false
 
         // 完了後の再注文では店舗維持、店舗変更では完全リセットに分ける。

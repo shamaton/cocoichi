@@ -16,10 +16,12 @@ struct MenuDiscoveryView: View {
                     if let store = orderStore.selectedStore {
                         StoreContextCard(store: store) {
                             orderStore.resetForNextOrder(keepingStore: false)
+                            orderStore.clearPendingFavoriteResume()
                             navigator.presentStoreSelect()
                         }
                     } else {
                         MissingStoreCard {
+                            orderStore.clearPendingFavoriteResume()
                             navigator.presentStoreSelect(nextTab: .menu)
                         }
                     }
@@ -109,6 +111,7 @@ struct MenuDiscoveryView: View {
 
     private func startOrder(for item: MenuItem) {
         guard orderStore.selectedStore != nil else {
+            orderStore.clearPendingFavoriteResume()
             navigator.presentStoreSelect(nextTab: .menu)
             return
         }
@@ -177,6 +180,14 @@ struct MenuDiscoveryView: View {
 
     private var favoriteEntryMessage: String {
         if let favorite = orderStore.featuredFavorite {
+            switch orderStore.favoriteResumeState(for: favorite) {
+            case .chooseStore:
+                return "店舗を選んでからお気に入りを再開できます"
+            case .storeSelectionRequired:
+                return "限定メニューを含むため、店舗を選ぶと再開できます"
+            case .ready, .needsReview:
+                break
+            }
             return "\(favorite.draft.menuItem.name) からすぐ再開できます"
         }
         return "注文後に保存した組み合わせを、ここからすぐ呼び出せます。"

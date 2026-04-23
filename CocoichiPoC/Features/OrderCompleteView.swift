@@ -70,6 +70,7 @@ struct OrderCompleteView: View {
                         }
                         SecondaryCTAButton(title: "店舗を変更", systemImage: "mappin.and.ellipse") {
                             orderStore.resetForNextOrder(keepingStore: false)
+                            orderStore.clearPendingFavoriteResume()
                             navigator.resetToStoreSelect()
                         }
                     }

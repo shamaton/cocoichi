@@ -346,20 +346,37 @@ struct StoreSelectView: View {
             .padding(POCSpacing.m)
             .pocCard(fill: POCColor.elevatedStrong)
 
+            if let pendingFavorite = orderStore.pendingFavoriteResume {
+                VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                    Text("再開するお気に入り")
+                        .font(.headline.weight(.semibold))
+                    Text(pendingFavorite.name)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+                    Text("\(pendingFavorite.draft.menuItem.name) / \(pendingFavorite.draft.spiceLevelText) / \(pendingFavorite.draft.riceGrams)g")
+                        .font(.subheadline)
+                        .foregroundStyle(POCColor.textSecondary)
+                }
+                .padding(POCSpacing.m)
+                .pocCard(fill: POCColor.elevated)
+            }
+
             VStack(alignment: .leading, spacing: POCSpacing.xs) {
                 Text("Next")
                     .font(.headline.weight(.semibold))
-                Text("この店舗のメニューと限定商品を表示します。")
+                Text(nextStepMessage)
                     .font(.subheadline)
                     .foregroundStyle(POCColor.textSecondary)
             }
 
-            PrimaryCTAButton(title: "この店舗でメニューを見る", systemImage: "arrow.right") {
+            PrimaryCTAButton(title: primaryConfirmationTitle, systemImage: "arrow.right") {
                 confirmStore(store)
             }
-            SecondaryCTAButton(title: "保存済みから始める", systemImage: "clock") {
-                confirmStore(store)
-                navigator.push(.savedCombos)
+            if orderStore.pendingFavoriteResume == nil {
+                SecondaryCTAButton(title: "保存済みから始める", systemImage: "clock") {
+                    confirmStore(store)
+                    navigator.push(.savedCombos)
+                }
             }
             SecondaryCTAButton(title: "別の店舗を探す", systemImage: "arrow.uturn.left") {
                 selectedCandidate = nil
@@ -407,7 +424,22 @@ struct StoreSelectView: View {
             orderStore.resetForNextOrder(keepingStore: false)
         }
         orderStore.selectStore(store)
+        orderStore.completePendingFavoriteResumeIfNeeded(using: store)
         navigator.completeStoreSelection()
+    }
+
+    private var nextStepMessage: String {
+        if orderStore.pendingFavoriteResume != nil {
+            return "この店舗でお気に入りを再開し、トッピング画面へ進みます。"
+        }
+        return "この店舗のメニューと限定商品を表示します。"
+    }
+
+    private var primaryConfirmationTitle: String {
+        if orderStore.pendingFavoriteResume != nil {
+            return "この店舗でお気に入りを再開"
+        }
+        return "この店舗でメニューを見る"
     }
 
     private var filteredStores: [Store] {

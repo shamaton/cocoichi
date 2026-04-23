@@ -17,14 +17,14 @@ struct SavedCombosView: View {
                 } else {
                     if !readyFavorites.isEmpty {
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader(orderStore.selectedStore == nil ? "Saved" : "Ready Here")
+                            SectionHeader(orderStore.selectedStore == nil ? "店舗を選んで再開" : "Ready Here")
                             ForEach(readyFavorites) { favorite in
                                 SavedComboCard(
                                     favorite: favorite,
                                     state: orderStore.favoriteResumeState(for: favorite),
-                                    actionTitle: "この内容で再開"
+                                    actionTitle: actionTitle(for: favorite)
                                 ) {
-                                    resumeFavorite(favorite)
+                                    handleFavoriteSelection(favorite)
                                 }
                             }
                         }
@@ -44,6 +44,19 @@ struct SavedCombosView: View {
                             }
                         }
                     }
+
+                    if !lockedFavorites.isEmpty {
+                        VStack(alignment: .leading, spacing: POCSpacing.s) {
+                            SectionHeader("店舗選択が必要")
+                            ForEach(lockedFavorites) { favorite in
+                                SavedComboCard(
+                                    favorite: favorite,
+                                    state: orderStore.favoriteResumeState(for: favorite),
+                                    actionTitle: "店舗を選ぶと再開できます"
+                                ) {}
+                            }
+                        }
+                    }
                 }
 
                 VStack(spacing: POCSpacing.s) {
@@ -52,7 +65,13 @@ struct SavedCombosView: View {
                     }
                     if orderStore.selectedStore != nil {
                         SecondaryCTAButton(title: "店舗を変更する", systemImage: "mappin.and.ellipse") {
+                            orderStore.clearPendingFavoriteResume()
                             navigator.resetToStoreSelect()
+                        }
+                    } else if !lockedFavorites.isEmpty {
+                        SecondaryCTAButton(title: "店舗を選ぶ", systemImage: "mappin.and.ellipse") {
+                            orderStore.clearPendingFavoriteResume()
+                            navigator.presentStoreSelect(nextTab: .menu, nextPath: [.savedCombos])
                         }
                     }
                 }
@@ -79,9 +98,11 @@ struct SavedCombosView: View {
     private var readyFavorites: [FavoriteCombo] {
         sortedFavorites.filter {
             switch orderStore.favoriteResumeState(for: $0) {
-            case .ready:
+            case .ready, .chooseStore:
                 return true
             case .needsReview:
+                return false
+            case .storeSelectionRequired:
                 return false
             }
         }
@@ -90,24 +111,63 @@ struct SavedCombosView: View {
     private var needsReviewFavorites: [FavoriteCombo] {
         sortedFavorites.filter {
             switch orderStore.favoriteResumeState(for: $0) {
-            case .ready:
+            case .ready, .chooseStore:
                 return false
             case .needsReview:
+                return true
+            case .storeSelectionRequired:
+                return false
+            }
+        }
+    }
+
+    private var lockedFavorites: [FavoriteCombo] {
+        sortedFavorites.filter {
+            switch orderStore.favoriteResumeState(for: $0) {
+            case .ready, .needsReview, .chooseStore:
+                return false
+            case .storeSelectionRequired:
                 return true
             }
         }
     }
 
     private func reviewMessage(for favorite: FavoriteCombo) -> String {
+        orderStore.favoriteResumeState(for: favorite).message
+    }
+
+    private func actionTitle(for favorite: FavoriteCombo) -> String {
         switch orderStore.favoriteResumeState(for: favorite) {
-        case let .ready(message), let .needsReview(message):
-            return message
+        case .chooseStore:
+            return "店舗を選んで再開"
+        case .ready:
+            return "この内容で再開"
+        case .needsReview:
+            return "内容を見る"
+        case .storeSelectionRequired:
+            return "店舗を選ぶと再開できます"
+        }
+    }
+
+    private func handleFavoriteSelection(_ favorite: FavoriteCombo) {
+        switch orderStore.favoriteResumeState(for: favorite) {
+        case .chooseStore:
+            orderStore.prepareFavoriteResumeAfterStoreSelection(favorite)
+            navigator.presentStoreSelect(nextTab: .menu, nextPath: [.curryDetail, .curryToppings])
+        case .ready:
+            orderStore.resumeFavorite(favorite)
+            navigator.showCurryToppings()
+        case .needsReview:
+            selectedFavoriteForReview = favorite
+        case .storeSelectionRequired:
+            break
         }
     }
 
     private func resumeFavorite(_ favorite: FavoriteCombo) {
+        guard orderStore.favoriteResumeState(for: favorite).isSelectable else { return }
         orderStore.resumeFavorite(favorite)
-        navigator.push(.curryDetail)
+        navigator.showCurryToppings()
     }
 }
 
@@ -122,7 +182,7 @@ private struct SavedCombosStoreContextCard: View {
                 SummaryRow(title: "Pickup", value: store.pickupLeadTimeText)
             } else {
                 SectionHeader("Store Context")
-                Text("店舗未設定のため、保存時の店舗で再開します。")
+                Text("共通メニューは選択後に店舗を決めて再開します。限定メニューは店舗選択後に有効になります。")
                     .font(.subheadline)
                     .foregroundStyle(POCColor.textSecondary)
             }
@@ -162,9 +222,15 @@ private struct SavedComboCard: View {
                         .foregroundStyle(POCColor.textTertiary)
                 }
 
-                Text("\(favorite.draft.store.name)で保存")
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(POCColor.textSecondary)
+                Group {
+                    if favorite.draft.menuItem.isStoreLimited {
+                        Text("\(favorite.draft.store.name)で保存")
+                    } else {
+                        Text("共通メニュー")
+                    }
+                }
+                .font(.caption.weight(.medium))
+                .foregroundStyle(POCColor.textSecondary)
 
                 Text(statusMessage)
                     .font(.subheadline)
@@ -173,40 +239,62 @@ private struct SavedComboCard: View {
                 HStack {
                     Text(actionTitle)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(POCColor.curry)
+                        .foregroundStyle(actionColor)
                     Spacer()
-                    Image(systemName: "arrow.right")
-                        .foregroundStyle(POCColor.curry)
+                    Image(systemName: actionSystemImage)
+                        .foregroundStyle(actionColor)
                 }
             }
             .padding(POCSpacing.m)
             .pocCard(fill: backgroundFill)
         }
         .buttonStyle(.plain)
+        .disabled(!state.isSelectable)
     }
 
     private var statusMessage: String {
-        switch state {
-        case let .ready(message), let .needsReview(message):
-            return message
-        }
+        state.message
     }
 
     private var statusColor: Color {
         switch state {
-        case .ready:
+        case .ready, .chooseStore:
             return POCColor.textSecondary
         case .needsReview:
             return POCColor.curry
+        case .storeSelectionRequired:
+            return POCColor.red
         }
     }
 
     private var backgroundFill: Color {
         switch state {
-        case .ready:
+        case .ready, .chooseStore:
             return POCColor.elevated
         case .needsReview:
             return POCColor.elevatedStrong
+        case .storeSelectionRequired:
+            return POCColor.elevated.opacity(0.72)
+        }
+    }
+
+    private var actionColor: Color {
+        switch state {
+        case .storeSelectionRequired:
+            return POCColor.textTertiary
+        case .ready, .needsReview, .chooseStore:
+            return POCColor.curry
+        }
+    }
+
+    private var actionSystemImage: String {
+        switch state {
+        case .storeSelectionRequired:
+            return "lock.fill"
+        case .ready, .needsReview:
+            return "arrow.right"
+        case .chooseStore:
+            return "mappin.and.ellipse"
         }
     }
 }
@@ -227,9 +315,15 @@ private struct SavedComboReviewSheet: View {
                     Text(favorite.name)
                         .font(.headline.weight(.semibold))
                         .foregroundStyle(POCColor.textPrimary)
-                    Text("\(favorite.draft.store.name)で保存")
-                        .font(.subheadline)
-                        .foregroundStyle(POCColor.textSecondary)
+                    Group {
+                        if favorite.draft.menuItem.isStoreLimited {
+                            Text("\(favorite.draft.store.name)で保存")
+                        } else {
+                            Text("共通メニュー")
+                        }
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(POCColor.textSecondary)
                 }
 
                 DraftSnapshotCard(
@@ -240,7 +334,7 @@ private struct SavedComboReviewSheet: View {
 
                 EmptyStateCard(
                     title: "Note",
-                    message: "\(message) 必要な調整は Customize 画面で続けられます。"
+                    message: "\(message) 再開後はトッピング画面から続けられ、必要ならベース設定へ戻れます。"
                 )
 
                 Spacer()

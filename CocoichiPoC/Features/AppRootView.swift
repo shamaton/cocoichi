@@ -170,6 +170,7 @@ private struct HomeView: View {
             }
 
             PrimaryCTAButton(title: orderStore.selectedStore == nil ? "選択する" : "変更する", systemImage: "arrow.right") {
+                orderStore.clearPendingFavoriteResume()
                 navigator.presentStoreSelect(nextTab: .menu)
             }
         }
@@ -306,6 +307,7 @@ private struct HomeView: View {
                 }
                 PrimaryCTAButton(title: "オーダーを始める", systemImage: "arrow.right") {
                     if orderStore.selectedStore == nil {
+                        orderStore.clearPendingFavoriteResume()
                         navigator.presentStoreSelect(nextTab: .menu)
                     } else {
                         navigator.showMenuDiscovery()
@@ -348,6 +350,7 @@ private struct HomeView: View {
 
     private func startHomeOrder(for item: MenuItem) {
         guard orderStore.selectedStore != nil else {
+            orderStore.clearPendingFavoriteResume()
             navigator.presentStoreSelect(nextTab: .menu)
             return
         }
@@ -388,6 +391,7 @@ private struct OrderTabView: View {
                 } else if let store = orderStore.selectedStore {
                     StoreContextCard(store: store) {
                         orderStore.resetForNextOrder(keepingStore: false)
+                        orderStore.clearPendingFavoriteResume()
                         navigator.presentStoreSelect(nextTab: .menu)
                     }
 
@@ -412,6 +416,7 @@ private struct OrderTabView: View {
 
                     HStack(spacing: POCSpacing.s) {
                         PrimaryCTAButton(title: "受取先を選ぶ", systemImage: "location") {
+                            orderStore.clearPendingFavoriteResume()
                             navigator.presentStoreSelect(nextTab: .menu)
                         }
                         SecondaryCTAButton(title: "メニューを見る", systemImage: "fork.knife") {
