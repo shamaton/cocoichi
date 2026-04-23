@@ -485,7 +485,7 @@ private enum CurryMenuMasterLoader {
 
     private static func makeID(for name: String, index: Int) -> String {
         switch name {
-        case "THE牛カレー":
+        case "THE牛カレー", "本格 牛カレー":
             return "the-gyu-curry"
         case "手仕込ささみカツ(2本)カレー":
             return "handmade-chicken-tender-cutlet-curry"
@@ -631,7 +631,7 @@ private enum CurryMenuMasterLoader {
 
     private static let fallbackYAML = """
     期間限定:
-      - name: THE牛カレー
+      - name: 本格 牛カレー
         price: 1120
         comment: 牛の旨みを強く打ち出した数量限定の一皿
       - name: 手仕込ささみカツ(2本)カレー
