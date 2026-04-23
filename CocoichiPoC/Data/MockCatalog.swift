@@ -489,7 +489,7 @@ private enum CurryMenuMasterLoader {
             return "the-gyu-curry"
         case "手仕込ささみカツ(2本)カレー":
             return "handmade-chicken-tender-cutlet-curry"
-        case "桜えびとあさりの春野菜カレー":
+        case "桜えびとあさりの春野菜カレー", "カキフライカレー":
             return "sakura-shrimp-asari-spring-vegetable-curry"
         case "ロースカツカレー":
             return "loin-cutlet-curry"
@@ -637,9 +637,9 @@ private enum CurryMenuMasterLoader {
       - name: 手仕込ささみカツ(2本)カレー
         price: 1082
         comment: 手仕込のささみカツで食べごたえを足せる限定メニュー
-      - name: 桜えびとあさりの春野菜カレー
+      - name: カキフライカレー
         price: 920
-        comment: 春らしい具材を重ねて軽やかに楽しめる限定カレー
+        comment: サクッとしたカキフライを主役に楽しめる限定カレー
 
     肉類のカレー:
       - name: ポークカレー

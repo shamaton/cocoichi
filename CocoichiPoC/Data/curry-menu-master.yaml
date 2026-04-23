@@ -9,10 +9,10 @@
     virtualPrice: 1170
     comment: 手仕込のささみカツで食べごたえを足せる限定メニュー
     imagePath: handmade-chicken-cutlet-curry.png
-  - name: 桜えびとあさりの春野菜カレー
+  - name: カキフライカレー
     price: 920
     virtualPrice: 1000
-    comment: 春らしい具材を重ねて軽やかに楽しめる限定カレー
+    comment: サクッとしたカキフライを主役に楽しめる限定カレー
     imagePath: shrimp-asari-spring-curry.png
 
 肉類のカレー:
