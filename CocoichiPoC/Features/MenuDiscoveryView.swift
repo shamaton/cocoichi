@@ -6,7 +6,6 @@ struct MenuDiscoveryView: View {
     @EnvironmentObject private var orderStore: OrderStore
 
     @State private var searchText = ""
-    @State private var selectedTag: MenuTag?
 
     var body: some View {
         GeometryReader { proxy in
@@ -41,49 +40,10 @@ struct MenuDiscoveryView: View {
                                 RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
                                     .stroke(POCColor.line, lineWidth: 1)
                             )
-
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: POCSpacing.xs) {
-                                ForEach(MenuTag.allCases, id: \.self) { tag in
-                                    FilterChip(title: tag.rawValue, isSelected: selectedTag == tag) {
-                                        selectedTag = selectedTag == tag ? nil : tag
-                                    }
-                                }
-                            }
-                        }
                     }
 
-                    if searchText.isEmpty, let favorite = orderStore.featuredFavorite {
-                        VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("For You")
-
-                            Button {
-                                orderStore.resumeFavorite(favorite)
-                                navigator.push(.curryDetail)
-                            } label: {
-                                VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                    Text("いつものに近い")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(POCColor.textTertiary)
-                                    Text(favorite.name)
-                                        .font(.headline.weight(.semibold))
-                                    Text(favorite.draft.menuItem.name)
-                                        .font(.subheadline)
-                                        .foregroundStyle(POCColor.textSecondary)
-                                    HStack {
-                                        Text("from Saved Combos")
-                                            .font(.caption)
-                                            .foregroundStyle(POCColor.textSecondary)
-                                        Spacer()
-                                        Image(systemName: "arrow.right")
-                                            .foregroundStyle(POCColor.curry)
-                                    }
-                                }
-                                .padding(POCSpacing.m)
-                                .pocCard(fill: POCColor.elevatedStrong)
-                            }
-                            .buttonStyle(.plain)
-                        }
+                    if searchText.isEmpty {
+                        favoriteEntrySection
                     }
 
                     if searchText.isEmpty, !popularItems.isEmpty {
@@ -141,20 +101,6 @@ struct MenuDiscoveryView: View {
                 .padding(.top, POCSpacing.l)
                 .padding(.bottom, POCSpacing.l)
             }
-            .safeAreaInset(edge: .bottom) {
-                HStack(spacing: POCSpacing.s) {
-                    SecondaryCTAButton(title: "保存済み", systemImage: "clock") {
-                        navigator.push(.savedCombos)
-                    }
-                    SecondaryCTAButton(title: "気分で探す", systemImage: "sparkles") {
-                        selectedTag = .recommended
-                    }
-                }
-                .padding(.horizontal, POCSpacing.l)
-                .padding(.top, POCSpacing.s)
-                .padding(.bottom, POCSpacing.s)
-                .background(.ultraThinMaterial)
-            }
             .navigationTitle("Menu Discovery")
             .navigationBarTitleDisplayMode(.inline)
             .pocProgressWaveBackground(.menuDiscovery)
@@ -177,7 +123,6 @@ struct MenuDiscoveryView: View {
 
     private var filteredMenuItems: [MenuItem] {
         orderStore.visibleMenuItems.filter { item in
-            let matchesTag = selectedTag.map { item.tags.contains($0) } ?? true
             let matchesSearch: Bool
             if searchText.isEmpty {
                 matchesSearch = true
@@ -188,8 +133,53 @@ struct MenuDiscoveryView: View {
                     .lowercased()
                 matchesSearch = searchSpace.contains(query)
             }
-            return matchesTag && matchesSearch
+            return matchesSearch
         }
+    }
+
+    private var favoriteEntrySection: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            SectionHeader("お気に入りから選ぶ")
+
+            Button {
+                navigator.push(.savedCombos)
+            } label: {
+                HStack(spacing: POCSpacing.m) {
+                    VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                        Text(favoriteEntryTitle)
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(POCColor.textPrimary)
+                        Text(favoriteEntryMessage)
+                            .font(.subheadline)
+                            .foregroundStyle(POCColor.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "arrow.right")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(POCColor.curry)
+                }
+                .padding(POCSpacing.m)
+                .pocCard(fill: POCColor.elevatedStrong)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var favoriteEntryTitle: String {
+        if let favorite = orderStore.featuredFavorite {
+            return favorite.name
+        }
+        return "保存済みのお気に入りを見る"
+    }
+
+    private var favoriteEntryMessage: String {
+        if let favorite = orderStore.featuredFavorite {
+            return "\(favorite.draft.menuItem.name) からすぐ再開できます"
+        }
+        return "注文後に保存した組み合わせを、ここからすぐ呼び出せます。"
     }
 
     private var groupedSections: [GroupedMenuSection] {
