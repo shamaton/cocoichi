@@ -199,27 +199,13 @@ private struct HomeView: View {
     private var seasonalBanner: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
             SectionHeader("Seasonal")
-            Button {
-                navigator.showMenuDiscovery()
-            } label: {
-                VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    HeroBanner(
-                        eyebrow: "期間限定",
-                        title: orderStore.selectedStore == nil ? "スパイスカレー特集" : "春のおすすめトッピング特集",
-                        accent: [POCColor.red, POCColor.cheese]
-                    )
-                    HStack {
-                        Text(orderStore.selectedStore == nil ? "今だけのおすすめをチェック" : "この店舗で今食べたいおすすめを探す")
-                            .font(.subheadline)
-                            .foregroundStyle(POCColor.textSecondary)
-                        Spacer()
-                        Text(orderStore.selectedStore == nil ? "メニューへ" : "見る")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(POCColor.curry)
-                    }
-                }
+            Text(orderStore.selectedStore == nil ? "今だけのおすすめをホームから先に見せます" : "この店舗で気分に合う一皿を先に見せます")
+                .font(.subheadline)
+                .foregroundStyle(POCColor.textSecondary)
+
+            ForEach(homeBanners) { banner in
+                HomeImageBannerCard(banner: banner)
             }
-            .buttonStyle(.plain)
         }
     }
 
@@ -386,6 +372,13 @@ private struct HomeView: View {
 
     private var featuredStoreItem: MenuItem? {
         orderStore.storeLimitedMenuItems.first
+    }
+
+    private var homeBanners: [HomeBanner] {
+        [
+            HomeBanner(imagePath: "the-gyu-curry.png"),
+            HomeBanner(imagePath: "oyster_curry.png"),
+        ]
     }
 }
 
@@ -602,5 +595,71 @@ private struct FutureValueCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(POCSpacing.m)
         .pocCard(fill: POCColor.elevated)
+    }
+}
+
+private struct HomeBanner: Identifiable {
+    let imagePath: String
+
+    var id: String { imagePath }
+}
+
+private struct HomeImageBannerCard: View {
+    let banner: HomeBanner
+
+    var body: some View {
+        bannerArtwork
+            .frame(maxWidth: .infinity)
+            .clipShape(RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous)
+                    .stroke(Color.white.opacity(0.22), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.08), radius: 20, x: 0, y: 10)
+    }
+
+    @ViewBuilder
+    private var bannerArtwork: some View {
+        if let bannerImage {
+            Image(uiImage: bannerImage)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity)
+                .background(POCColor.elevated)
+        } else {
+            LinearGradient(
+                colors: [POCColor.red, POCColor.cheese, POCColor.elevatedStrong],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .frame(maxWidth: .infinity)
+            .frame(height: 176)
+            .overlay {
+                Image(systemName: "fork.knife.circle.fill")
+                    .font(.largeTitle)
+                    .foregroundStyle(.white.opacity(0.92))
+            }
+        }
+    }
+
+    private var bannerImage: UIImage? {
+        let resourcePath = banner.imagePath as NSString
+        let resourceName = resourcePath.deletingPathExtension
+        let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
+
+        if let bannerURL = Bundle.main.url(
+            forResource: resourceName,
+            withExtension: resourceExtension,
+            subdirectory: "BannerImages"
+        ) {
+            return UIImage(contentsOfFile: bannerURL.path)
+        }
+
+        if let bundledImage = UIImage(named: resourceName) {
+            return bundledImage
+        }
+
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: resourceExtension) else { return nil }
+        return UIImage(contentsOfFile: url.path)
     }
 }

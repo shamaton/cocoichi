@@ -277,3 +277,14 @@
    Done by: CODEX
    Done at: 2026-04-23T23:00:54Z
 
+26. home-banner-images
+   Id: 26-home-banner-images
+   Scope: Now / M1
+   Files: CocoichiPoC/Features/AppRootView.swift, CocoichiPoC.xcodeproj/project.pbxproj
+   Note: Home に BannerImages を静的表示で追加。project.pbxproj に BannerImages folder resource を登録、make build 成功、Simulator screenshot で表示確認。
+   Detail: tasks/details/26-home-banner-images.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-24T09:45:22Z
+   Done by: CODEX
+   Done at: 2026-04-24T09:47:57Z
+

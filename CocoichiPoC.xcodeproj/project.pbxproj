@@ -70,6 +70,7 @@
 			A00000000000000000000038 /* vege-source.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000038 /* vege-source.png */; };
 			A00000000000000000000039 /* RiceImages in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000039 /* RiceImages */; };
 			A0000000000000000000003A /* SpiceImages in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003A /* SpiceImages */; };
+			A00000000000000000000042 /* BannerImages in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000042 /* BannerImages */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -136,6 +137,7 @@
 		B00000000000000000000039 /* RiceImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = RiceImages; sourceTree = "<group>"; };
 		B0000000000000000000003A /* SpiceImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SpiceImages; sourceTree = "<group>"; };
 		B0000000000000000000003C /* ToppingImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ToppingImages; sourceTree = "<group>"; };
+		B00000000000000000000042 /* BannerImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BannerImages; sourceTree = "<group>"; };
 		B0000000000000000000000B /* CocoichiPoC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoichiPoC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -244,6 +246,7 @@
 					C0000000000000000000000C /* CurryGenreImages */,
 					C0000000000000000000000D /* CurrySourceImages */,
 					C0000000000000000000000B /* MenuImages */,
+					B00000000000000000000042 /* BannerImages */,
 					B0000000000000000000003C /* ToppingImages */,
 					B00000000000000000000039 /* RiceImages */,
 					B0000000000000000000003A /* SpiceImages */,
@@ -420,6 +423,7 @@
 					A00000000000000000000038 /* vege-source.png in Resources */,
 					A00000000000000000000039 /* RiceImages in Resources */,
 					A0000000000000000000003A /* SpiceImages in Resources */,
+					A00000000000000000000042 /* BannerImages in Resources */,
 					A0000000000000000000000B /* curry-menu-master.yaml in Resources */,
 					A0000000000000000000003B /* topping-menu-master.yaml in Resources */,
 					A0000000000000000000003C /* ToppingImages in Resources */,
