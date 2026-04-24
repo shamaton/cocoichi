@@ -132,7 +132,7 @@ private struct HomeView: View {
             .padding(POCSpacing.l)
             .padding(.bottom, 96)
         }
-        .navigationTitle("Home")
+        .navigationTitle("ホーム")
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .top, spacing: 0) {
             HomeStickyHeader()
@@ -141,11 +141,8 @@ private struct HomeView: View {
 
     private var homeHeader: some View {
         VStack(alignment: .leading, spacing: POCSpacing.xs) {
-            Text("こんにちは")
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(POCColor.textSecondary)
             Text(headerTitle)
-                .font(.largeTitle.weight(.bold))
+                .font(.title2.weight(.bold))
                 .foregroundStyle(POCColor.textPrimary)
         }
     }
@@ -169,7 +166,7 @@ private struct HomeView: View {
 
     private var recommendedSection: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader(orderStore.selectedStore == nil ? "Recommended For First Order" : "Recommended For You")
+            SectionHeader(orderStore.selectedStore == nil ? "はじめての注文におすすめ" : "あなたへのおすすめ")
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: POCSpacing.s) {
                     ForEach(recommendedItems) { item in
@@ -200,7 +197,7 @@ private struct HomeView: View {
     @ViewBuilder
     private func featuredStoreItemCard(item: MenuItem) -> some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("This Store Only")
+            SectionHeader("この店舗限定")
             Button {
                 startHomeOrder(for: item)
             } label: {
@@ -230,7 +227,7 @@ private struct HomeView: View {
 
     private var savedCombosSection: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Saved Combos")
+            SectionHeader("保存した組み合わせ")
             if let favorite = orderStore.featuredFavorite {
                 Button {
                     navigator.push(.savedCombos)
@@ -315,7 +312,7 @@ private struct OrderTabView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
                 HeroBanner(
-                    eyebrow: "Order",
+                    eyebrow: "オーダー",
                     title: orderStore.hasReviewItems ? "今の注文に戻る" : "注文を始める",
                     accent: [POCColor.curry, POCColor.cheese]
                 )
@@ -368,13 +365,13 @@ private struct OrderTabView: View {
             .padding(POCSpacing.l)
             .padding(.bottom, 96)
         }
-        .navigationTitle("Order")
+        .navigationTitle("オーダー")
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private var currentOrderSummary: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Current Order")
+            SectionHeader("現在の注文")
 
             ForEach(Array(orderStore.cartItems.enumerated()), id: \.element.id) { index, item in
                 DraftSnapshotCard(
@@ -410,18 +407,18 @@ private struct RewardsPlaceholderView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
                 HeroBanner(
-                    eyebrow: "Rewards",
+                    eyebrow: "リワード",
                     title: "スタンプと会員価値は今後追加",
                     accent: [POCColor.green, POCColor.cheese]
                 )
 
                 EmptyStateCard(
-                    title: "PoC ではまだプレースホルダーです",
+                    title: "この PoC ではまだ仮表示です",
                     message: "将来はスタンプ、注文履歴、会員特典、ログイン価値の置き場として扱います。"
                 )
 
                 VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    SectionHeader("Will Live Here")
+                    SectionHeader("今後ここに追加")
 
                     FutureValueCard(
                         title: "スタンプ / リワード",
@@ -434,7 +431,7 @@ private struct RewardsPlaceholderView: View {
                 }
 
                 VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    SectionHeader("Future Work")
+                    SectionHeader("今後の検討")
                     Text("ログインは注文開始時に促し、起動時には毎回求めない方針を検討します。")
                         .font(.subheadline)
                         .foregroundStyle(POCColor.textSecondary)
@@ -449,7 +446,7 @@ private struct RewardsPlaceholderView: View {
             .padding(POCSpacing.l)
             .padding(.bottom, 96)
         }
-        .navigationTitle("Rewards")
+        .navigationTitle("リワード")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
