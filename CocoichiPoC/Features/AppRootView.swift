@@ -121,15 +121,13 @@ private struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
                 homeHeader
-                fulfillmentCard
+                primaryTabsSection
                 seasonalBanner
                 if let featuredStoreItem {
                     featuredStoreItemCard(item: featuredStoreItem)
                 }
                 recommendedSection
-                startQuicklySection
                 savedCombosSection
-                otherTabsSection
             }
             .padding(POCSpacing.l)
             .padding(.bottom, 96)
@@ -159,52 +157,9 @@ private struct HomeView: View {
         return "今日は何にする？"
     }
 
-    private var fulfillmentCard: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
-            HStack(alignment: .top, spacing: POCSpacing.s) {
-                Image(systemName: orderStore.selectedStore == nil ? "location" : "location.fill")
-                    .font(.headline)
-                    .foregroundStyle(POCColor.curry)
-
-                VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                    if let store = orderStore.selectedStore {
-                        Text(store.name)
-                            .font(.headline.weight(.semibold))
-                        Text("受取目安 \(store.pickupLeadTimeText)")
-                            .font(.subheadline)
-                            .foregroundStyle(POCColor.textSecondary)
-                    } else {
-                        Text("受取先を選ぶ")
-                            .font(.headline.weight(.semibold))
-                        Text("店舗を選ぶと受取時間と限定メニューが分かります")
-                            .font(.subheadline)
-                            .foregroundStyle(POCColor.textSecondary)
-                    }
-                }
-
-                Spacer()
-
-                Text(orderStore.selectedStore == nil ? "未設定" : "Change")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(POCColor.curry)
-            }
-
-            PrimaryCTAButton(title: orderStore.selectedStore == nil ? "選択する" : "変更する", systemImage: "arrow.right") {
-                orderStore.clearPendingFavoriteResume()
-                orderStore.clearPendingMenuSelection()
-                navigator.presentStoreSelect(nextTab: .menu)
-            }
-        }
-        .padding(POCSpacing.m)
-        .pocCard(fill: POCColor.elevated)
-    }
-
     private var seasonalBanner: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Seasonal")
-            Text(orderStore.selectedStore == nil ? "今だけのおすすめをホームから先に見せます" : "この店舗で気分に合う一皿を先に見せます")
-                .font(.subheadline)
-                .foregroundStyle(POCColor.textSecondary)
+            SectionHeader("今だけのオススメ")
 
             ForEach(homeBanners) { banner in
                 HomeImageBannerCard(banner: banner)
@@ -305,33 +260,10 @@ private struct HomeView: View {
         }
     }
 
-    private var startQuicklySection: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Start Quickly")
-            HStack(spacing: POCSpacing.s) {
-                SecondaryCTAButton(title: "メニューを見る", systemImage: "fork.knife") {
-                    navigator.showMenuDiscovery()
-                }
-                PrimaryCTAButton(title: "オーダーを始める", systemImage: "arrow.right") {
-                    if orderStore.selectedStore == nil {
-                        orderStore.clearPendingFavoriteResume()
-                        orderStore.clearPendingMenuSelection()
-                        navigator.presentStoreSelect(nextTab: .menu)
-                    } else {
-                        navigator.showMenuDiscovery()
-                    }
-                }
-            }
-        }
-    }
-
-    private var otherTabsSection: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Other Tabs")
-            HStack(spacing: POCSpacing.s) {
+    private var primaryTabsSection: some View {
+        HStack(spacing: POCSpacing.s) {
                 HomeShortcutCard(
                     title: "メニュー",
-                    subtitle: "一覧から探す",
                     systemImage: "fork.knife"
                 ) {
                     navigator.selectedTab = .menu
@@ -339,20 +271,10 @@ private struct HomeView: View {
 
                 HomeShortcutCard(
                     title: "オーダー",
-                    subtitle: orderStore.hasReviewItems ? "今の注文へ" : "状態を確認",
                     systemImage: "cart"
                 ) {
                     navigator.selectedTab = .order
                 }
-
-                HomeShortcutCard(
-                    title: "リワード",
-                    subtitle: "将来機能",
-                    systemImage: "seal"
-                ) {
-                    navigator.selectedTab = .rewards
-                }
-            }
         }
     }
 
@@ -556,26 +478,23 @@ private struct MenuArtworkBadge: View {
 
 private struct HomeShortcutCard: View {
     let title: String
-    let subtitle: String
     let systemImage: String
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
+            VStack(spacing: POCSpacing.s) {
                 Image(systemName: systemImage)
-                    .font(.headline)
+                    .font(.system(size: 28, weight: .semibold))
                     .foregroundStyle(POCColor.curry)
                 Text(title)
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(POCColor.textPrimary)
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(POCColor.textSecondary)
-                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
             }
-            .frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
-            .padding(POCSpacing.m)
+            .frame(maxWidth: .infinity, minHeight: 88)
+            .padding(.horizontal, POCSpacing.m)
+            .padding(.vertical, POCSpacing.s)
             .pocCard(fill: POCColor.elevated)
         }
         .buttonStyle(.plain)
