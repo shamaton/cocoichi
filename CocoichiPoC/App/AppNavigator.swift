@@ -8,12 +8,17 @@ enum AppTab: Hashable {
 }
 
 enum AppScreen: Hashable {
-    case storeSelect
     case curryDetail
     case curryToppings
     case savedCombos
     case orderReview
     case orderComplete
+}
+
+enum AppCover: String, Identifiable {
+    case storeSelect
+
+    var id: String { rawValue }
 }
 
 enum AppSheet: String, Identifiable {
@@ -28,6 +33,7 @@ final class AppNavigator: ObservableObject {
     // PoC では Home を root に置き、注文開始時だけ S1 をゲートとして開く。
     @Published var selectedTab: AppTab = .home
     @Published var path: [AppScreen] = []
+    @Published var presentedCover: AppCover?
     @Published var presentedSheet: AppSheet?
     private var nextTabAfterStoreSelect: AppTab = .menu
     private var nextPathAfterStoreSelect: [AppScreen] = []
@@ -40,13 +46,14 @@ final class AppNavigator: ObservableObject {
     func presentStoreSelect(nextTab: AppTab = .menu, nextPath: [AppScreen] = []) {
         nextTabAfterStoreSelect = nextTab
         nextPathAfterStoreSelect = nextPath
-        path = [.storeSelect]
+        presentedCover = .storeSelect
         presentedSheet = nil
     }
 
     func completeStoreSelection(pathOverride: [AppScreen]? = nil) {
         selectedTab = nextTabAfterStoreSelect
         path = pathOverride ?? nextPathAfterStoreSelect
+        presentedCover = nil
     }
 
     func push(_ screen: AppScreen) {
