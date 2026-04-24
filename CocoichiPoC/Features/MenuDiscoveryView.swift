@@ -32,7 +32,7 @@ struct MenuDiscoveryView: View {
                         Text("今日は何にする？")
                             .font(.largeTitle.weight(.bold))
 
-                        TextField("Search menu, topping, keyword", text: $searchText)
+                        TextField("メニュー名・トッピング・キーワードで探す", text: $searchText)
                             .textInputAutocapitalization(.never)
                             .padding(.horizontal, POCSpacing.m)
                             .padding(.vertical, 14)
@@ -52,7 +52,7 @@ struct MenuDiscoveryView: View {
 
                     if searchText.isEmpty, !popularItems.isEmpty {
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("Popular Today")
+                            SectionHeader("今日のおすすめ")
 
                             PopularMenuGrid(items: popularItems, contentWidth: contentWidth) { item in
                                 startOrder(for: item)
@@ -62,7 +62,7 @@ struct MenuDiscoveryView: View {
 
                     if searchText.isEmpty, let store = orderStore.selectedStore, !storeOnlyItems.isEmpty {
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("This Store Only")
+                            SectionHeader("この店舗限定")
                             Text("\(store.name)で選べる限定メニュー")
                                 .font(.subheadline)
                                 .foregroundStyle(POCColor.textSecondary)
@@ -105,7 +105,7 @@ struct MenuDiscoveryView: View {
                 .padding(.top, POCSpacing.l)
                 .padding(.bottom, POCSpacing.l)
             }
-            .navigationTitle("Menu Discovery")
+            .navigationTitle("カレーライスを選ぶ")
             .navigationBarTitleDisplayMode(.inline)
             .pocProgressWaveBackground(.menuDiscovery)
         }
