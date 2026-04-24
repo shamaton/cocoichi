@@ -583,17 +583,27 @@ private struct HomeShortcutCard: View {
 }
 
 private struct HomeStickyHeader: View {
+    private let sideControlSize: CGFloat = 40
+
     var body: some View {
-        HomeBrandHeader(iconSize: 66, fallbackSize: 36)
+        HStack(spacing: POCSpacing.s) {
+            HomeAccountMockIcon(size: sideControlSize)
+            Spacer()
+            HomeBrandHeader(iconSize: 66, fallbackSize: 36)
+            Spacer()
+            Color.clear
+                .frame(width: sideControlSize, height: sideControlSize)
+        }
+        .padding(.horizontal, POCSpacing.m)
             .padding(.top, POCSpacing.xxs)
             .padding(.bottom, POCSpacing.xs)
-            .frame(maxWidth: .infinity)
-            .background(.ultraThinMaterial)
-            .overlay(alignment: .bottom) {
-                Rectangle()
-                    .fill(POCColor.line)
-                    .frame(height: 1)
-            }
+        .frame(maxWidth: .infinity)
+        .background(.ultraThinMaterial)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(POCColor.line)
+                .frame(height: 1)
+        }
     }
 }
 
@@ -625,6 +635,30 @@ private struct HomeBrandHeader: View {
 
         guard let url = Bundle.main.url(forResource: "shop_icon", withExtension: "png") else { return nil }
         return UIImage(contentsOfFile: url.path)
+    }
+}
+
+private struct HomeAccountMockIcon: View {
+    let size: CGFloat
+
+    var body: some View {
+        Button {
+        } label: {
+            Image(systemName: "person.crop.circle.fill")
+                .font(.system(size: size * 0.7))
+                .foregroundStyle(POCColor.textPrimary, POCColor.elevatedStrong)
+                .frame(width: size, height: size)
+                .background(
+                    Circle()
+                        .fill(POCColor.elevated.opacity(0.92))
+                )
+                .overlay {
+                    Circle()
+                        .stroke(POCColor.line, lineWidth: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("アカウント")
     }
 }
 
