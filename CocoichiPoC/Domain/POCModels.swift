@@ -383,7 +383,7 @@ enum CouponEligibility: Codable, Hashable {
 enum CurrySauceOption: String, CaseIterable, Codable, Hashable {
     case original = "ポークソース"
     case rich = "ビーフソース"
-    case butter = "ココイチベジソース"
+    case butter = "ヘルシーベジソース"
 
     var cardTitle: String {
         rawValue
@@ -392,7 +392,7 @@ enum CurrySauceOption: String, CaseIterable, Codable, Hashable {
     var subtitle: String {
         switch self {
         case .original:
-            return "変わらないおいしさのココイチの基本となるソース"
+            return "変わらないおいしさを楽しめる定番ソース"
         case .rich:
             return "ビーフの旨みが凝縮された\"もう一つの定番ソース\""
         case .butter:
