@@ -118,19 +118,27 @@ private struct HomeView: View {
     @EnvironmentObject private var orderStore: OrderStore
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: POCSpacing.l) {
-                homeHeader
-                primaryTabsSection
-                seasonalBanner
-                if let featuredStoreItem {
-                    featuredStoreItemCard(item: featuredStoreItem)
+        GeometryReader { proxy in
+            let contentWidth = availableContentWidth(in: proxy)
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: POCSpacing.l) {
+                    homeHeader
+                    primaryTabsSection
+                    seasonalBanner
+                    if let featuredStoreItem {
+                        featuredStoreItemCard(item: featuredStoreItem)
+                    }
+                    if !popularItems.isEmpty {
+                        recommendedSection(contentWidth: contentWidth)
+                    }
+                    savedCombosSection
                 }
-                recommendedSection
-                savedCombosSection
+                .frame(width: contentWidth, alignment: .leading)
+                .padding(.horizontal, POCSpacing.l)
+                .padding(.top, POCSpacing.l)
+                .padding(.bottom, 96)
             }
-            .padding(POCSpacing.l)
-            .padding(.bottom, 96)
         }
         .navigationTitle("ホーム")
         .navigationBarTitleDisplayMode(.inline)
@@ -164,32 +172,12 @@ private struct HomeView: View {
         }
     }
 
-    private var recommendedSection: some View {
+    private func recommendedSection(contentWidth: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader(orderStore.selectedStore == nil ? "はじめての注文におすすめ" : "あなたへのおすすめ")
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: POCSpacing.s) {
-                    ForEach(recommendedItems) { item in
-                        Button {
-                            startHomeOrder(for: item)
-                        } label: {
-                            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                MenuArtworkBadge(item: item)
-                                Text(item.name)
-                                    .font(.headline.weight(.semibold))
-                                    .foregroundStyle(POCColor.textPrimary)
-                                    .lineLimit(2)
-                                Text(item.basePrice.yenText)
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(POCColor.curry)
-                            }
-                            .frame(width: 184, alignment: .leading)
-                            .padding(POCSpacing.m)
-                            .pocCard(fill: POCColor.elevated)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
+            SectionHeader("今日のおすすめ")
+
+            PopularMenuGrid(items: popularItems, contentWidth: contentWidth) { item in
+                startHomeOrder(for: item)
             }
         }
     }
@@ -286,10 +274,13 @@ private struct HomeView: View {
         navigator.push(.curryDetail)
     }
 
-    private var recommendedItems: [MenuItem] {
-        Array(orderStore.visibleMenuItems.filter { item in
-            item.tags.contains(.recommended) || item.tags.contains(.staple)
-        }.prefix(4))
+    private func availableContentWidth(in proxy: GeometryProxy) -> CGFloat {
+        let horizontalInsets = proxy.safeAreaInsets.leading + proxy.safeAreaInsets.trailing
+        return max(0, proxy.size.width - horizontalInsets - (POCSpacing.l * 2))
+    }
+
+    private var popularItems: [MenuItem] {
+        PopularMenuCurator.popularItems(from: orderStore.visibleMenuItems)
     }
 
     private var featuredStoreItem: MenuItem? {
