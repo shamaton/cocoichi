@@ -106,7 +106,7 @@ enum MockCatalog {
         basePrice: Pricing.virtualDisplayedPrice(for: 998),
         tags: [.recommended, .rich],
         searchKeywords: ["限定", "渋谷", "海老", "えび", "海老カツ", "店舗限定"],
-        imagePath: nil,
+        imagePath: "store-limited-ebi-katsu-curry.png",
         recommendedToppingIDs: ["spinach", "egg"],
         accentHexes: [0xB84E2F, 0xE5B94E],
         isGlobal: false,
