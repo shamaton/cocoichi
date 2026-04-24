@@ -136,6 +136,9 @@ private struct HomeView: View {
         }
         .navigationTitle("Home")
         .navigationBarTitleDisplayMode(.inline)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            HomeStickyHeader()
+        }
     }
 
     private var homeHeader: some View {
@@ -576,6 +579,52 @@ private struct HomeShortcutCard: View {
             .pocCard(fill: POCColor.elevated)
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct HomeStickyHeader: View {
+    var body: some View {
+        HomeBrandHeader(iconSize: 66, fallbackSize: 36)
+            .padding(.top, POCSpacing.xxs)
+            .padding(.bottom, POCSpacing.xs)
+            .frame(maxWidth: .infinity)
+            .background(.ultraThinMaterial)
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(POCColor.line)
+                    .frame(height: 1)
+            }
+    }
+}
+
+private struct HomeBrandHeader: View {
+    let iconSize: CGFloat
+    let fallbackSize: CGFloat
+
+    var body: some View {
+        Group {
+            if let iconImage {
+                Image(uiImage: iconImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: iconSize, height: iconSize)
+            } else {
+                Image(systemName: "fork.knife.circle.fill")
+                    .font(.system(size: fallbackSize))
+                    .foregroundStyle(POCColor.curry)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityLabel("CoCo壱番屋ホームヘッダ")
+    }
+
+    private var iconImage: UIImage? {
+        if let bundledImage = UIImage(named: "shop_icon") {
+            return bundledImage
+        }
+
+        guard let url = Bundle.main.url(forResource: "shop_icon", withExtension: "png") else { return nil }
+        return UIImage(contentsOfFile: url.path)
     }
 }
 
