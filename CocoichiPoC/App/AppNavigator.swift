@@ -56,6 +56,10 @@ final class AppNavigator: ObservableObject {
         presentedCover = nil
     }
 
+    func dismissStoreSelect() {
+        presentedCover = nil
+    }
+
     func push(_ screen: AppScreen) {
         path.append(screen)
     }

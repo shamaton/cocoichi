@@ -104,6 +104,18 @@ struct StoreSelectView: View {
         }
         .navigationTitle("受取先を選ぶ")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    navigator.dismissStoreSelect()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.headline.weight(.semibold))
+                }
+                .foregroundStyle(POCColor.textPrimary)
+                .accessibilityLabel("閉じる")
+            }
+        }
         .onAppear {
             if let selectedStore = orderStore.selectedStore {
                 query = selectedStore.neighborhood
