@@ -492,9 +492,9 @@ private struct HomeShortcutCard: View {
                     .foregroundStyle(POCColor.textPrimary)
                     .multilineTextAlignment(.center)
             }
-            .frame(maxWidth: .infinity, minHeight: 88)
-            .padding(.horizontal, POCSpacing.m)
-            .padding(.vertical, POCSpacing.s)
+            .frame(maxWidth: .infinity, minHeight: 76)
+            .padding(.horizontal, POCSpacing.s)
+            .padding(.vertical, POCSpacing.xs)
             .pocCard(fill: POCColor.elevated)
         }
         .buttonStyle(.plain)
