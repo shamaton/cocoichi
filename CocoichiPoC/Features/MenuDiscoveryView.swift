@@ -28,11 +28,6 @@ struct MenuDiscoveryView: View {
                         }
                     }
 
-                    VStack(alignment: .leading, spacing: POCSpacing.s) {
-                        Text("今日は何にする？")
-                            .font(.largeTitle.weight(.bold))
-                    }
-
                     genreContent(contentWidth: contentWidth)
                 }
                 .frame(width: contentWidth, alignment: .leading)
