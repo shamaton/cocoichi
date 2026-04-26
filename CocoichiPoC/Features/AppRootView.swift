@@ -132,6 +132,7 @@ private struct HomeView: View {
                     if !popularItems.isEmpty {
                         recommendedSection(contentWidth: contentWidth)
                     }
+                    recommendedBannersSection
                     savedCombosSection
                 }
                 .frame(width: contentWidth, alignment: .leading)
@@ -178,6 +179,14 @@ private struct HomeView: View {
 
             PopularMenuGrid(items: popularItems, contentWidth: contentWidth) { item in
                 startHomeOrder(for: item)
+            }
+        }
+    }
+
+    private var recommendedBannersSection: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            ForEach(recommendedBanners) { banner in
+                HomeImageBannerCard(banner: banner)
             }
         }
     }
@@ -291,6 +300,13 @@ private struct HomeView: View {
         [
             HomeBanner(imagePath: "the-gyu-curry.png"),
             HomeBanner(imagePath: "oyster_curry.png"),
+        ]
+    }
+
+    private var recommendedBanners: [HomeBanner] {
+        [
+            HomeBanner(imagePath: "collaboration.png"),
+            HomeBanner(imagePath: "philosophy.png"),
         ]
     }
 }
