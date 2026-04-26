@@ -1,3 +1,4 @@
+import MapKit
 import SwiftUI
 
 private enum StoreSearchMethod: String, CaseIterable, Identifiable {
@@ -37,7 +38,7 @@ private enum StoreSearchMethod: String, CaseIterable, Identifiable {
     var prompt: String {
         switch self {
         case .currentLocation:
-            return "近くの店舗と受取目安を表示"
+            return "近くの店舗と受取目安をすぐ見つけます"
         case .station:
             return "渋谷 / 新宿 / 池袋 など"
         case .postalCode:
@@ -50,7 +51,7 @@ private enum StoreSearchMethod: String, CaseIterable, Identifiable {
     var systemImage: String {
         switch self {
         case .currentLocation:
-            return "location"
+            return "location.fill"
         case .station:
             return "tram.fill"
         case .postalCode:
@@ -63,13 +64,29 @@ private enum StoreSearchMethod: String, CaseIterable, Identifiable {
     var searchPlaceholder: String {
         switch self {
         case .currentLocation:
-            return "現在地から近い店舗を表示"
+            return "店舗を検索"
         case .station:
             return "駅名を入力"
         case .postalCode:
             return "郵便番号を入力"
         case .storeName:
-            return "店名を入力"
+            return "店舗名を入力"
+        }
+    }
+}
+
+private enum StoreListTab: String, CaseIterable, Identifiable {
+    case all
+    case frequent
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .all:
+            return "店舗一覧"
+        case .frequent:
+            return "よく使う店舗"
         }
     }
 }
@@ -79,20 +96,27 @@ struct StoreSelectView: View {
     @EnvironmentObject private var orderStore: OrderStore
 
     @State private var searchMethod: StoreSearchMethod = .currentLocation
+    @State private var selectedListTab: StoreListTab = .all
     @State private var query = ""
     @State private var pendingStoreChange: Store?
+    @State private var isShowingSearchFilters = false
+    @State private var focusedStoreID: Store.ID?
+    @State private var mapCameraPosition: MapCameraPosition = .region(StoreSelectView.defaultMapRegion)
 
     var body: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
                 header
                 fulfillmentModeSwitcher
 
                 if orderStore.selectedFulfillmentMode == .pickup {
-                    quickStartSection
-                    searchMethodSection
-                    searchResultsSection
-                    recentlyUsedSection
+                    searchBarSection
+                    if isShowingSearchFilters {
+                        searchFilterSection
+                    }
+                    mapSection
+                    storeTabSection
+                    storeListSection
                     savedCombosSection
                 } else {
                     deliveryEntrySection
@@ -118,9 +142,33 @@ struct StoreSelectView: View {
         }
         .onAppear {
             if let selectedStore = orderStore.selectedStore {
-                query = selectedStore.neighborhood
+                focusedStoreID = selectedStore.id
+                if query.isEmpty {
+                    query = selectedStore.neighborhood
+                }
                 searchMethod = .station
+            } else if let firstStore = filteredStores.first {
+                focusedStoreID = firstStore.id
             }
+            recenterMap(for: mapStores, preferredStoreID: focusedStoreID)
+        }
+        .onChange(of: searchMethod) {
+            if searchMethod == .currentLocation {
+                query = ""
+            }
+            syncFocusedStore()
+            recenterMap(for: mapStores, preferredStoreID: focusedStoreID)
+        }
+        .onChange(of: query) {
+            syncFocusedStore()
+            recenterMap(for: mapStores, preferredStoreID: focusedStoreID)
+        }
+        .onChange(of: selectedListTab) {
+            syncFocusedStore()
+        }
+        .onChange(of: orderStore.selectedStore?.id) {
+            focusedStoreID = orderStore.selectedStore?.id ?? activeStores.first?.id
+            recenterMap(for: mapStores, preferredStoreID: focusedStoreID)
         }
         .alert("店舗を変更しますか？", isPresented: isShowingStoreChangeAlert, presenting: pendingStoreChange) { store in
             Button("キャンセル", role: .cancel) {
@@ -136,13 +184,36 @@ struct StoreSelectView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.xs) {
-            Text("受取先を選ぶ")
-                .font(.largeTitle.weight(.bold))
-                .foregroundStyle(POCColor.textPrimary)
-            Text("注文前に、どこで受け取るかだけ決めます")
-                .font(.subheadline)
-                .foregroundStyle(POCColor.textSecondary)
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            HStack(alignment: .top, spacing: POCSpacing.s) {
+                VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                    Text("受取先を選ぶ")
+                        .font(.largeTitle.weight(.bold))
+                        .foregroundStyle(POCColor.textPrimary)
+                    Text("地図と一覧を見ながら、受け取りたい店舗をすぐ決められます。")
+                        .font(.subheadline)
+                        .foregroundStyle(POCColor.textSecondary)
+                }
+
+                Spacer(minLength: POCSpacing.m)
+
+                if let selectedStore = orderStore.selectedStore {
+                    VStack(alignment: .trailing, spacing: POCSpacing.xxs) {
+                        Text("現在の店舗")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(POCColor.textTertiary)
+                        Text(selectedStore.name)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(POCColor.curry)
+                            .multilineTextAlignment(.trailing)
+                    }
+                }
+            }
+
+            HStack(spacing: POCSpacing.xs) {
+                infoBadge(title: mapHeaderTitle, systemImage: mapHeaderSymbol, tint: POCColor.cheese)
+                infoBadge(title: "\(filteredStores.count)店舗", systemImage: "fork.knife.circle", tint: POCColor.elevatedStrong)
+            }
         }
     }
 
@@ -177,62 +248,43 @@ struct StoreSelectView: View {
         .buttonStyle(.plain)
     }
 
-    private var quickStartSection: some View {
+    private var searchBarSection: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Quick Start")
-            ForEach(StoreSearchMethod.allCases) { method in
+            HStack(spacing: POCSpacing.s) {
+                HStack(spacing: POCSpacing.s) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.headline)
+                        .foregroundStyle(POCColor.textTertiary)
+
+                    TextField(searchMethod.searchPlaceholder, text: $query)
+                        .textInputAutocapitalization(.never)
+                        .disableAutocorrection(true)
+                        .font(.body)
+                        .foregroundStyle(POCColor.textPrimary)
+                }
+                .padding(.horizontal, POCSpacing.m)
+                .padding(.vertical, 14)
+                .background(
+                    RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                        .fill(Color.white.opacity(0.78))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                        .stroke(POCColor.line, lineWidth: 1)
+                )
+
                 Button {
-                    searchMethod = method
-                    if method == .currentLocation {
-                        query = ""
+                    withAnimation(.snappy(duration: 0.2)) {
+                        isShowingSearchFilters.toggle()
                     }
                 } label: {
-                    HStack(alignment: .top, spacing: POCSpacing.s) {
-                        Image(systemName: method.systemImage)
+                    HStack(spacing: POCSpacing.xs) {
+                        Image(systemName: "slider.horizontal.3")
                             .font(.headline)
-                            .foregroundStyle(POCColor.curry)
-                            .frame(width: 28)
-
-                        VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                            Text(method.fieldTitle)
-                                .font(.headline.weight(.semibold))
-                                .foregroundStyle(POCColor.textPrimary)
-                            Text(method.prompt)
-                                .font(.subheadline)
-                                .foregroundStyle(POCColor.textSecondary)
-                        }
-
-                        Spacer()
-
-                        if searchMethod == method {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(POCColor.curry)
-                        }
+                        Text("絞り込み")
+                            .font(.subheadline.weight(.semibold))
                     }
-                    .padding(POCSpacing.m)
-                    .pocCard(fill: searchMethod == method ? POCColor.elevatedStrong : POCColor.elevated)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    private var searchMethodSection: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Search Method")
-
-            if searchMethod != .currentLocation {
-                HStack(spacing: POCSpacing.xs) {
-                    ForEach([StoreSearchMethod.station, .postalCode, .storeName]) { method in
-                        FilterChip(title: method.title, isSelected: searchMethod == method) {
-                            searchMethod = method
-                            query = ""
-                        }
-                    }
-                }
-
-                TextField(searchMethod.searchPlaceholder, text: $query)
-                    .textInputAutocapitalization(.never)
+                    .foregroundStyle(POCColor.textPrimary)
                     .padding(.horizontal, POCSpacing.m)
                     .padding(.vertical, 14)
                     .background(
@@ -243,45 +295,231 @@ struct StoreSelectView: View {
                         RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
                             .stroke(POCColor.line, lineWidth: 1)
                     )
-            } else {
-                VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                    Text("Current Location")
-                        .font(.headline.weight(.semibold))
+                }
+                .buttonStyle(.plain)
+            }
+
+            Text(searchMethod.fieldTitle)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(POCColor.textSecondary)
+        }
+    }
+
+    private var searchFilterSection: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: POCSpacing.xs) {
+                    ForEach(StoreSearchMethod.allCases) { method in
+                        methodFilterChip(method)
+                    }
+                }
+                .padding(.vertical, 1)
+            }
+
+            HStack(alignment: .center, spacing: POCSpacing.s) {
+                Image(systemName: searchMethod.systemImage)
+                    .font(.headline)
+                    .foregroundStyle(POCColor.curry)
+                    .frame(width: 28, height: 28)
+                    .background(
+                        Circle()
+                            .fill(POCColor.cream.opacity(0.65))
+                    )
+
+                VStack(alignment: .leading, spacing: POCSpacing.xxs) {
+                    Text(searchMethod.prompt)
+                        .font(.subheadline.weight(.semibold))
                         .foregroundStyle(POCColor.textPrimary)
-                    Text("位置情報を取得できない場合も、手入力検索で続けられます。")
-                        .font(.subheadline)
+                    Text(searchMethodHint)
+                        .font(.caption)
                         .foregroundStyle(POCColor.textSecondary)
                 }
-                .padding(POCSpacing.m)
-                .pocCard(fill: POCColor.elevated)
+
+                Spacer()
             }
+            .padding(POCSpacing.m)
+            .pocCard(fill: POCColor.elevated)
         }
+        .transition(.move(edge: .top).combined(with: .opacity))
     }
 
-    private var searchResultsSection: some View {
+    private func methodFilterChip(_ method: StoreSearchMethod) -> some View {
+        Button {
+            searchMethod = method
+        } label: {
+            HStack(spacing: POCSpacing.xs) {
+                Image(systemName: method.systemImage)
+                    .font(.caption.weight(.semibold))
+                Text(method.title)
+                    .font(.subheadline.weight(.medium))
+            }
+            .foregroundStyle(searchMethod == method ? POCColor.textPrimary : POCColor.textSecondary)
+            .padding(.horizontal, POCSpacing.s)
+            .padding(.vertical, POCSpacing.xs)
+            .background(
+                Capsule()
+                    .fill(searchMethod == method ? POCColor.cheese : POCColor.elevated)
+            )
+            .overlay(
+                Capsule()
+                    .stroke(searchMethod == method ? POCColor.cheese : POCColor.line, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var mapSection: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("Search Results")
-            if filteredStores.isEmpty {
-                EmptyStateCard(
-                    title: "候補が見つかりません",
-                    message: "検索方法を変えるか、店名や駅名を短くして試してください。"
+            HStack(alignment: .center) {
+                SectionHeader("地図から選ぶ")
+                Spacer()
+                if let focusedStore = focusedStore {
+                    Text(focusedStore.pickupLeadTimeText)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(POCColor.curry)
+                }
+            }
+
+            ZStack(alignment: .topLeading) {
+                Map(position: $mapCameraPosition) {
+                    ForEach(mapStores) { store in
+                        Annotation(store.name, coordinate: coordinate(for: store), anchor: .bottom) {
+                            Button {
+                                focusedStoreID = store.id
+                                recenterMap(for: mapStores, preferredStoreID: store.id)
+                            } label: {
+                                mapMarker(for: store)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+                .mapStyle(.standard)
+                .frame(height: 320)
+                .clipShape(RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous)
+                        .stroke(POCColor.line, lineWidth: 1)
                 )
-            } else {
-                ForEach(filteredStores) { store in
-                    storeRow(store)
+
+                VStack(alignment: .leading, spacing: POCSpacing.s) {
+                    infoBadge(title: mapHeaderTitle, systemImage: mapHeaderSymbol, tint: .white.opacity(0.92))
+                    if searchMethod == .currentLocation {
+                        infoBadge(title: "位置情報がなくても手入力に切替可能", systemImage: "hand.tap", tint: .white.opacity(0.86))
+                    }
+                }
+                .padding(POCSpacing.m)
+            }
+            .overlay(alignment: .bottomLeading) {
+                if let focusedStore = focusedStore {
+                    mapFocusedStoreCard(store: focusedStore)
+                        .padding(POCSpacing.m)
                 }
             }
         }
     }
 
-    private var recentlyUsedSection: some View {
-        Group {
-            if !recentStores.isEmpty {
-                VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    SectionHeader("Recently Used")
-                    ForEach(recentStores) { store in
-                        storeRow(store)
-                    }
+    private func mapMarker(for store: Store) -> some View {
+        let isFocused = focusedStoreID == store.id
+        let isSelectedStore = orderStore.selectedStore?.id == store.id
+
+        return VStack(spacing: 2) {
+            ZStack {
+                Circle()
+                    .fill(isFocused ? POCColor.curry : Color.white)
+                    .frame(width: isFocused ? 34 : 28, height: isFocused ? 34 : 28)
+                Image(systemName: isSelectedStore ? "checkmark.circle.fill" : "fork.knife")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(isFocused ? Color.white : POCColor.curry)
+            }
+            .overlay(
+                Circle()
+                    .stroke(POCColor.curry.opacity(isFocused ? 0 : 0.35), lineWidth: 1.5)
+            )
+
+            RoundedRectangle(cornerRadius: 3, style: .continuous)
+                .fill(isFocused ? POCColor.curry : Color.white)
+                .frame(width: 4, height: 8)
+        }
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 6)
+        .scaleEffect(isFocused ? 1 : 0.94)
+    }
+
+    private func mapFocusedStoreCard(store: Store) -> some View {
+        HStack(alignment: .center, spacing: POCSpacing.s) {
+            VStack(alignment: .leading, spacing: POCSpacing.xxs) {
+                Text(store.name)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                Text(store.address)
+                    .font(.caption)
+                    .foregroundStyle(POCColor.textSecondary)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: POCSpacing.s)
+
+            VStack(alignment: .trailing, spacing: POCSpacing.xxs) {
+                Text(distanceText(for: store))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                Text("受取 \(store.pickupLeadTimeText)")
+                    .font(.caption)
+                    .foregroundStyle(POCColor.curry)
+            }
+        }
+        .padding(.horizontal, POCSpacing.m)
+        .padding(.vertical, POCSpacing.s)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .stroke(Color.white.opacity(0.55), lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.12), radius: 18, x: 0, y: 8)
+    }
+
+    private var storeTabSection: some View {
+        HStack(spacing: POCSpacing.xs) {
+            ForEach(StoreListTab.allCases) { tab in
+                Button {
+                    selectedListTab = tab
+                } label: {
+                    Text(tab.title)
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(selectedListTab == tab ? POCColor.textPrimary : POCColor.textSecondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                                .fill(selectedListTab == tab ? Color.white : Color.clear)
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(POCSpacing.xs)
+        .background(
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .fill(POCColor.elevated)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .stroke(POCColor.line, lineWidth: 1)
+        )
+    }
+
+    private var storeListSection: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            if activeStores.isEmpty {
+                EmptyStateCard(
+                    title: selectedListTab == .all ? "候補が見つかりません" : "よく使う店舗はまだありません",
+                    message: selectedListTab == .all
+                        ? "検索方法を変えるか、駅名や店名を短くして試してください。"
+                        : "注文完了や保存済みの組み合わせから、ここに再訪しやすい店舗が並びます。"
+                )
+            } else {
+                ForEach(activeStores) { store in
+                    storeRow(store)
                 }
             }
         }
@@ -317,6 +555,8 @@ struct StoreSelectView: View {
 
     private var savedCombosSection: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
+            SectionHeader("再開ショートカット")
+
             if orderStore.favoriteCombos.isEmpty {
                 EmptyStateCard(
                     title: "保存済みの組み合わせはまだありません",
@@ -331,38 +571,147 @@ struct StoreSelectView: View {
     }
 
     private func storeRow(_ store: Store) -> some View {
-        Button {
+        let isFocused = focusedStoreID == store.id
+        let isSelected = orderStore.selectedStore?.id == store.id
+        let isFrequent = frequentStores.contains(store)
+        let hasLimitedMenu = storeHasLimitedMenu(store)
+
+        return Button {
             handleStoreSelection(store)
         } label: {
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                        Text(store.name)
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(POCColor.textPrimary)
-                        Text(store.address)
-                            .font(.caption)
-                            .foregroundStyle(POCColor.textSecondary)
-                    }
-                    Spacer()
-                    Text(store.pickupLeadTimeText)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(POCColor.curry)
+            HStack(alignment: .top, spacing: POCSpacing.s) {
+                ZStack(alignment: .topLeading) {
+                    Image("shop_icon")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 92, height: 72)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+                    Text(distanceText(for: store))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+                        .padding(.horizontal, POCSpacing.xs)
+                        .padding(.vertical, 5)
+                        .background(Color.white.opacity(0.9), in: Capsule())
+                        .padding(POCSpacing.xs)
                 }
 
-                HStack {
-                    Text("この店舗で始める")
-                        .font(.subheadline.weight(.semibold))
-                    Spacer()
-                    Image(systemName: "arrow.right")
-                        .font(.footnote.weight(.bold))
+                VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                    HStack(alignment: .top, spacing: POCSpacing.s) {
+                        VStack(alignment: .leading, spacing: POCSpacing.xxs) {
+                            Text(store.name)
+                                .font(.headline.weight(.semibold))
+                                .foregroundStyle(POCColor.textPrimary)
+
+                            if isSelected {
+                                Text("現在選択中")
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(POCColor.curry)
+                            } else {
+                                Text(store.neighborhood)
+                                    .font(.caption)
+                                    .foregroundStyle(POCColor.textSecondary)
+                            }
+                        }
+
+                        Spacer(minLength: POCSpacing.s)
+
+                        Image(systemName: isFocused ? "location.fill" : "location")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(isFocused ? POCColor.curry : POCColor.textTertiary)
+                    }
+
+                    HStack(spacing: POCSpacing.xs) {
+                        storeMetaPill(title: "受取 \(store.pickupLeadTimeText)", tint: POCColor.cream)
+
+                        if hasLimitedMenu {
+                            storeMetaPill(title: "限定あり", tint: POCColor.elevatedStrong)
+                        }
+
+                        if isFrequent {
+                            storeMetaPill(title: "よく使う", tint: Color.white)
+                        }
+                    }
+
+                    Text(store.address)
+                        .font(.caption)
+                        .foregroundStyle(POCColor.textSecondary)
+                        .lineLimit(2)
+
+                    HStack {
+                        Text("この店舗で始める")
+                            .font(.subheadline.weight(.semibold))
+                        Spacer()
+                        Image(systemName: "arrow.right")
+                            .font(.footnote.weight(.bold))
+                    }
+                    .foregroundStyle(POCColor.curry)
                 }
-                .foregroundStyle(POCColor.curry)
             }
             .padding(POCSpacing.m)
-            .pocCard(fill: POCColor.elevated)
+            .background(cardBackground(isFocused: isFocused, isSelected: isSelected))
+            .overlay(
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .stroke(isFocused ? POCColor.curry.opacity(0.28) : POCColor.line, lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(isFocused ? 0.08 : 0.05), radius: 18, x: 0, y: 10)
         }
         .buttonStyle(.plain)
+        .simultaneousGesture(
+            TapGesture().onEnded {
+                focusedStoreID = store.id
+            }
+        )
+    }
+
+    private func cardBackground(isFocused: Bool, isSelected: Bool) -> some ShapeStyle {
+        if isSelected {
+            return AnyShapeStyle(
+                LinearGradient(
+                    colors: [POCColor.elevatedStrong, Color.white],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+        }
+
+        if isFocused {
+            return AnyShapeStyle(
+                LinearGradient(
+                    colors: [Color.white, POCColor.elevated],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+        }
+
+        return AnyShapeStyle(POCColor.elevated)
+    }
+
+    private func storeMetaPill(title: String, tint: Color) -> some View {
+        Text(title)
+            .font(.caption.weight(.medium))
+            .foregroundStyle(POCColor.textPrimary)
+            .padding(.horizontal, POCSpacing.xs)
+            .padding(.vertical, 5)
+            .background(tint, in: Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(POCColor.line.opacity(0.65), lineWidth: 1)
+            )
+    }
+
+    private func infoBadge(title: String, systemImage: String, tint: Color) -> some View {
+        HStack(spacing: POCSpacing.xs) {
+            Image(systemName: systemImage)
+                .font(.caption.weight(.bold))
+            Text(title)
+                .font(.caption.weight(.medium))
+        }
+        .foregroundStyle(POCColor.textPrimary)
+        .padding(.horizontal, POCSpacing.s)
+        .padding(.vertical, POCSpacing.xs)
+        .background(tint, in: Capsule())
     }
 
     private var isShowingStoreChangeAlert: Binding<Bool> {
@@ -407,9 +756,7 @@ struct StoreSelectView: View {
     private var filteredStores: [Store] {
         switch searchMethod {
         case .currentLocation:
-            return orderStore.stores.sorted {
-                $0.pickupLeadTimeMin < $1.pickupLeadTimeMin
-            }
+            return currentLocationStores
         case .station:
             return matchingStores { store in
                 [store.neighborhood, store.address]
@@ -420,13 +767,27 @@ struct StoreSelectView: View {
             }
         case .storeName:
             return matchingStores { store in
-                [store.name, store.neighborhood]
+                [store.name, store.neighborhood, store.address]
             }
         }
     }
 
+    private var currentLocationStores: [Store] {
+        let normalizedQuery = self.normalizedQuery
+        let sortedStores = orderStore.stores.sorted { lhs, rhs in
+            lhs.pickupLeadTimeMin < rhs.pickupLeadTimeMin
+        }
+
+        guard !normalizedQuery.isEmpty else { return sortedStores }
+        return sortedStores.filter { store in
+            [store.name, store.neighborhood, store.address]
+                .joined(separator: " ")
+                .localizedCaseInsensitiveContains(normalizedQuery)
+        }
+    }
+
     private func matchingStores(_ values: (Store) -> [String]) -> [Store] {
-        let normalizedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedQuery = self.normalizedQuery
         guard !normalizedQuery.isEmpty else { return orderStore.stores }
         return orderStore.stores.filter { store in
             values(store)
@@ -435,11 +796,165 @@ struct StoreSelectView: View {
         }
     }
 
-    private var recentStores: [Store] {
+    private var frequentStores: [Store] {
         var seenIDs = Set<String>()
         let stores = ([orderStore.selectedStore] + orderStore.favoriteCombos.map(\.draft.store)).compactMap { $0 }
-        return stores.filter { store in
+        let uniqueStores = stores.filter { store in
             seenIDs.insert(store.id).inserted
         }
+
+        guard !normalizedQuery.isEmpty else { return uniqueStores }
+        return uniqueStores.filter { store in
+            [store.name, store.neighborhood, store.address]
+                .joined(separator: " ")
+                .localizedCaseInsensitiveContains(normalizedQuery)
+        }
     }
+
+    private var activeStores: [Store] {
+        switch selectedListTab {
+        case .all:
+            return filteredStores
+        case .frequent:
+            return frequentStores
+        }
+    }
+
+    private var mapStores: [Store] {
+        let stores = filteredStores.isEmpty ? orderStore.stores : filteredStores
+        return Array(stores.prefix(6))
+    }
+
+    private var focusedStore: Store? {
+        if let focusedStoreID {
+            return (mapStores + activeStores).first(where: { $0.id == focusedStoreID })
+        }
+        return activeStores.first ?? mapStores.first
+    }
+
+    private var normalizedQuery: String {
+        query.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var searchMethodHint: String {
+        switch searchMethod {
+        case .currentLocation:
+            return "GPS で詰まらないよう、駅名や店名への切り替えもすぐできます。"
+        case .station:
+            return "駅名ベースで近い候補を比較しやすく並べます。"
+        case .postalCode:
+            return "番地まで厳密でなくても、郵便番号の断片入力で絞り込めます。"
+        case .storeName:
+            return "店名や地名の一部だけでも候補を出せます。"
+        }
+    }
+
+    private var mapHeaderTitle: String {
+        switch searchMethod {
+        case .currentLocation:
+            return "近くの店舗"
+        case .station:
+            return normalizedQuery.isEmpty ? "駅名から探す" : "\(normalizedQuery)周辺"
+        case .postalCode:
+            return normalizedQuery.isEmpty ? "郵便番号から探す" : normalizedQuery
+        case .storeName:
+            return normalizedQuery.isEmpty ? "店舗名から探す" : "「\(normalizedQuery)」の候補"
+        }
+    }
+
+    private var mapHeaderSymbol: String {
+        switch searchMethod {
+        case .currentLocation:
+            return "location.fill"
+        case .station:
+            return "tram.fill"
+        case .postalCode:
+            return "mail"
+        case .storeName:
+            return "magnifyingglass"
+        }
+    }
+
+    private func distanceText(for store: Store) -> String {
+        switch store.id {
+        case "shibuya-dogenzaka":
+            return "500m"
+        case "ebisu-ekimae":
+            return "1.2km"
+        case "shinagawa-konan":
+            return "3.1km"
+        default:
+            return "近く"
+        }
+    }
+
+    private func storeHasLimitedMenu(_ store: Store) -> Bool {
+        orderStore.menuItems.contains { item in
+            item.isStoreLimited && item.availableStoreIDs.contains(store.id)
+        }
+    }
+
+    private func syncFocusedStore() {
+        if let focusedStoreID,
+           (mapStores + activeStores).contains(where: { $0.id == focusedStoreID }) {
+            return
+        }
+        focusedStoreID = activeStores.first?.id ?? mapStores.first?.id
+    }
+
+    private func recenterMap(for stores: [Store], preferredStoreID: Store.ID?) {
+        guard !stores.isEmpty else { return }
+
+        if let preferredStoreID,
+           let preferredStore = stores.first(where: { $0.id == preferredStoreID }) {
+            mapCameraPosition = .region(
+                MKCoordinateRegion(
+                    center: coordinate(for: preferredStore),
+                    span: MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)
+                )
+            )
+            return
+        }
+
+        let coordinates = stores.map(coordinate(for:))
+        let latitudes = coordinates.map(\.latitude)
+        let longitudes = coordinates.map(\.longitude)
+
+        guard
+            let minLatitude = latitudes.min(),
+            let maxLatitude = latitudes.max(),
+            let minLongitude = longitudes.min(),
+            let maxLongitude = longitudes.max()
+        else {
+            return
+        }
+
+        let center = CLLocationCoordinate2D(
+            latitude: (minLatitude + maxLatitude) / 2,
+            longitude: (minLongitude + maxLongitude) / 2
+        )
+        let span = MKCoordinateSpan(
+            latitudeDelta: max((maxLatitude - minLatitude) * 1.9, 0.03),
+            longitudeDelta: max((maxLongitude - minLongitude) * 1.9, 0.03)
+        )
+        mapCameraPosition = .region(MKCoordinateRegion(center: center, span: span))
+    }
+
+    private func coordinate(for store: Store) -> CLLocationCoordinate2D {
+        switch store.id {
+        case "shibuya-dogenzaka":
+            return CLLocationCoordinate2D(latitude: 35.6582, longitude: 139.6980)
+        case "ebisu-ekimae":
+            return CLLocationCoordinate2D(latitude: 35.6467, longitude: 139.7100)
+        case "shinagawa-konan":
+            return CLLocationCoordinate2D(latitude: 35.6285, longitude: 139.7416)
+        default:
+            return CLLocationCoordinate2D(latitude: 35.6472, longitude: 139.7171)
+        }
+    }
+
+    private static let defaultMapRegion = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 35.6472, longitude: 139.7171),
+        span: MKCoordinateSpan(latitudeDelta: 0.055, longitudeDelta: 0.055)
+    )
 }
