@@ -13,7 +13,7 @@ struct MenuDiscoveryView: View {
             let contentWidth = availableContentWidth(in: proxy)
 
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: POCSpacing.l, pinnedViews: [.sectionHeaders]) {
+                LazyVStack(alignment: .leading, spacing: POCSpacing.l) {
                     if let store = orderStore.selectedStore {
                         StoreContextCard(store: store) {
                             orderStore.resetForNextOrder(keepingStore: false)
@@ -32,19 +32,6 @@ struct MenuDiscoveryView: View {
                     VStack(alignment: .leading, spacing: POCSpacing.s) {
                         Text("今日は何にする？")
                             .font(.largeTitle.weight(.bold))
-
-                        TextField(selectedGenre.searchPlaceholder, text: $searchText)
-                            .textInputAutocapitalization(.never)
-                            .padding(.horizontal, POCSpacing.m)
-                            .padding(.vertical, 14)
-                            .background(
-                                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                                    .fill(POCColor.elevated)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                                    .stroke(POCColor.line, lineWidth: 1)
-                            )
                     }
 
                     genreContent(contentWidth: contentWidth)
@@ -57,7 +44,7 @@ struct MenuDiscoveryView: View {
             .navigationTitle("メニューを選ぶ")
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .top, spacing: 0) {
-                pinnedGenreHeader(contentWidth: contentWidth)
+                pinnedNavigationHeader(contentWidth: contentWidth)
             }
             .pocProgressWaveBackground(.menuDiscovery)
         }
@@ -120,7 +107,7 @@ struct MenuDiscoveryView: View {
                         }
                     }
                 } header: {
-                    StickyGroupHeader(
+                    MenuGroupHeader(
                         title: section.group.rawValue,
                         group: section.group
                     )
@@ -130,18 +117,33 @@ struct MenuDiscoveryView: View {
         }
     }
 
-    private func pinnedGenreHeader(contentWidth: CGFloat) -> some View {
-        genreHeader
-            .frame(width: contentWidth, alignment: .leading)
-            .padding(.horizontal, POCSpacing.l)
-            .padding(.top, POCSpacing.s)
-            .padding(.bottom, POCSpacing.s)
-            .background(POCColor.background.opacity(0.96))
-            .overlay(alignment: .bottom) {
-                Rectangle()
-                    .fill(POCColor.line)
-                    .frame(height: 1)
-            }
+    private func pinnedNavigationHeader(contentWidth: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            genreHeader
+
+            TextField(selectedGenre.searchPlaceholder, text: $searchText)
+                .textInputAutocapitalization(.never)
+                .padding(.horizontal, POCSpacing.m)
+                .padding(.vertical, 14)
+                .background(
+                    RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                        .fill(POCColor.elevated)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                        .stroke(POCColor.line, lineWidth: 1)
+                )
+        }
+        .frame(width: contentWidth, alignment: .leading)
+        .padding(.horizontal, POCSpacing.l)
+        .padding(.top, POCSpacing.s)
+        .padding(.bottom, POCSpacing.s)
+        .background(POCColor.background.opacity(0.96))
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(POCColor.line)
+                .frame(height: 1)
+        }
     }
 
     private var genreHeader: some View {
@@ -406,7 +408,7 @@ private struct GroupedMenuSection: Identifiable {
     var id: CurryMenuGroup { group }
 }
 
-private struct StickyGroupHeader: View {
+private struct MenuGroupHeader: View {
     let title: String
     let group: CurryMenuGroup
 
