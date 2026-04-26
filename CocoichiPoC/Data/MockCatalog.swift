@@ -541,7 +541,7 @@ private enum CurryMenuMasterLoader {
             return "vegetable-curry"
         case "とろ～りたまフライカレー":
             return "runny-egg-fry-curry"
-        case "ココイチベジカレー":
+        case "ベジソースカレー":
             return "cocoichi-vegetarian-curry"
         case "オムカレー":
             return "omelet-curry"
@@ -721,7 +721,7 @@ private enum CurryMenuMasterLoader {
       - name: とろ～りたまフライカレー
         price: 769
         comment: とろけるたまごのコクでやさしくまとまる
-      - name: ココイチベジカレー
+      - name: ベジソースカレー
         price: 621
         comment: 動物性原材料を使わず軽やかに楽しめる
       - name: オムカレー
