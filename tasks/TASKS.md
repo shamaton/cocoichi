@@ -310,3 +310,25 @@
    Done by: CODEX
    Done at: 2026-04-26T05:34:15Z
 
+29. s5-centered-delete-dialog
+   Id: 29-s5-centered-delete-dialog
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5削除確認を中央ダイアログ化。make build成功、git diff --check問題なし
+   Detail: tasks/details/29-s5-centered-delete-dialog.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-26T05:41:06Z
+   Done by: CODEX
+   Done at: 2026-04-26T05:42:41Z
+
+30. s5-delete-dialog-info-icon
+   Id: 30-s5-delete-dialog-info-icon
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5削除ダイアログ補足アイコンを info.circle へ変更。make build成功、git diff --check問題なし
+   Detail: tasks/details/30-s5-delete-dialog-info-icon.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-26T05:44:08Z
+   Done by: CODEX
+   Done at: 2026-04-26T05:44:29Z
+

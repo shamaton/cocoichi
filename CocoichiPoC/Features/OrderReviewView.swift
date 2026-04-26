@@ -3,91 +3,110 @@ import SwiftUI
 struct OrderReviewView: View {
     @EnvironmentObject private var navigator: AppNavigator
     @EnvironmentObject private var orderStore: OrderStore
+    @State private var pendingDeletion: PendingDeletion?
 
     var body: some View {
-        Group {
-            if orderStore.hasReviewItems {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: POCSpacing.l) {
-                        SectionHeader("受取情報")
+        ZStack {
+            Group {
+                if orderStore.hasReviewItems {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: POCSpacing.l) {
+                            SectionHeader("受取情報")
 
-                        if let store = orderStore.reviewStore {
+                            if let store = orderStore.reviewStore {
+                                VStack(alignment: .leading, spacing: POCSpacing.s) {
+                                    SummaryRow(title: store.name, value: store.pickupLeadTimeText)
+                                }
+                                .padding(POCSpacing.m)
+                                .pocCard(fill: POCColor.elevated)
+                            }
+
+                            ReviewCartCard(
+                                lineItems: orderStore.reviewLineItems,
+                                onDelete: { item, reviewIndex in
+                                    pendingDeletion = PendingDeletion(item: item, reviewIndex: reviewIndex)
+                                }
+                            )
+
+                            if let appliedCoupon = orderStore.appliedCoupon {
+                                VStack(alignment: .leading, spacing: POCSpacing.s) {
+                                    SectionHeader("適用中のクーポン")
+                                    Text(appliedCoupon.displayTitle.reviewCurrencyText)
+                                        .font(.headline.weight(.semibold))
+                                    Text(appliedCoupon.displaySummary.reviewCurrencyText)
+                                        .font(.subheadline)
+                                        .foregroundStyle(POCColor.textSecondary)
+                                    Button("外す") {
+                                        orderStore.removeCoupon()
+                                    }
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(POCColor.curry)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(POCSpacing.m)
+                                .pocCard(fill: POCColor.elevatedStrong)
+                            } else if let suggestedCoupon = orderStore.availableCoupons.first {
+                                VStack(alignment: .leading, spacing: POCSpacing.s) {
+                                    Text("この注文に使えるクーポンがあります")
+                                        .font(.headline.weight(.semibold))
+                                    Text(suggestedCoupon.displayTitle.reviewCurrencyText)
+                                        .font(.subheadline)
+                                        .foregroundStyle(POCColor.textSecondary)
+                                    Button("クーポンを見る") {
+                                        navigator.showSheet(.couponSuggestion)
+                                    }
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(POCColor.curry)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(POCSpacing.m)
+                                .pocCard(fill: POCColor.elevatedStrong)
+                            }
+
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                SummaryRow(title: store.name, value: store.pickupLeadTimeText)
+                                SectionHeader("料金確認")
+                                SummaryRow(title: "小計", value: orderStore.reviewSubtotal.reviewYenText)
+                                SummaryRow(title: "クーポン", value: orderStore.reviewDiscount == 0 ? "-" : "-\(orderStore.reviewDiscount.reviewYenText)")
+                                SummaryRow(title: "合計", value: orderStore.reviewTotal.reviewYenText)
                             }
                             .padding(POCSpacing.m)
-                            .pocCard(fill: POCColor.elevated)
+                            .pocCard(fill: POCColor.elevatedStrong)
                         }
-
-                        ReviewCartCard(
-                            lineItems: orderStore.reviewLineItems
+                        .padding(POCSpacing.l)
+                    }
+                    .safeAreaInset(edge: .bottom) {
+                        ReviewFooterBar(
+                            total: orderStore.reviewTotal,
+                            isDisabled: !orderStore.hasReviewItems,
+                            continueAction: continueOrdering,
+                            confirmAction: confirmOrder
                         )
-
-                        if let appliedCoupon = orderStore.appliedCoupon {
-                            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                SectionHeader("適用中のクーポン")
-                                Text(appliedCoupon.displayTitle.reviewCurrencyText)
-                                    .font(.headline.weight(.semibold))
-                                Text(appliedCoupon.displaySummary.reviewCurrencyText)
-                                    .font(.subheadline)
-                                    .foregroundStyle(POCColor.textSecondary)
-                                Button("外す") {
-                                    orderStore.removeCoupon()
-                                }
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(POCColor.curry)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(POCSpacing.m)
-                            .pocCard(fill: POCColor.elevatedStrong)
-                        } else if let suggestedCoupon = orderStore.availableCoupons.first {
-                            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                Text("この注文に使えるクーポンがあります")
-                                    .font(.headline.weight(.semibold))
-                                Text(suggestedCoupon.displayTitle.reviewCurrencyText)
-                                    .font(.subheadline)
-                                    .foregroundStyle(POCColor.textSecondary)
-                                Button("クーポンを見る") {
-                                    navigator.showSheet(.couponSuggestion)
-                                }
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(POCColor.curry)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(POCSpacing.m)
-                            .pocCard(fill: POCColor.elevatedStrong)
-                        }
-
-                        VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("料金確認")
-                            SummaryRow(title: "小計", value: orderStore.reviewSubtotal.reviewYenText)
-                            SummaryRow(title: "クーポン", value: orderStore.reviewDiscount == 0 ? "-" : "-\(orderStore.reviewDiscount.reviewYenText)")
-                            SummaryRow(title: "合計", value: orderStore.reviewTotal.reviewYenText)
-                        }
-                        .padding(POCSpacing.m)
-                        .pocCard(fill: POCColor.elevatedStrong)
                     }
-                    .padding(POCSpacing.l)
-                }
-                .safeAreaInset(edge: .bottom) {
-                    ReviewFooterBar(
-                        total: orderStore.reviewTotal,
-                        isDisabled: !orderStore.hasReviewItems,
-                        continueAction: continueOrdering,
-                        confirmAction: confirmOrder
-                    )
-                }
-                .task {
-                    if !orderStore.hasPresentedCouponSuggestion, !orderStore.availableCoupons.isEmpty {
-                        orderStore.hasPresentedCouponSuggestion = true
-                        navigator.showSheet(.couponSuggestion)
+                    .task {
+                        if !orderStore.hasPresentedCouponSuggestion, !orderStore.availableCoupons.isEmpty {
+                            orderStore.hasPresentedCouponSuggestion = true
+                            navigator.showSheet(.couponSuggestion)
+                        }
                     }
+                } else {
+                    Color.clear
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-            } else {
-                Color.clear
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .allowsHitTesting(pendingDeletion == nil)
+
+            if let pendingDeletion {
+                ReviewDeleteConfirmationOverlay(
+                    pendingDeletion: pendingDeletion,
+                    isDeletingLastItem: orderStore.reviewLineItems.count == 1,
+                    cancelAction: { self.pendingDeletion = nil },
+                    confirmAction: { confirmDeletion(pendingDeletion) }
+                )
+                .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                .zIndex(1)
             }
         }
+        .animation(.snappy(duration: 0.22, extraBounce: 0), value: pendingDeletion != nil)
         .task(id: orderStore.hasReviewItems) {
             guard !orderStore.hasReviewItems else { return }
             navigator.dismissSheet()
@@ -108,6 +127,11 @@ struct OrderReviewView: View {
         orderStore.placeOrder()
         navigator.push(.orderComplete)
     }
+
+    private func confirmDeletion(_ pendingDeletion: PendingDeletion) {
+        orderStore.removeReviewItem(pendingDeletion.item, reviewIndex: pendingDeletion.reviewIndex)
+        self.pendingDeletion = nil
+    }
 }
 
 private struct ReviewCartCard: View {
@@ -115,8 +139,7 @@ private struct ReviewCartCard: View {
     @EnvironmentObject private var orderStore: OrderStore
 
     let lineItems: [ReviewLineItem]
-
-    @State private var pendingDeletion: PendingDeletion?
+    let onDelete: (ReviewLineItem, Int) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
@@ -134,31 +157,13 @@ private struct ReviewCartCard: View {
                         navigator.showCurryToppings()
                     },
                     onDelete: {
-                        pendingDeletion = PendingDeletion(item: item, reviewIndex: index)
+                        onDelete(item, index)
                     }
                 )
             }
         }
         .padding(POCSpacing.m)
         .pocCard(fill: POCColor.elevated)
-        .confirmationDialog(
-            "この商品を削除しますか？",
-            isPresented: isShowingDeleteConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("削除", role: .destructive) {
-                guard let pendingDeletion else { return }
-                orderStore.removeReviewItem(pendingDeletion.item, reviewIndex: pendingDeletion.reviewIndex)
-                self.pendingDeletion = nil
-            }
-            Button("キャンセル", role: .cancel) {
-                pendingDeletion = nil
-            }
-        } message: {
-            if let pendingDeletion {
-                Text("\(pendingDeletion.item.draft.menuItem.name) をご注文内容から削除します。")
-            }
-        }
     }
 
     private func beginEditing(_ item: ReviewLineItem, reviewIndex: Int) {
@@ -169,22 +174,100 @@ private struct ReviewCartCard: View {
             break
         }
     }
-
-    private var isShowingDeleteConfirmation: Binding<Bool> {
-        Binding(
-            get: { pendingDeletion != nil },
-            set: { isPresented in
-                if !isPresented {
-                    pendingDeletion = nil
-                }
-            }
-        )
-    }
 }
 
 private struct PendingDeletion {
     let item: ReviewLineItem
     let reviewIndex: Int
+}
+
+private struct ReviewDeleteConfirmationOverlay: View {
+    let pendingDeletion: PendingDeletion
+    let isDeletingLastItem: Bool
+    let cancelAction: () -> Void
+    let confirmAction: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.42)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    cancelAction()
+                }
+
+            VStack(alignment: .leading, spacing: POCSpacing.m) {
+                Text("この商品を削除しますか？")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+
+                VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                    Text(pendingDeletion.item.draft.menuItem.name)
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+
+                    Text("ご注文内容から外します。")
+                        .font(.subheadline)
+                        .foregroundStyle(POCColor.textSecondary)
+                }
+
+                if isDeletingLastItem {
+                    Label("最後の1件を削除すると、メニュー選択に戻ります。", systemImage: "info.circle")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(POCColor.textSecondary)
+                        .padding(POCSpacing.s)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                                .fill(POCColor.elevatedStrong)
+                        )
+                }
+
+                HStack(spacing: POCSpacing.s) {
+                    SecondaryCTAButton(title: "キャンセル", systemImage: nil) {
+                        cancelAction()
+                    }
+
+                    DestructiveCTAButton(title: "削除する", systemImage: "trash") {
+                        confirmAction()
+                    }
+                }
+            }
+            .padding(POCSpacing.l)
+            .frame(maxWidth: 360, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .fill(POCColor.elevated)
+                    .shadow(color: Color.black.opacity(0.12), radius: 24, y: 12)
+            )
+            .padding(.horizontal, POCSpacing.l)
+        }
+    }
+}
+
+private struct DestructiveCTAButton: View {
+    let title: String
+    let systemImage: String?
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: POCSpacing.xs) {
+                if let systemImage {
+                    Image(systemName: systemImage)
+                }
+                Text(title)
+                    .font(.headline.weight(.semibold))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 15)
+            .foregroundStyle(Color.white)
+            .background(
+                RoundedRectangle(cornerRadius: POCRadius.cta, style: .continuous)
+                    .fill(POCColor.red)
+            )
+        }
+        .buttonStyle(.plain)
+    }
 }
 
 private struct CartLineSummaryCard: View {
