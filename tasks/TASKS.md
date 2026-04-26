@@ -288,3 +288,25 @@
    Done by: CODEX
    Done at: 2026-04-24T09:47:57Z
 
+27. s5-review-item-delete
+   Id: 27-s5-review-item-delete
+   Scope: Now / M3
+   Files: CocoichiPoC/State/OrderStore.swift, CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5注文確認で商品削除を追加。make build成功、git diff --check問題なし
+   Detail: tasks/details/27-s5-review-item-delete.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-26T05:27:22Z
+   Done by: CODEX
+   Done at: 2026-04-26T05:29:33Z
+
+28. s5-auto-return-on-empty
+   Id: 28-s5-auto-return-on-empty
+   Scope: Now / M3
+   Files: CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5空状態でメニューへ自動復帰。make build成功、git diff --check問題なし
+   Detail: tasks/details/28-s5-auto-return-on-empty.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-26T05:33:52Z
+   Done by: CODEX
+   Done at: 2026-04-26T05:34:15Z
+

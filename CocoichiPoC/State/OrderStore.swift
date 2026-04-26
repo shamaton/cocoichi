@@ -368,6 +368,24 @@ final class OrderStore: ObservableObject {
         normalizeAppliedCoupon()
     }
 
+    func removeReviewItem(_ item: ReviewLineItem, reviewIndex: Int) {
+        switch item.source {
+        case let .cart(lineItemID):
+            removeCartItem(lineItemID, reviewIndex: reviewIndex)
+        case .pendingDraft:
+            draftOrder = nil
+            pendingReviewInsertionIndex = nil
+            isDraftConfirmedForReview = false
+        }
+
+        if !hasReviewItems {
+            pendingReviewInsertionIndex = nil
+            isDraftConfirmedForReview = false
+        }
+
+        normalizeAppliedCoupon()
+    }
+
     func placeOrder() {
         var finalizedItems = cartItems
         if let draftOrder {
@@ -460,6 +478,26 @@ final class OrderStore: ObservableObject {
         }
 
         return min(max(originalPendingIndex, 0), cartCountAfterRemoval)
+    }
+
+    private func removeCartItem(_ lineItemID: CartLineItem.ID, reviewIndex: Int) {
+        let originalPendingIndex = draftOrder.map { _ in
+            resolvedPendingReviewInsertionIndex(forCartCount: cartItems.count)
+        }
+
+        guard let index = cartItems.firstIndex(where: { $0.id == lineItemID }) else { return }
+        cartItems.remove(at: index)
+
+        guard let originalPendingIndex else {
+            pendingReviewInsertionIndex = nil
+            return
+        }
+
+        if reviewIndex < originalPendingIndex {
+            pendingReviewInsertionIndex = max(originalPendingIndex - 1, 0)
+        } else {
+            pendingReviewInsertionIndex = min(originalPendingIndex, cartItems.count)
+        }
     }
 
     private func persistFavorites() {

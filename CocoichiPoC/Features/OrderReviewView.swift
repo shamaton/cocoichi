@@ -84,9 +84,14 @@ struct OrderReviewView: View {
                     }
                 }
             } else {
-                EmptyStateCard(title: "注文内容がありません", message: "S3 から注文内容を作ってください。")
-                    .padding(POCSpacing.l)
+                Color.clear
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+        }
+        .task(id: orderStore.hasReviewItems) {
+            guard !orderStore.hasReviewItems else { return }
+            navigator.dismissSheet()
+            navigator.popToMenuDiscovery()
         }
         .navigationTitle("ご注文内容の確認")
         .navigationBarTitleDisplayMode(.inline)
@@ -111,6 +116,8 @@ private struct ReviewCartCard: View {
 
     let lineItems: [ReviewLineItem]
 
+    @State private var pendingDeletion: PendingDeletion?
+
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
             SectionHeader("ご注文内容の確認")
@@ -125,12 +132,33 @@ private struct ReviewCartCard: View {
                     onChangeToppings: {
                         beginEditing(item, reviewIndex: index)
                         navigator.showCurryToppings()
+                    },
+                    onDelete: {
+                        pendingDeletion = PendingDeletion(item: item, reviewIndex: index)
                     }
                 )
             }
         }
         .padding(POCSpacing.m)
         .pocCard(fill: POCColor.elevated)
+        .confirmationDialog(
+            "この商品を削除しますか？",
+            isPresented: isShowingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("削除", role: .destructive) {
+                guard let pendingDeletion else { return }
+                orderStore.removeReviewItem(pendingDeletion.item, reviewIndex: pendingDeletion.reviewIndex)
+                self.pendingDeletion = nil
+            }
+            Button("キャンセル", role: .cancel) {
+                pendingDeletion = nil
+            }
+        } message: {
+            if let pendingDeletion {
+                Text("\(pendingDeletion.item.draft.menuItem.name) をご注文内容から削除します。")
+            }
+        }
     }
 
     private func beginEditing(_ item: ReviewLineItem, reviewIndex: Int) {
@@ -141,12 +169,29 @@ private struct ReviewCartCard: View {
             break
         }
     }
+
+    private var isShowingDeleteConfirmation: Binding<Bool> {
+        Binding(
+            get: { pendingDeletion != nil },
+            set: { isPresented in
+                if !isPresented {
+                    pendingDeletion = nil
+                }
+            }
+        )
+    }
+}
+
+private struct PendingDeletion {
+    let item: ReviewLineItem
+    let reviewIndex: Int
 }
 
 private struct CartLineSummaryCard: View {
     let draft: DraftOrder
     var onChangeBasics: (() -> Void)? = nil
     var onChangeToppings: (() -> Void)? = nil
+    var onDelete: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
@@ -169,6 +214,16 @@ private struct CartLineSummaryCard: View {
             )
 
             HStack {
+                if let onDelete {
+                    Button(role: .destructive) {
+                        onDelete()
+                    } label: {
+                        Label("削除", systemImage: "trash")
+                            .font(.caption.weight(.semibold))
+                    }
+                    .foregroundStyle(POCColor.red)
+                }
+
                 Spacer()
 
                 Text(draft.subtotal.reviewYenText)
