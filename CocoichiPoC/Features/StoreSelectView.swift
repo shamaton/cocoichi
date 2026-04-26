@@ -40,11 +40,11 @@ private enum StoreSearchMethod: String, CaseIterable, Identifiable {
         case .currentLocation:
             return "近くの店舗と受取目安をすぐ見つけます"
         case .station:
-            return "渋谷 / 新宿 / 池袋 など"
+            return "名駅 / 栄 / 金山 など"
         case .postalCode:
-            return "150-0043 など"
+            return "450-0002 など"
         case .storeName:
-            return "道玄坂 / 秋葉原 / 池袋東口 など"
+            return "広小路 / 錦通 / 金山南口 など"
         }
     }
 
@@ -871,12 +871,16 @@ struct StoreSelectView: View {
 
     private func distanceText(for store: Store) -> String {
         switch store.id {
-        case "shibuya-dogenzaka":
-            return "500m"
-        case "ebisu-ekimae":
-            return "1.2km"
-        case "shinagawa-konan":
-            return "3.1km"
+        case "nagoya-meieki":
+            return "400m"
+        case "sakae-nishiki":
+            return "1.1km"
+        case "kanayama-ekimae":
+            return "2.4km"
+        case "fushimi-hirokoji":
+            return "900m"
+        case "chikusa-imaike":
+            return "3.2km"
         default:
             return "近く"
         }
@@ -936,19 +940,23 @@ struct StoreSelectView: View {
 
     private func coordinate(for store: Store) -> CLLocationCoordinate2D {
         switch store.id {
-        case "shibuya-dogenzaka":
-            return CLLocationCoordinate2D(latitude: 35.6582, longitude: 139.6980)
-        case "ebisu-ekimae":
-            return CLLocationCoordinate2D(latitude: 35.6467, longitude: 139.7100)
-        case "shinagawa-konan":
-            return CLLocationCoordinate2D(latitude: 35.6285, longitude: 139.7416)
+        case "nagoya-meieki":
+            return CLLocationCoordinate2D(latitude: 35.1685, longitude: 136.8856)
+        case "sakae-nishiki":
+            return CLLocationCoordinate2D(latitude: 35.1708, longitude: 136.9084)
+        case "kanayama-ekimae":
+            return CLLocationCoordinate2D(latitude: 35.1430, longitude: 136.9008)
+        case "fushimi-hirokoji":
+            return CLLocationCoordinate2D(latitude: 35.1671, longitude: 136.8954)
+        case "chikusa-imaike":
+            return CLLocationCoordinate2D(latitude: 35.1680, longitude: 136.9368)
         default:
-            return CLLocationCoordinate2D(latitude: 35.6472, longitude: 139.7171)
+            return CLLocationCoordinate2D(latitude: 35.1698, longitude: 136.8996)
         }
     }
 
     private static let defaultMapRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 35.6472, longitude: 139.7171),
+        center: CLLocationCoordinate2D(latitude: 35.1698, longitude: 136.8996),
         span: MKCoordinateSpan(latitudeDelta: 0.055, longitudeDelta: 0.055)
     )
 }

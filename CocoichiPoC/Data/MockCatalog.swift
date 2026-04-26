@@ -3,28 +3,44 @@ import Foundation
 enum MockCatalog {
     static let stores: [Store] = [
         Store(
-            id: "shibuya-dogenzaka",
-            name: "渋谷道玄坂店",
-            neighborhood: "渋谷",
-            address: "東京都渋谷区道玄坂1-8-5",
-            pickupLeadTimeMin: 12,
-            pickupLeadTimeMax: 18
-        ),
-        Store(
-            id: "ebisu-ekimae",
-            name: "恵比寿駅前店",
-            neighborhood: "恵比寿",
-            address: "東京都渋谷区恵比寿南1-4-15",
+            id: "nagoya-meieki",
+            name: "名駅広小路店",
+            neighborhood: "名駅",
+            address: "愛知県名古屋市中村区名駅4-26-12",
             pickupLeadTimeMin: 10,
             pickupLeadTimeMax: 16
         ),
         Store(
-            id: "shinagawa-konan",
-            name: "品川港南口店",
-            neighborhood: "品川",
-            address: "東京都港区港南2-3-10",
+            id: "sakae-nishiki",
+            name: "栄錦通店",
+            neighborhood: "栄",
+            address: "愛知県名古屋市中区錦3-14-21",
+            pickupLeadTimeMin: 12,
+            pickupLeadTimeMax: 18
+        ),
+        Store(
+            id: "kanayama-ekimae",
+            name: "金山駅南口店",
+            neighborhood: "金山",
+            address: "愛知県名古屋市中区金山1-17-18",
             pickupLeadTimeMin: 14,
             pickupLeadTimeMax: 20
+        ),
+        Store(
+            id: "fushimi-hirokoji",
+            name: "伏見広小路店",
+            neighborhood: "伏見",
+            address: "愛知県名古屋市中区栄1-5-8",
+            pickupLeadTimeMin: 11,
+            pickupLeadTimeMax: 17
+        ),
+        Store(
+            id: "chikusa-imaike",
+            name: "今池広小路店",
+            neighborhood: "今池",
+            address: "愛知県名古屋市千種区今池1-9-19",
+            pickupLeadTimeMin: 13,
+            pickupLeadTimeMax: 19
         ),
     ]
 
@@ -57,7 +73,7 @@ enum MockCatalog {
     ]
 
     static var initialFavoriteCombos: [FavoriteCombo] {
-        let shibuya = stores[0]
+        let meieki = stores[0]
         let loinCutlet = menuItems.first(where: { $0.name == "ロースカツカレー" }) ?? menuItems[0]
         let porkCurry = menuItems.first(where: { $0.name == "ポークカレー" }) ?? menuItems[1]
         let cheese = toppings.first(where: { $0.id == "cheese" }) ?? Topping(id: "cheese", name: "チーズ", price: 240, accentHex: 0xE5B94E, group: .other)
@@ -68,7 +84,7 @@ enum MockCatalog {
                 id: UUID(uuidString: "11111111-1111-1111-1111-111111111111") ?? UUID(),
                 name: "いつものロースカツ3辛",
                 draft: DraftOrder(
-                    store: shibuya,
+                    store: meieki,
                     menuItem: loinCutlet,
                     currySauce: .rich,
                     spiceLevel: 3,
@@ -83,7 +99,7 @@ enum MockCatalog {
                 id: UUID(uuidString: "22222222-2222-2222-2222-222222222222") ?? UUID(),
                 name: "軽めのポーク",
                 draft: DraftOrder(
-                    store: shibuya,
+                    store: meieki,
                     menuItem: porkCurry,
                     currySauce: .original,
                     spiceLevel: 2,
@@ -98,20 +114,20 @@ enum MockCatalog {
     }
 
     private static let storeOnlyMenuItem = MenuItem(
-        id: "shibuya-store-limited-ebi-katsu-curry",
+        id: "nagoya-store-limited-ebi-katsu-curry",
         name: "海老カツカレー",
         group: .limitedTime,
-        subtitle: "渋谷道玄坂店限定 / 数量限定のサクッとした一皿",
+        subtitle: "名駅広小路店限定 / 数量限定のサクッとした一皿",
         actualBasePrice: 998,
         basePrice: Pricing.virtualDisplayedPrice(for: 998),
         tags: [.recommended, .rich],
-        searchKeywords: ["限定", "渋谷", "海老", "えび", "海老カツ", "店舗限定"],
+        searchKeywords: ["限定", "名古屋", "名駅", "海老", "えび", "海老カツ", "店舗限定"],
         imagePath: "store-limited-ebi-katsu-curry.png",
         recommendedToppingIDs: ["spinach", "egg"],
         accentHexes: [0xB84E2F, 0xE5B94E],
         isGlobal: false,
-        availableStoreIDs: ["shibuya-dogenzaka"],
-        availabilityNote: "渋谷道玄坂店限定"
+        availableStoreIDs: ["nagoya-meieki"],
+        availabilityNote: "名駅広小路店限定"
     )
 }
 
