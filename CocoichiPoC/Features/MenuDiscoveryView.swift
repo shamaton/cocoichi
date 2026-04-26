@@ -5,7 +5,6 @@ struct MenuDiscoveryView: View {
     @EnvironmentObject private var navigator: AppNavigator
     @EnvironmentObject private var orderStore: OrderStore
 
-    @State private var searchText = ""
     @State private var selectedGenre: MenuDiscoveryGenre = .curry
 
     var body: some View {
@@ -62,11 +61,9 @@ struct MenuDiscoveryView: View {
 
     @ViewBuilder
     private func curryContent(contentWidth: CGFloat) -> some View {
-        if searchText.isEmpty {
-            favoriteEntrySection
-        }
+        favoriteEntrySection
 
-        if searchText.isEmpty, !popularItems.isEmpty {
+        if !popularItems.isEmpty {
             VStack(alignment: .leading, spacing: POCSpacing.s) {
                 SectionHeader("今日のおすすめ")
 
@@ -76,7 +73,7 @@ struct MenuDiscoveryView: View {
             }
         }
 
-        if searchText.isEmpty, let store = orderStore.selectedStore, !storeOnlyItems.isEmpty {
+        if let store = orderStore.selectedStore, !storeOnlyItems.isEmpty {
             VStack(alignment: .leading, spacing: POCSpacing.s) {
                 SectionHeader("この店舗限定")
                 Text("\(store.name)で選べる限定メニュー")
@@ -94,7 +91,7 @@ struct MenuDiscoveryView: View {
         if groupedSections.isEmpty {
             EmptyStateCard(
                 title: "該当するカレーがありません",
-                message: "検索語やフィルタを変えると別のグループが見つかります。"
+                message: "表示条件を見直すと、別のメニューが表示される場合があります。"
             )
         } else {
             ForEach(groupedSections) { section in
@@ -118,22 +115,7 @@ struct MenuDiscoveryView: View {
     }
 
     private func pinnedNavigationHeader(contentWidth: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
-            genreHeader
-
-            TextField(selectedGenre.searchPlaceholder, text: $searchText)
-                .textInputAutocapitalization(.never)
-                .padding(.horizontal, POCSpacing.m)
-                .padding(.vertical, 14)
-                .background(
-                    RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                        .fill(POCColor.elevated)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                        .stroke(POCColor.line, lineWidth: 1)
-                )
-        }
+        genreHeader
         .frame(width: contentWidth, alignment: .leading)
         .padding(.horizontal, POCSpacing.l)
         .padding(.top, POCSpacing.s)
@@ -156,7 +138,6 @@ struct MenuDiscoveryView: View {
                             isSelected: selectedGenre == genre
                         ) {
                             selectedGenre = genre
-                            searchText = ""
                         }
                     }
                 }
@@ -201,22 +182,6 @@ struct MenuDiscoveryView: View {
     private func availableContentWidth(in proxy: GeometryProxy) -> CGFloat {
         let horizontalInsets = proxy.safeAreaInsets.leading + proxy.safeAreaInsets.trailing
         return max(0, proxy.size.width - horizontalInsets - (POCSpacing.l * 2))
-    }
-
-    private var filteredMenuItems: [MenuItem] {
-        orderStore.visibleMenuItems.filter { item in
-            let matchesSearch: Bool
-            if searchText.isEmpty {
-                matchesSearch = true
-            } else {
-                let query = searchText.lowercased()
-                let searchSpace = ([item.name, item.subtitle, item.group.rawValue] + item.searchKeywords + item.tags.map(\.rawValue))
-                    .joined(separator: " ")
-                    .lowercased()
-                matchesSearch = searchSpace.contains(query)
-            }
-            return matchesSearch
-        }
     }
 
     private var favoriteEntrySection: some View {
@@ -281,16 +246,16 @@ struct MenuDiscoveryView: View {
     }
 
     private var groupedMenuItems: [MenuItem] {
-        let hiddenStoreOnlyIDs = Set(searchText.isEmpty ? storeOnlyItems.map(\.id) : [])
-        return filteredMenuItems.filter { !hiddenStoreOnlyIDs.contains($0.id) }
+        let hiddenStoreOnlyIDs = Set(storeOnlyItems.map(\.id))
+        return orderStore.visibleMenuItems.filter { !hiddenStoreOnlyIDs.contains($0.id) }
     }
 
     private var storeOnlyItems: [MenuItem] {
-        filteredMenuItems.filter(\.isStoreLimited)
+        orderStore.visibleMenuItems.filter(\.isStoreLimited)
     }
 
     private var popularItems: [MenuItem] {
-        PopularMenuCurator.popularItems(from: filteredMenuItems)
+        PopularMenuCurator.popularItems(from: orderStore.visibleMenuItems)
     }
 }
 
@@ -301,19 +266,6 @@ private enum MenuDiscoveryGenre: String, CaseIterable, Identifiable {
     case other = "その他"
 
     var id: Self { self }
-
-    var searchPlaceholder: String {
-        switch self {
-        case .curry:
-            return "メニュー名・トッピング・キーワードで探す"
-        case .salad:
-            return "サラダ名で探す"
-        case .drink:
-            return "ドリンク名で探す"
-        case .other:
-            return "サイドメニュー名で探す"
-        }
-    }
 
     var sectionTitle: String {
         switch self {
