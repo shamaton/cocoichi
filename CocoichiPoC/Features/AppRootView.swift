@@ -133,7 +133,6 @@ private struct HomeView: View {
                         recommendedSection(contentWidth: contentWidth)
                     }
                     recommendedBannersSection
-                    savedCombosSection
                 }
                 .frame(width: contentWidth, alignment: .leading)
                 .padding(.horizontal, POCSpacing.l)
@@ -149,18 +148,15 @@ private struct HomeView: View {
     }
 
     private var homeHeader: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.xs) {
-            Text(headerTitle)
-                .font(.title2.weight(.bold))
-                .foregroundStyle(POCColor.textPrimary)
+        Group {
+            if let store = orderStore.selectedStore {
+                VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                    Text("\(store.name)で受け取り")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(POCColor.textPrimary)
+                }
+            }
         }
-    }
-
-    private var headerTitle: String {
-        if let store = orderStore.selectedStore {
-            return "\(store.name)で受け取り"
-        }
-        return "今日は何にする？"
     }
 
     private var seasonalBanner: some View {
@@ -219,38 +215,6 @@ private struct HomeView: View {
                 .pocCard(fill: POCColor.elevatedStrong)
             }
             .buttonStyle(.plain)
-        }
-    }
-
-    private var savedCombosSection: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("保存した組み合わせ")
-            if let favorite = orderStore.featuredFavorite {
-                Button {
-                    navigator.push(.savedCombos)
-                } label: {
-                    VStack(alignment: .leading, spacing: POCSpacing.s) {
-                        Text("いつものに近い")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(POCColor.textTertiary)
-                        Text(favorite.name)
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(POCColor.textPrimary)
-                        Text(favorite.draft.menuItem.name)
-                            .font(.subheadline)
-                            .foregroundStyle(POCColor.textSecondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(POCSpacing.m)
-                    .pocCard(fill: POCColor.elevated)
-                }
-                .buttonStyle(.plain)
-            } else {
-                EmptyStateCard(
-                    title: "まだ保存された組み合わせはありません",
-                    message: "注文後にいつもの組み合わせを残せます。"
-                )
-            }
         }
     }
 

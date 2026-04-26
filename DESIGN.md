@@ -164,9 +164,9 @@ Do not introduce decorative or highly stylized font choices in this PoC unless t
 
 Good examples:
 
-- `今日は何にする？`
 - `ご注文を受け付けました`
 - `この注文に使えるクーポンがあります`
+- `受取先を選ぶと限定メニューも見られます`
 
 Avoid:
 
