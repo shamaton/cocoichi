@@ -649,7 +649,10 @@ struct StoreSelectView: View {
                 }
             }
             .padding(POCSpacing.m)
-            .background(cardBackground(isFocused: isFocused, isSelected: isSelected))
+            .background(
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .fill(cardBackground(isFocused: isFocused, isSelected: isSelected))
+            )
             .overlay(
                 RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
                     .stroke(isFocused ? POCColor.curry.opacity(0.28) : POCColor.line, lineWidth: 1)
