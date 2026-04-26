@@ -393,7 +393,7 @@ private struct MissingStoreCard: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .padding(POCSpacing.m)
-            .pocCard(fill: POCColor.elevated)
+            .pocCard(fill: POCColor.elevatedStrong)
         }
         .buttonStyle(.plain)
     }
