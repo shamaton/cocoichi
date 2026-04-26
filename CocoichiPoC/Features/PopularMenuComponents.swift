@@ -4,8 +4,8 @@ import UIKit
 enum PopularMenuCurator {
     static func popularItems(from items: [MenuItem]) -> [MenuItem] {
         let curatedIDs = [
-            "the-gyu-curry",
-            "sakura-shrimp-asari-spring-vegetable-curry",
+            "handmade-chicken-tender-cutlet-curry",
+            "stewed-beef-tendon-curry",
             "loin-cutlet-curry",
             "cheese-curry",
         ]
