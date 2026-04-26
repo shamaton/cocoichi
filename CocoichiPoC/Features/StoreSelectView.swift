@@ -186,17 +186,6 @@ struct StoreSelectView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
             HStack(alignment: .top, spacing: POCSpacing.s) {
-                VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                    Text("受取先を選ぶ")
-                        .font(.largeTitle.weight(.bold))
-                        .foregroundStyle(POCColor.textPrimary)
-                    Text("地図と一覧を見ながら、受け取りたい店舗をすぐ決められます。")
-                        .font(.subheadline)
-                        .foregroundStyle(POCColor.textSecondary)
-                }
-
-                Spacer(minLength: POCSpacing.m)
-
                 if let selectedStore = orderStore.selectedStore {
                     VStack(alignment: .trailing, spacing: POCSpacing.xxs) {
                         Text("現在の店舗")
@@ -208,6 +197,8 @@ struct StoreSelectView: View {
                             .multilineTextAlignment(.trailing)
                     }
                 }
+
+                Spacer(minLength: 0)
             }
 
             HStack(spacing: POCSpacing.xs) {
