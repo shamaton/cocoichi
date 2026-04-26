@@ -6,6 +6,7 @@ struct MenuDiscoveryView: View {
     @EnvironmentObject private var orderStore: OrderStore
 
     @State private var searchText = ""
+    @State private var selectedGenre: MenuDiscoveryGenre = .curry
 
     var body: some View {
         GeometryReader { proxy in
@@ -32,7 +33,7 @@ struct MenuDiscoveryView: View {
                         Text("今日は何にする？")
                             .font(.largeTitle.weight(.bold))
 
-                        TextField("メニュー名・トッピング・キーワードで探す", text: $searchText)
+                        TextField(selectedGenre.searchPlaceholder, text: $searchText)
                             .textInputAutocapitalization(.never)
                             .padding(.horizontal, POCSpacing.m)
                             .padding(.vertical, 14)
@@ -46,68 +47,141 @@ struct MenuDiscoveryView: View {
                             )
                     }
 
-                    if searchText.isEmpty {
-                        favoriteEntrySection
-                    }
-
-                    if searchText.isEmpty, !popularItems.isEmpty {
-                        VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("今日のおすすめ")
-
-                            PopularMenuGrid(items: popularItems, contentWidth: contentWidth) { item in
-                                startOrder(for: item)
-                            }
-                        }
-                    }
-
-                    if searchText.isEmpty, let store = orderStore.selectedStore, !storeOnlyItems.isEmpty {
-                        VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("この店舗限定")
-                            Text("\(store.name)で選べる限定メニュー")
-                                .font(.subheadline)
-                                .foregroundStyle(POCColor.textSecondary)
-
-                            ForEach(storeOnlyItems) { item in
-                                CompactMenuRow(item: item) {
-                                    startOrder(for: item)
-                                }
-                            }
-                        }
-                    }
-
-                    if groupedSections.isEmpty {
-                        EmptyStateCard(
-                            title: "該当するカレーがありません",
-                            message: "検索語やフィルタを変えると別のグループが見つかります。"
-                        )
-                    } else {
-                        ForEach(groupedSections) { section in
-                            Section {
-                                VStack(spacing: POCSpacing.s) {
-                                    ForEach(section.items) { item in
-                                        CompactMenuRow(item: item) {
-                                            startOrder(for: item)
-                                        }
-                                    }
-                                }
-                            } header: {
-                                StickyGroupHeader(
-                                    title: section.group.rawValue,
-                                    group: section.group
-                                )
-                                .frame(width: contentWidth, alignment: .leading)
-                            }
-                        }
-                    }
+                    genreContent(contentWidth: contentWidth)
                 }
                 .frame(width: contentWidth, alignment: .leading)
                 .padding(.horizontal, POCSpacing.l)
                 .padding(.top, POCSpacing.l)
                 .padding(.bottom, POCSpacing.l)
             }
-            .navigationTitle("カレーライスを選ぶ")
+            .navigationTitle("メニューを選ぶ")
             .navigationBarTitleDisplayMode(.inline)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                pinnedGenreHeader(contentWidth: contentWidth)
+            }
             .pocProgressWaveBackground(.menuDiscovery)
+        }
+    }
+
+    @ViewBuilder
+    private func genreContent(contentWidth: CGFloat) -> some View {
+        switch selectedGenre {
+        case .curry:
+            curryContent(contentWidth: contentWidth)
+        case .salad, .drink, .other:
+            placeholderContent(for: selectedGenre)
+        }
+    }
+
+    @ViewBuilder
+    private func curryContent(contentWidth: CGFloat) -> some View {
+        if searchText.isEmpty {
+            favoriteEntrySection
+        }
+
+        if searchText.isEmpty, !popularItems.isEmpty {
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                SectionHeader("今日のおすすめ")
+
+                PopularMenuGrid(items: popularItems, contentWidth: contentWidth) { item in
+                    startOrder(for: item)
+                }
+            }
+        }
+
+        if searchText.isEmpty, let store = orderStore.selectedStore, !storeOnlyItems.isEmpty {
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                SectionHeader("この店舗限定")
+                Text("\(store.name)で選べる限定メニュー")
+                    .font(.subheadline)
+                    .foregroundStyle(POCColor.textSecondary)
+
+                ForEach(storeOnlyItems) { item in
+                    CompactMenuRow(item: item) {
+                        startOrder(for: item)
+                    }
+                }
+            }
+        }
+
+        if groupedSections.isEmpty {
+            EmptyStateCard(
+                title: "該当するカレーがありません",
+                message: "検索語やフィルタを変えると別のグループが見つかります。"
+            )
+        } else {
+            ForEach(groupedSections) { section in
+                Section {
+                    VStack(spacing: POCSpacing.s) {
+                        ForEach(section.items) { item in
+                            CompactMenuRow(item: item) {
+                                startOrder(for: item)
+                            }
+                        }
+                    }
+                } header: {
+                    StickyGroupHeader(
+                        title: section.group.rawValue,
+                        group: section.group
+                    )
+                    .frame(width: contentWidth, alignment: .leading)
+                }
+            }
+        }
+    }
+
+    private func pinnedGenreHeader(contentWidth: CGFloat) -> some View {
+        genreHeader
+            .frame(width: contentWidth, alignment: .leading)
+            .padding(.horizontal, POCSpacing.l)
+            .padding(.top, POCSpacing.s)
+            .padding(.bottom, POCSpacing.s)
+            .background(POCColor.background.opacity(0.96))
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(POCColor.line)
+                    .frame(height: 1)
+            }
+    }
+
+    private var genreHeader: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: POCSpacing.s) {
+                    ForEach(MenuDiscoveryGenre.allCases) { genre in
+                        MenuGenreChip(
+                            genre: genre,
+                            isSelected: selectedGenre == genre
+                        ) {
+                            selectedGenre = genre
+                            searchText = ""
+                        }
+                    }
+                }
+                .padding(.vertical, 2)
+            }
+        }
+    }
+
+    private func placeholderContent(for genre: MenuDiscoveryGenre) -> some View {
+        VStack(alignment: .leading, spacing: POCSpacing.m) {
+            SectionHeader(genre.sectionTitle)
+
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                Text("\(genre.rawValue)メニューはPoCで準備中です")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                Text(genre.placeholderMessage)
+                    .font(.subheadline)
+                    .foregroundStyle(POCColor.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("まずはカレーから注文フローを確認できます。")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(POCColor.curry)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(POCSpacing.m)
+            .pocCard(fill: POCColor.elevatedStrong)
         }
     }
 
@@ -215,6 +289,79 @@ struct MenuDiscoveryView: View {
 
     private var popularItems: [MenuItem] {
         PopularMenuCurator.popularItems(from: filteredMenuItems)
+    }
+}
+
+private enum MenuDiscoveryGenre: String, CaseIterable, Identifiable {
+    case curry = "カレー"
+    case salad = "サラダ"
+    case drink = "ドリンク"
+    case other = "その他"
+
+    var id: Self { self }
+
+    var searchPlaceholder: String {
+        switch self {
+        case .curry:
+            return "メニュー名・トッピング・キーワードで探す"
+        case .salad:
+            return "サラダ名で探す"
+        case .drink:
+            return "ドリンク名で探す"
+        case .other:
+            return "サイドメニュー名で探す"
+        }
+    }
+
+    var sectionTitle: String {
+        switch self {
+        case .curry:
+            return "カレー"
+        case .salad:
+            return "サラダ"
+        case .drink:
+            return "ドリンク"
+        case .other:
+            return "その他"
+        }
+    }
+
+    var placeholderMessage: String {
+        switch self {
+        case .curry:
+            return ""
+        case .salad:
+            return "季節のサラダやセット候補をここに追加できる想定です。"
+        case .drink:
+            return "ラッシーやソフトドリンクなどの一覧をここに載せる想定です。"
+        case .other:
+            return "スープやサイドなど、カレー以外の補助メニューをここに載せる想定です。"
+        }
+    }
+}
+
+private struct MenuGenreChip: View {
+    let genre: MenuDiscoveryGenre
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(genre.rawValue)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(isSelected ? POCColor.textPrimary : POCColor.textSecondary)
+                .padding(.horizontal, POCSpacing.m)
+                .padding(.vertical, POCSpacing.xs)
+                .background(
+                    Capsule()
+                        .fill(isSelected ? POCColor.cheese : POCColor.elevated)
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(isSelected ? POCColor.cheese : POCColor.line, lineWidth: 1)
+                )
+        }
+        .buttonStyle(.plain)
     }
 }
 
