@@ -369,20 +369,33 @@ private struct MissingStoreCard: View {
     let onSelectStore: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
-            Text("受取先を選ぶと店舗限定メニューも見られます")
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(POCColor.textPrimary)
-            Text("まずは共通メニューを見られます。注文に進む前に店舗を選びます。")
-                .font(.subheadline)
-                .foregroundStyle(POCColor.textSecondary)
-            Button("店舗を選ぶ", action: onSelectStore)
-                .font(.subheadline.weight(.semibold))
+        Button(action: onSelectStore) {
+            HStack(spacing: POCSpacing.m) {
+                VStack(alignment: .leading, spacing: POCSpacing.s) {
+                    Text("店舗が未設定です")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+                    Text("選ぶと店舗限定メニューも確認できます")
+                        .font(.subheadline)
+                        .foregroundStyle(POCColor.textSecondary)
+                }
+
+                Spacer(minLength: 0)
+
+                VStack(spacing: POCSpacing.xxs) {
+                    Text("選択")
+                        .font(.footnote.weight(.semibold))
+                    Image(systemName: "arrow.right")
+                        .font(.headline.weight(.semibold))
+                }
                 .foregroundStyle(POCColor.curry)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .padding(POCSpacing.m)
+            .pocCard(fill: POCColor.elevated)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(POCSpacing.m)
-        .pocCard(fill: POCColor.elevated)
+        .buttonStyle(.plain)
     }
 }
 
