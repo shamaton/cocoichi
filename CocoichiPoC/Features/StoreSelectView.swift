@@ -118,10 +118,8 @@ struct StoreSelectView: View {
                     mapSection
                     storeTabSection
                     storeListSection
-                    savedCombosSection
                 } else {
                     deliveryEntrySection
-                    savedCombosSection
                 }
             }
             .padding(POCSpacing.l)
@@ -180,27 +178,21 @@ struct StoreSelectView: View {
         }
     }
 
+    @ViewBuilder
     private var header: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
+        if let selectedStore = orderStore.selectedStore {
             HStack(alignment: .top, spacing: POCSpacing.s) {
-                if let selectedStore = orderStore.selectedStore {
-                    VStack(alignment: .trailing, spacing: POCSpacing.xxs) {
-                        Text("現在の店舗")
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(POCColor.textTertiary)
-                        Text(selectedStore.name)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(POCColor.curry)
-                            .multilineTextAlignment(.trailing)
-                    }
-                }
-
                 Spacer(minLength: 0)
-            }
 
-            HStack(spacing: POCSpacing.xs) {
-                infoBadge(title: mapHeaderTitle, systemImage: mapHeaderSymbol, tint: POCColor.cheese)
-                infoBadge(title: "\(filteredStores.count)店舗", systemImage: "fork.knife.circle", tint: POCColor.elevatedStrong)
+                VStack(alignment: .trailing, spacing: POCSpacing.xxs) {
+                    Text("現在の店舗")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(POCColor.textTertiary)
+                    Text(selectedStore.name)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(POCColor.curry)
+                        .multilineTextAlignment(.trailing)
+                }
             }
         }
     }
@@ -376,9 +368,6 @@ struct StoreSelectView: View {
 
                 VStack(alignment: .leading, spacing: POCSpacing.s) {
                     infoBadge(title: mapHeaderTitle, systemImage: mapHeaderSymbol, tint: .white.opacity(0.92))
-                    if searchMethod == .currentLocation {
-                        infoBadge(title: "位置情報がなくても手入力に切替可能", systemImage: "hand.tap", tint: .white.opacity(0.86))
-                    }
                 }
                 .padding(POCSpacing.m)
             }
@@ -517,23 +506,6 @@ struct StoreSelectView: View {
                 title: "Delivery Note",
                 message: "配達可否や時間は仮表示でもよいが、次に何が起きるかは明確に伝える。"
             )
-        }
-    }
-
-    private var savedCombosSection: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("再開ショートカット")
-
-            if orderStore.favoriteCombos.isEmpty {
-                EmptyStateCard(
-                    title: "保存済みの組み合わせはまだありません",
-                    message: "注文完了後に保存すると、次回ここからすぐ再開できます。"
-                )
-            } else {
-                SecondaryCTAButton(title: "保存済みから始める", systemImage: "clock.arrow.trianglehead.counterclockwise") {
-                    navigator.push(.savedCombos)
-                }
-            }
         }
     }
 
