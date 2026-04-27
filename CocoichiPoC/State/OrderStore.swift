@@ -60,7 +60,18 @@ final class OrderStore: ObservableObject {
     private let favoriteStorageKey = "jp.cocoichi.poc.favoriteCombos"
 
     init() {
-        favoriteCombos = Self.loadFavorites(forKey: favoriteStorageKey) ?? MockCatalog.initialFavoriteCombos
+        let fallbackFavorites = MockCatalog.initialFavoriteCombos
+        let loadedFavorites = Self.loadFavorites(forKey: favoriteStorageKey)
+        let resolvedFavorites = Self.sanitizedFavorites(
+            loadedFavorites ?? fallbackFavorites,
+            availableStoreIDs: Set(MockCatalog.stores.map(\.id))
+        )
+
+        favoriteCombos = resolvedFavorites.isEmpty ? fallbackFavorites : resolvedFavorites
+
+        if let loadedFavorites, loadedFavorites != favoriteCombos {
+            persistFavorites()
+        }
     }
 
     var availableCoupons: [Coupon] {
@@ -508,6 +519,15 @@ final class OrderStore: ObservableObject {
     private static func loadFavorites(forKey key: String) -> [FavoriteCombo]? {
         guard let data = UserDefaults.standard.data(forKey: key) else { return nil }
         return try? JSONDecoder().decode([FavoriteCombo].self, from: data)
+    }
+
+    private static func sanitizedFavorites(
+        _ favorites: [FavoriteCombo],
+        availableStoreIDs: Set<String>
+    ) -> [FavoriteCombo] {
+        favorites.filter { favorite in
+            availableStoreIDs.contains(favorite.draft.store.id)
+        }
     }
 
     private static func referenceStamp(from date: Date) -> String {
