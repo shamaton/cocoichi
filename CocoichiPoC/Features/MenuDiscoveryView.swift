@@ -15,7 +15,6 @@ struct MenuDiscoveryView: View {
                 LazyVStack(alignment: .leading, spacing: POCSpacing.l) {
                     if let store = orderStore.selectedStore {
                         StoreContextCard(store: store) {
-                            orderStore.resetForNextOrder(keepingStore: false)
                             orderStore.clearPendingFavoriteResume()
                             orderStore.clearPendingMenuSelection()
                             navigator.presentStoreSelect()

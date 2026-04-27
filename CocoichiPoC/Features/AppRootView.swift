@@ -296,7 +296,6 @@ private struct OrderTabView: View {
                     }
                 } else if let store = orderStore.selectedStore {
                     StoreContextCard(store: store) {
-                        orderStore.resetForNextOrder(keepingStore: false)
                         orderStore.clearPendingFavoriteResume()
                         orderStore.clearPendingMenuSelection()
                         navigator.presentStoreSelect(nextTab: .menu)

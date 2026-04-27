@@ -143,10 +143,6 @@ struct StoreSelectView: View {
         .onAppear {
             if let selectedStore = orderStore.selectedStore {
                 focusedStoreID = selectedStore.id
-                if query.isEmpty {
-                    query = selectedStore.neighborhood
-                }
-                searchMethod = .station
             } else if let firstStore = filteredStores.first {
                 focusedStoreID = firstStore.id
             }
@@ -174,7 +170,7 @@ struct StoreSelectView: View {
             Button("キャンセル", role: .cancel) {
                 pendingStoreChange = nil
             }
-            Button("店舗を変更する", role: .destructive) {
+            Button("変更する", role: .destructive) {
                 pendingStoreChange = nil
                 commitStoreSelection(store, resetsOrder: true)
             }
@@ -630,13 +626,13 @@ struct StoreSelectView: View {
                         .lineLimit(2)
 
                     HStack {
-                        Text("この店舗で始める")
+                        Text(isSelected ? "選択済み" : "この店舗で始める")
                             .font(.subheadline.weight(.semibold))
                         Spacer()
-                        Image(systemName: "arrow.right")
+                        Image(systemName: isSelected ? "checkmark.circle.fill" : "arrow.right")
                             .font(.footnote.weight(.bold))
                     }
-                    .foregroundStyle(POCColor.curry)
+                    .foregroundStyle(isSelected ? POCColor.textTertiary : POCColor.curry)
                 }
             }
             .padding(POCSpacing.m)
@@ -651,6 +647,9 @@ struct StoreSelectView: View {
             .shadow(color: Color.black.opacity(isFocused ? 0.08 : 0.05), radius: 18, x: 0, y: 10)
         }
         .buttonStyle(.plain)
+        .disabled(isSelected)
+        .opacity(isSelected ? 0.82 : 1)
+        .accessibilityHint(isSelected ? "現在選択中のため選べません" : "この店舗を選択します")
         .simultaneousGesture(
             TapGesture().onEnded {
                 focusedStoreID = store.id
@@ -720,6 +719,7 @@ struct StoreSelectView: View {
     }
 
     private func handleStoreSelection(_ store: Store) {
+        guard orderStore.selectedStore?.id != store.id else { return }
         if shouldConfirmStoreChange(to: store) {
             pendingStoreChange = store
             return
