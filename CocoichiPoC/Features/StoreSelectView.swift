@@ -236,59 +236,53 @@ struct StoreSelectView: View {
     }
 
     private var searchBarSection: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
+        HStack(spacing: POCSpacing.s) {
             HStack(spacing: POCSpacing.s) {
-                HStack(spacing: POCSpacing.s) {
-                    Image(systemName: "magnifyingglass")
-                        .font(.headline)
-                        .foregroundStyle(POCColor.textTertiary)
+                Image(systemName: "magnifyingglass")
+                    .font(.headline)
+                    .foregroundStyle(POCColor.textTertiary)
 
-                    TextField(searchMethod.searchPlaceholder, text: $query)
-                        .textInputAutocapitalization(.never)
-                        .disableAutocorrection(true)
-                        .font(.body)
-                        .foregroundStyle(POCColor.textPrimary)
+                TextField(searchMethod.searchPlaceholder, text: $query)
+                    .textInputAutocapitalization(.never)
+                    .disableAutocorrection(true)
+                    .font(.body)
+                    .foregroundStyle(POCColor.textPrimary)
+            }
+            .padding(.horizontal, POCSpacing.m)
+            .padding(.vertical, 14)
+            .background(
+                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                    .fill(Color.white.opacity(0.78))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                    .stroke(POCColor.line, lineWidth: 1)
+            )
+
+            Button {
+                withAnimation(.snappy(duration: 0.2)) {
+                    isShowingSearchFilters.toggle()
                 }
+            } label: {
+                HStack(spacing: POCSpacing.xs) {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.headline)
+                    Text("絞り込み")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .foregroundStyle(POCColor.textPrimary)
                 .padding(.horizontal, POCSpacing.m)
                 .padding(.vertical, 14)
                 .background(
                     RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                        .fill(Color.white.opacity(0.78))
+                        .fill(POCColor.elevated)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
                         .stroke(POCColor.line, lineWidth: 1)
                 )
-
-                Button {
-                    withAnimation(.snappy(duration: 0.2)) {
-                        isShowingSearchFilters.toggle()
-                    }
-                } label: {
-                    HStack(spacing: POCSpacing.xs) {
-                        Image(systemName: "slider.horizontal.3")
-                            .font(.headline)
-                        Text("絞り込み")
-                            .font(.subheadline.weight(.semibold))
-                    }
-                    .foregroundStyle(POCColor.textPrimary)
-                    .padding(.horizontal, POCSpacing.m)
-                    .padding(.vertical, 14)
-                    .background(
-                        RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                            .fill(POCColor.elevated)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                            .stroke(POCColor.line, lineWidth: 1)
-                    )
-                }
-                .buttonStyle(.plain)
             }
-
-            Text(searchMethod.fieldTitle)
-                .font(.caption.weight(.medium))
-                .foregroundStyle(POCColor.textSecondary)
+            .buttonStyle(.plain)
         }
     }
 
@@ -357,16 +351,6 @@ struct StoreSelectView: View {
 
     private var mapSection: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            HStack(alignment: .center) {
-                SectionHeader("地図から選ぶ")
-                Spacer()
-                if let focusedStore = focusedStore {
-                    Text(focusedStore.pickupLeadTimeText)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(POCColor.curry)
-                }
-            }
-
             ZStack(alignment: .topLeading) {
                 Map(position: $mapCameraPosition) {
                     ForEach(mapStores) { store in
@@ -446,14 +430,9 @@ struct StoreSelectView: View {
 
             Spacer(minLength: POCSpacing.s)
 
-            VStack(alignment: .trailing, spacing: POCSpacing.xxs) {
-                Text(distanceText(for: store))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(POCColor.textPrimary)
-                Text("受取 \(store.pickupLeadTimeText)")
-                    .font(.caption)
-                    .foregroundStyle(POCColor.curry)
-            }
+            Text(distanceText(for: store))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(POCColor.textPrimary)
         }
         .padding(.horizontal, POCSpacing.m)
         .padding(.vertical, POCSpacing.s)
@@ -626,11 +605,11 @@ struct StoreSelectView: View {
                         .lineLimit(2)
 
                     HStack {
-                        Text(isSelected ? "選択済み" : "この店舗で始める")
-                            .font(.subheadline.weight(.semibold))
                         Spacer()
-                        Image(systemName: isSelected ? "checkmark.circle.fill" : "arrow.right")
-                            .font(.footnote.weight(.bold))
+                        if isSelected {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.footnote.weight(.bold))
+                        }
                     }
                     .foregroundStyle(isSelected ? POCColor.textTertiary : POCColor.curry)
                 }
