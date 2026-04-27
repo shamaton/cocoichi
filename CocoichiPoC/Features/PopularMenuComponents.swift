@@ -96,7 +96,7 @@ private struct PopularMenuCard: View {
 }
 
 private enum PopularMenuLayout {
-    static let columnSpacing: CGFloat = POCSpacing.l
+    static let columnSpacing: CGFloat = POCSpacing.xl
     static let rowSpacing: CGFloat = POCSpacing.xs
     static let cardPadding: CGFloat = POCSpacing.xs
     static let contentSpacing: CGFloat = POCSpacing.xs
