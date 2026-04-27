@@ -281,11 +281,8 @@ struct StoreContextCard: View {
     var body: some View {
         HStack(alignment: .top, spacing: POCSpacing.m) {
             VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                Text("Store: \(store.name)")
+                Text(store.name)
                     .font(.headline.weight(.semibold))
-                Text("受取目安 \(store.pickupLeadTimeText)")
-                    .font(.subheadline)
-                    .foregroundStyle(POCColor.textSecondary)
                 Text(store.address)
                     .font(.caption)
                     .foregroundStyle(POCColor.textTertiary)
@@ -293,9 +290,22 @@ struct StoreContextCard: View {
 
             Spacer()
 
-            Button("Change", action: onChange)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(POCColor.curry)
+            Button(action: onChange) {
+                Text("変更")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(POCColor.curry)
+                    .padding(.horizontal, POCSpacing.s)
+                    .padding(.vertical, POCSpacing.xs)
+                    .background(
+                        Capsule()
+                            .fill(POCColor.elevatedStrong)
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(POCColor.line, lineWidth: 1)
+                    )
+            }
+            .buttonStyle(.plain)
         }
         .padding(POCSpacing.m)
         .pocCard(fill: POCColor.elevated)

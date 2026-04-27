@@ -330,13 +330,19 @@ private struct MissingStoreCard: View {
 
                 Spacer(minLength: 0)
 
-                VStack(spacing: POCSpacing.xxs) {
-                    Text("選択")
-                        .font(.footnote.weight(.semibold))
-                    Image(systemName: "arrow.right")
-                        .font(.headline.weight(.semibold))
-                }
-                .foregroundStyle(POCColor.curry)
+                Text("選ぶ")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(POCColor.curry)
+                    .padding(.horizontal, POCSpacing.s)
+                    .padding(.vertical, POCSpacing.xs)
+                    .background(
+                        Capsule()
+                            .fill(POCColor.elevated)
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(POCColor.line, lineWidth: 1)
+                    )
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
