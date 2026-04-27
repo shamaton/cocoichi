@@ -792,7 +792,7 @@ struct DraftToppingSelection: Identifiable, Hashable {
     var id: String { topping.id }
 
     var summaryLabel: String {
-        "\(topping.name) x \(quantity)"
+        "\(topping.name) × \(quantity)"
     }
 
     var subtotal: Int {
