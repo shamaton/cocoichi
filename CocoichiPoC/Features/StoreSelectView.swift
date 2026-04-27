@@ -1,5 +1,6 @@
 import MapKit
 import SwiftUI
+import UIKit
 
 private enum StoreSearchMethod: String, CaseIterable, Identifiable {
     case currentLocation
@@ -546,21 +547,7 @@ struct StoreSelectView: View {
             handleStoreSelection(store)
         } label: {
             HStack(alignment: .top, spacing: POCSpacing.s) {
-                ZStack(alignment: .topLeading) {
-                    Image("shop_icon")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 92, height: 72)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-
-                    Text(distanceText(for: store))
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(POCColor.textPrimary)
-                        .padding(.horizontal, POCSpacing.xs)
-                        .padding(.vertical, 5)
-                        .background(Color.white.opacity(0.9), in: Capsule())
-                        .padding(POCSpacing.xs)
-                }
+                storeThumbnail(for: store)
 
                 VStack(alignment: .leading, spacing: POCSpacing.xs) {
                     HStack(alignment: .top, spacing: POCSpacing.s) {
@@ -573,10 +560,6 @@ struct StoreSelectView: View {
                                 Text("現在選択中")
                                     .font(.caption.weight(.medium))
                                     .foregroundStyle(POCColor.curry)
-                            } else {
-                                Text(store.neighborhood)
-                                    .font(.caption)
-                                    .foregroundStyle(POCColor.textSecondary)
                             }
                         }
 
@@ -634,6 +617,39 @@ struct StoreSelectView: View {
                 focusedStoreID = store.id
             }
         )
+    }
+
+    private func storeThumbnail(for store: Store) -> some View {
+        ZStack(alignment: .topLeading) {
+            Group {
+                if let storeImage = storeCardImage {
+                    Image(uiImage: storeImage)
+                        .resizable()
+                        .scaledToFill()
+                } else {
+                    LinearGradient(
+                        colors: [POCColor.elevatedStrong, POCColor.elevated],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .overlay {
+                        Image(systemName: "fork.knife.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundStyle(POCColor.curry)
+                    }
+                }
+            }
+            .frame(width: 108, height: 88)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+            Text(distanceText(for: store))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(POCColor.textPrimary)
+                .padding(.horizontal, POCSpacing.xs)
+                .padding(.vertical, 5)
+                .background(Color.white.opacity(0.9), in: Capsule())
+                .padding(POCSpacing.xs)
+        }
     }
 
     private func cardBackground(isFocused: Bool, isSelected: Bool) -> some ShapeStyle {
@@ -863,6 +879,15 @@ struct StoreSelectView: View {
         default:
             return "近く"
         }
+    }
+
+    private var storeCardImage: UIImage? {
+        if let bundledImage = UIImage(named: "shop_icon") {
+            return bundledImage
+        }
+
+        guard let url = Bundle.main.url(forResource: "shop_icon", withExtension: "png") else { return nil }
+        return UIImage(contentsOfFile: url.path)
     }
 
     private func storeHasLimitedMenu(_ store: Store) -> Bool {
