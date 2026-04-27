@@ -570,15 +570,15 @@ struct StoreSelectView: View {
                             .foregroundStyle(isFocused ? POCColor.curry : POCColor.textTertiary)
                     }
 
-                    HStack(spacing: POCSpacing.xs) {
-                        storeMetaPill(title: "受取 \(store.pickupLeadTimeText)", tint: POCColor.cream)
+                    if hasLimitedMenu || isFrequent {
+                        HStack(spacing: POCSpacing.xs) {
+                            if hasLimitedMenu {
+                                storeMetaPill(title: "限定あり", tint: POCColor.elevatedStrong)
+                            }
 
-                        if hasLimitedMenu {
-                            storeMetaPill(title: "限定あり", tint: POCColor.elevatedStrong)
-                        }
-
-                        if isFrequent {
-                            storeMetaPill(title: "よく使う", tint: Color.white)
+                            if isFrequent {
+                                storeMetaPill(title: "よく使う", tint: Color.white)
+                            }
                         }
                     }
 
