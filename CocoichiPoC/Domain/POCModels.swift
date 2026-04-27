@@ -197,6 +197,7 @@ struct Store: Identifiable, Hashable, Codable {
     let address: String
     let pickupLeadTimeMin: Int
     let pickupLeadTimeMax: Int
+    let imagePath: String?
 
     var pickupLeadTimeText: String {
         "\(pickupLeadTimeMin)-\(pickupLeadTimeMax)分"

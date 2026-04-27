@@ -73,6 +73,7 @@
 		A0000000000000000000003A /* SpiceImages in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000003A /* SpiceImages */; };
 		A00000000000000000000042 /* BannerImages in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000042 /* BannerImages */; };
 		A00000000000000000000043 /* shop_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000043 /* shop_icon.png */; };
+		A00000000000000000000045 /* ShopImages in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000045 /* ShopImages */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -142,6 +143,7 @@
 		B0000000000000000000003C /* ToppingImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ToppingImages; sourceTree = "<group>"; };
 		B00000000000000000000042 /* BannerImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BannerImages; sourceTree = "<group>"; };
 		B00000000000000000000043 /* shop_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "shop_icon.png"; sourceTree = "<group>"; };
+		B00000000000000000000045 /* ShopImages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ShopImages; sourceTree = "<group>"; };
 		B0000000000000000000000B /* CocoichiPoC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoichiPoC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -255,6 +257,7 @@
 					B0000000000000000000003C /* ToppingImages */,
 					B00000000000000000000039 /* RiceImages */,
 					B0000000000000000000003A /* SpiceImages */,
+					B00000000000000000000045 /* ShopImages */,
 					B00000000000000000000043 /* shop_icon.png */,
 				);
 				path = Resources;
@@ -430,6 +433,7 @@
 					A00000000000000000000039 /* RiceImages in Resources */,
 					A0000000000000000000003A /* SpiceImages in Resources */,
 					A00000000000000000000042 /* BannerImages in Resources */,
+					A00000000000000000000045 /* ShopImages in Resources */,
 					A00000000000000000000043 /* shop_icon.png in Resources */,
 					A0000000000000000000000B /* curry-menu-master.yaml in Resources */,
 					A0000000000000000000003B /* topping-menu-master.yaml in Resources */,

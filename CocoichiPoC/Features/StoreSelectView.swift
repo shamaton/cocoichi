@@ -622,7 +622,7 @@ struct StoreSelectView: View {
     private func storeThumbnail(for store: Store) -> some View {
         ZStack(alignment: .topLeading) {
             Group {
-                if let storeImage = storeCardImage {
+                if let storeImage = storeCardImage(for: store) {
                     Image(uiImage: storeImage)
                         .resizable()
                         .scaledToFill()
@@ -881,13 +881,39 @@ struct StoreSelectView: View {
         }
     }
 
-    private var storeCardImage: UIImage? {
+    private func storeCardImage(for store: Store) -> UIImage? {
+        if let imagePath = store.imagePath,
+           let image = image(from: imagePath) {
+            return image
+        }
+
         if let bundledImage = UIImage(named: "shop_icon") {
             return bundledImage
         }
 
         guard let url = Bundle.main.url(forResource: "shop_icon", withExtension: "png") else { return nil }
         return UIImage(contentsOfFile: url.path)
+    }
+
+    private func image(from imagePath: String) -> UIImage? {
+        let resourcePath = imagePath as NSString
+        let resourceName = (resourcePath.lastPathComponent as NSString).deletingPathExtension
+        let resourceExtension = resourcePath.pathExtension.isEmpty ? nil : resourcePath.pathExtension
+        let resourceSubdirectory = resourcePath.deletingLastPathComponent.isEmpty ? nil : resourcePath.deletingLastPathComponent
+
+        if let url = Bundle.main.url(
+            forResource: resourceName,
+            withExtension: resourceExtension,
+            subdirectory: resourceSubdirectory
+        ) {
+            return UIImage(contentsOfFile: url.path)
+        }
+
+        if let bundledImage = UIImage(named: resourcePath.deletingPathExtension) {
+            return bundledImage
+        }
+
+        return UIImage(named: resourceName)
     }
 
     private func storeHasLimitedMenu(_ store: Store) -> Bool {

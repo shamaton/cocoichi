@@ -8,7 +8,8 @@ enum MockCatalog {
             neighborhood: "名駅",
             address: "愛知県名古屋市中村区名駅4-26-12",
             pickupLeadTimeMin: 10,
-            pickupLeadTimeMax: 16
+            pickupLeadTimeMax: 16,
+            imagePath: "ShopImages/Shop1.png"
         ),
         Store(
             id: "sakae-nishiki",
@@ -16,7 +17,8 @@ enum MockCatalog {
             neighborhood: "栄",
             address: "愛知県名古屋市中区錦3-14-21",
             pickupLeadTimeMin: 12,
-            pickupLeadTimeMax: 18
+            pickupLeadTimeMax: 18,
+            imagePath: "ShopImages/Shop2.png"
         ),
         Store(
             id: "kanayama-ekimae",
@@ -24,7 +26,8 @@ enum MockCatalog {
             neighborhood: "金山",
             address: "愛知県名古屋市中区金山1-17-18",
             pickupLeadTimeMin: 14,
-            pickupLeadTimeMax: 20
+            pickupLeadTimeMax: 20,
+            imagePath: "ShopImages/Shop3.png"
         ),
         Store(
             id: "fushimi-hirokoji",
@@ -32,7 +35,8 @@ enum MockCatalog {
             neighborhood: "伏見",
             address: "愛知県名古屋市中区栄1-5-8",
             pickupLeadTimeMin: 11,
-            pickupLeadTimeMax: 17
+            pickupLeadTimeMax: 17,
+            imagePath: "ShopImages/Shop4.png"
         ),
         Store(
             id: "chikusa-imaike",
@@ -40,7 +44,8 @@ enum MockCatalog {
             neighborhood: "今池",
             address: "愛知県名古屋市千種区今池1-9-19",
             pickupLeadTimeMin: 13,
-            pickupLeadTimeMax: 19
+            pickupLeadTimeMax: 19,
+            imagePath: "ShopImages/Shop5.png"
         ),
     ]
 
