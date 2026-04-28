@@ -414,7 +414,7 @@ final class OrderStore: ObservableObject {
         // PoC では API を持たないため、完了画面に必要な受取情報をローカルで確定させる。
         completedOrder = CompletedOrder(
             id: UUID(),
-            referenceID: "仮受付-\(Self.referenceStamp(from: placedAt))",
+            referenceID: "POC-\(Self.referenceStamp(from: placedAt))",
             placedAt: placedAt,
             pickupStart: pickupStart,
             pickupEnd: pickupEnd,
