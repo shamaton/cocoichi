@@ -284,9 +284,9 @@ private struct CompletedOrderCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("ご注文内容の確認")
-            ForEach(Array(order.cartItems.enumerated()), id: \.element.id) { index, item in
-                CompletedOrderLineCard(index: index, item: item)
+            SectionHeader("ご注文内容")
+            ForEach(order.cartItems) { item in
+                CompletedOrderLineCard(item: item)
             }
 
             VStack(alignment: .leading, spacing: POCSpacing.s) {
@@ -313,29 +313,15 @@ private struct CompletedOrderCard: View {
 }
 
 private struct CompletedOrderLineCard: View {
-    let index: Int
     let item: CartLineItem
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("\(index + 1)皿目")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(POCColor.textTertiary)
-
-                Spacer()
-
-                Text(item.subtotal.completeYenText)
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(POCColor.textPrimary)
-                    .monospacedDigit()
-            }
-
             Text(item.draft.menuItem.name)
                 .font(.headline.weight(.semibold))
                 .foregroundStyle(POCColor.textPrimary)
 
-            CompletedOrderDetailGroup(
+            OrderDetailBulletGroup(
                 title: "ベース",
                 items: [
                     item.draft.currySauce.rawValue,
@@ -344,48 +330,24 @@ private struct CompletedOrderLineCard: View {
                 ]
             )
 
-            CompletedOrderDetailGroup(
+            OrderDetailBulletGroup(
                 title: "トッピング",
                 items: item.draft.toppings.isEmpty ? ["なし"] : item.draft.toppingsSummary.components(separatedBy: " / ")
             )
+
+            HStack {
+                Spacer()
+
+                Text(item.subtotal.completeYenText)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .monospacedDigit()
+            }
         }
         .padding(POCSpacing.m)
         .background(
             RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
                 .fill(POCColor.elevatedStrong)
-        )
-    }
-}
-
-private struct CompletedOrderDetailGroup: View {
-    let title: String
-    let items: [String]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.xs) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(POCColor.textPrimary)
-
-            VStack(alignment: .leading, spacing: POCSpacing.xxs) {
-                ForEach(items, id: \.self) { item in
-                    HStack(alignment: .top, spacing: POCSpacing.xs) {
-                        Text("•")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(POCColor.textSecondary)
-
-                        Text(item)
-                            .font(.subheadline)
-                            .foregroundStyle(POCColor.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-            }
-        }
-        .padding(POCSpacing.s)
-        .background(
-            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                .fill(POCColor.elevated.opacity(0.85))
         )
     }
 }

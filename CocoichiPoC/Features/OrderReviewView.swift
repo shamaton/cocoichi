@@ -335,7 +335,7 @@ private struct CartLineSummaryCard: View {
     }
 }
 
-private struct OrderDetailBulletGroup: View {
+struct OrderDetailBulletGroup: View {
     let title: String
     let items: [String]
     var action: (() -> Void)? = nil
