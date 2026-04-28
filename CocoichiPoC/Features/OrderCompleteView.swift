@@ -8,11 +8,7 @@ struct OrderCompleteView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
                 if let completedOrder = orderStore.completedOrder {
-                    HeroBanner(
-                        eyebrow: "注文完了",
-                        title: "ご注文を受け付けました",
-                        accent: [POCColor.success, POCColor.green]
-                    )
+                    OrderCompleteHeroBanner()
 
                     VStack(alignment: .leading, spacing: POCSpacing.s) {
                         SectionHeader("受取情報")
@@ -82,6 +78,34 @@ struct OrderCompleteView: View {
         }
         .navigationTitle("注文完了")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct OrderCompleteHeroBanner: View {
+    var body: some View {
+        HStack(alignment: .center, spacing: POCSpacing.s) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.title.weight(.semibold))
+                .foregroundStyle(.white)
+                .accessibilityHidden(true)
+
+            Text("ご注文を受け付けました")
+                .font(.title.weight(.bold))
+                .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, POCSpacing.l)
+        .padding(.vertical, POCSpacing.m)
+        .background(
+            LinearGradient(
+                colors: [POCColor.success, POCColor.green],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: POCRadius.hero, style: .continuous)
+        )
+        .shadow(color: POCColor.green.opacity(0.25), radius: 18, x: 0, y: 10)
     }
 }
 
