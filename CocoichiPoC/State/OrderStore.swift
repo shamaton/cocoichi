@@ -125,6 +125,14 @@ final class OrderStore: ObservableObject {
         !cartItems.isEmpty || draftOrder != nil
     }
 
+    var confirmedCartItemCount: Int {
+        cartItems.count
+    }
+
+    var confirmedCartTotal: Int {
+        cartItems.map(\.subtotal).reduce(0, +)
+    }
+
     var hasPendingMenuSelection: Bool {
         pendingMenuSelection != nil
     }

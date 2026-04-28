@@ -77,6 +77,7 @@ struct AppRootView: View {
 
 private struct AppTabShellView: View {
     @EnvironmentObject private var navigator: AppNavigator
+    @EnvironmentObject private var orderStore: OrderStore
 
     var body: some View {
         ZStack {
@@ -108,8 +109,74 @@ private struct AppTabShellView: View {
                     }
             }
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if showsMenuCartFooter {
+                MenuCartFooter(
+                    itemCount: orderStore.confirmedCartItemCount,
+                    total: orderStore.confirmedCartTotal
+                ) {
+                    navigator.push(.orderReview)
+                }
+            }
+        }
+        .toolbar(showsMenuCartFooter ? .hidden : .visible, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
         .toolbarBackground(.thinMaterial, for: .tabBar)
+    }
+
+    private var showsMenuCartFooter: Bool {
+        navigator.selectedTab == .menu
+            && navigator.path.isEmpty
+            && orderStore.confirmedCartItemCount > 0
+    }
+}
+
+private struct MenuCartFooter: View {
+    let itemCount: Int
+    let total: Int
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: POCSpacing.l) {
+                ZStack(alignment: .topTrailing) {
+                    Image(systemName: "cart.fill")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(POCColor.curry)
+                        .frame(width: 44, height: 44)
+
+                    Text("\(itemCount)")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(Color.white)
+                        .monospacedDigit()
+                        .frame(minWidth: 20, minHeight: 20)
+                        .padding(.horizontal, itemCount > 9 ? 4 : 0)
+                        .background(Capsule().fill(POCColor.curry))
+                        .offset(x: 4, y: -2)
+                        .contentTransition(.numericText(value: Double(itemCount)))
+                }
+
+                Text(total.yenText)
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .monospacedDigit()
+                    .contentTransition(.numericText(value: Double(total)))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, POCSpacing.l)
+            .padding(.top, POCSpacing.s)
+            .padding(.bottom, POCSpacing.s)
+            .background(.ultraThinMaterial)
+            .overlay(alignment: .top) {
+                Rectangle()
+                    .fill(POCColor.line)
+                    .frame(height: 1)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("注文数 \(itemCount) 点、合計 \(total.yenText)")
+        .accessibilityHint("注文内容の確認に移動します")
     }
 }
 
