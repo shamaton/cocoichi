@@ -205,6 +205,7 @@
   - ボタン上に `Total` を固定表示する
   - 左に secondary CTA の `続けて注文`、右に primary CTA の `注文を確定` を置く
   - `続けて注文` 押下時に `pending draft` を cart に昇格させて S2 に戻す
+  - S2/Menu root へ戻った後は、通常タブバーではなくカートアイコン、注文数バッジ、合計金額だけのフッターを表示する
 
 ### S5 重要ルール
 
@@ -215,6 +216,7 @@
 - 初版 PoC では cart line item は read-only とする
 - `続けて注文` を押した時に pending draft を cart に昇格させる
 - `続けて注文` の遷移先で `2皿目のカレー` または `サイドメニュー追加` を選べるようにする
+- 確定済み商品がある Menu root では、下部フッターから `S5 Order Review` にすぐ戻れるようにする
 - multi-item 状態でも `Suggested Savings` を残し、footer の `続けて注文` / `注文を確定` の責務を変えない
 - クーポン未適用でも注文確定できる
 - お気に入り保存は `S8 Order Complete` で提案し、S5 では扱わない
