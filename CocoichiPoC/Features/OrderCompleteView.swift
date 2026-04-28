@@ -296,16 +296,6 @@ private struct CompletedOrderCard: View {
                 SummaryRow(title: "合計", value: order.total.completeYenText)
             }
             .padding(.top, POCSpacing.xs)
-
-            if let appliedCoupon = order.appliedCoupon {
-                Text("適用中のクーポン：\(appliedCoupon.displayTitle.completeCurrencyText)")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(POCColor.textSecondary)
-            }
-
-            Text("レシートでは税区分の違いが分かる形で表示されますが、この試作版では店内飲食とテイクアウトを同額で扱います。")
-                .font(.caption)
-                .foregroundStyle(POCColor.textTertiary)
         }
         .padding(POCSpacing.m)
         .pocCard(fill: POCColor.elevated)
@@ -355,13 +345,5 @@ private struct CompletedOrderLineCard: View {
 private extension Int {
     var completeYenText: String {
         "￥\(formatted(.number.grouping(.automatic)))"
-    }
-}
-
-private extension String {
-    var completeCurrencyText: String {
-        guard let regex = try? NSRegularExpression(pattern: #"([0-9,]+)円"#) else { return self }
-        let range = NSRange(startIndex..<endIndex, in: self)
-        return regex.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: "￥$1")
     }
 }
