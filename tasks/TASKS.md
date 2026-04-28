@@ -332,3 +332,14 @@
    Done by: CODEX
    Done at: 2026-04-26T05:44:29Z
 
+31. s8-order-content-favorite-action
+   Id: 31-s8-order-content-favorite-action
+   Scope: Now / M3
+   Files: docs/poc-wireframes-s8-2026-03-28.md, docs/poc-screen-flow-2026-03-28.md, CocoichiPoC/Features/OrderCompleteView.swift
+   Note: S8完了画面の保存UIを各注文内容の価格行へ移動。お気に入り由来で未編集の明細は保存済み表示。S8/flow docs更新、make build成功、git diff --check問題なし
+   Detail: tasks/details/31-s8-order-content-favorite-action.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-28T13:32:46Z
+   Done by: CODEX
+   Done at: 2026-04-28T13:40:33Z
+

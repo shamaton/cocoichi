@@ -606,6 +606,7 @@ struct DraftOrder: Identifiable, Hashable, Codable {
     var sauceAmount: SauceAmountOption = .regular
     var toppings: [Topping]
     var appliedCoupon: Coupon?
+    var sourceFavoriteID: FavoriteCombo.ID?
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -617,6 +618,7 @@ struct DraftOrder: Identifiable, Hashable, Codable {
         case sauceAmount
         case toppings
         case appliedCoupon
+        case sourceFavoriteID
     }
 
     init(
@@ -628,7 +630,8 @@ struct DraftOrder: Identifiable, Hashable, Codable {
         riceGrams: Int,
         sauceAmount: SauceAmountOption = .regular,
         toppings: [Topping],
-        appliedCoupon: Coupon?
+        appliedCoupon: Coupon?,
+        sourceFavoriteID: FavoriteCombo.ID? = nil
     ) {
         self.id = id
         self.store = store
@@ -639,6 +642,7 @@ struct DraftOrder: Identifiable, Hashable, Codable {
         self.sauceAmount = sauceAmount
         self.toppings = toppings
         self.appliedCoupon = appliedCoupon
+        self.sourceFavoriteID = sourceFavoriteID
     }
 
     init(from decoder: Decoder) throws {
@@ -652,6 +656,7 @@ struct DraftOrder: Identifiable, Hashable, Codable {
         sauceAmount = try container.decodeIfPresent(SauceAmountOption.self, forKey: .sauceAmount) ?? .regular
         toppings = try container.decode([Topping].self, forKey: .toppings)
         appliedCoupon = try container.decodeIfPresent(Coupon.self, forKey: .appliedCoupon)
+        sourceFavoriteID = try container.decodeIfPresent(FavoriteCombo.ID.self, forKey: .sourceFavoriteID)
     }
 
     var subtotal: Int {
@@ -724,6 +729,7 @@ struct DraftOrder: Identifiable, Hashable, Codable {
     func adding(topping: Topping) -> DraftOrder {
         var next = self
         next.toppings.append(topping)
+        next.sourceFavoriteID = nil
         return next.normalizedCoupon()
     }
 
@@ -732,36 +738,42 @@ struct DraftOrder: Identifiable, Hashable, Codable {
         if let index = next.toppings.lastIndex(where: { $0.id == topping.id }) {
             next.toppings.remove(at: index)
         }
+        next.sourceFavoriteID = nil
         return next.normalizedCoupon()
     }
 
     func removingAll(topping: Topping) -> DraftOrder {
         var next = self
         next.toppings.removeAll { $0.id == topping.id }
+        next.sourceFavoriteID = nil
         return next.normalizedCoupon()
     }
 
     func with(currySauce: CurrySauceOption) -> DraftOrder {
         var next = self
         next.currySauce = currySauce
+        next.sourceFavoriteID = nil
         return next.normalizedCoupon()
     }
 
     func with(spiceLevel: Int) -> DraftOrder {
         var next = self
         next.spiceLevel = spiceLevel
+        next.sourceFavoriteID = nil
         return next.normalizedCoupon()
     }
 
     func with(riceGrams: Int) -> DraftOrder {
         var next = self
         next.riceGrams = riceGrams
+        next.sourceFavoriteID = nil
         return next.normalizedCoupon()
     }
 
     func with(sauceAmount: SauceAmountOption) -> DraftOrder {
         var next = self
         next.sauceAmount = sauceAmount
+        next.sourceFavoriteID = nil
         return next.normalizedCoupon()
     }
 
@@ -774,6 +786,12 @@ struct DraftOrder: Identifiable, Hashable, Codable {
     func sanitizedForFavorite() -> DraftOrder {
         var next = self
         next.appliedCoupon = nil
+        return next
+    }
+
+    func clearingFavoriteSource() -> DraftOrder {
+        var next = self
+        next.sourceFavoriteID = nil
         return next
     }
 

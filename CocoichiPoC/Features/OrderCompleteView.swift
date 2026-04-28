@@ -19,36 +19,16 @@ struct OrderCompleteView: View {
                     .padding(POCSpacing.m)
                     .pocCard(fill: POCColor.elevated)
 
-                    CompletedOrderCard(order: completedOrder)
-
-                    if let savedFavoriteName = orderStore.recentlySavedFavoriteName {
-                        VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("保存しました")
-                            Text("「\(savedFavoriteName)」として保存しました。")
-                                .font(.headline.weight(.semibold))
-                                .foregroundStyle(POCColor.textPrimary)
-                            Text("保存済みの組み合わせから次回すぐ再開できます。")
-                                .font(.subheadline)
-                                .foregroundStyle(POCColor.textSecondary)
+                    CompletedOrderCard(
+                        order: completedOrder,
+                        isSavedFavoriteItem: { item in
+                            orderStore.isSavedFavoriteItem(item)
+                        },
+                        onSaveFavorite: { draft in
+                            orderStore.prepareFavoriteSave(for: draft)
+                            navigator.showSheet(.saveFavorite)
                         }
-                        .padding(POCSpacing.m)
-                        .pocCard(fill: POCColor.elevatedStrong)
-                    } else if let favoriteCandidate = orderStore.favoriteSaveCandidate {
-                        VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader("いつもの候補に保存")
-                            Text("今回の1皿をいつもの候補に保存できます。")
-                                .font(.headline.weight(.semibold))
-                                .foregroundStyle(POCColor.textPrimary)
-                            Text("\(favoriteCandidate.menuItem.name)・\(favoriteCandidate.spiceLevelText)・ライス \(favoriteCandidate.riceGrams)g")
-                                .font(.subheadline)
-                                .foregroundStyle(POCColor.textSecondary)
-                            SecondaryCTAButton(title: "保存する", systemImage: "star") {
-                                navigator.showSheet(.saveFavorite)
-                            }
-                        }
-                        .padding(POCSpacing.m)
-                        .pocCard(fill: POCColor.elevated)
-                    }
+                    )
 
                     EmptyStateCard(
                         title: "次にすること",
@@ -208,6 +188,7 @@ struct SaveFavoriteSheet: View {
 
                 HStack(spacing: POCSpacing.s) {
                     SecondaryCTAButton(title: "キャンセル", systemImage: "xmark") {
+                        orderStore.clearPreparedFavoriteSave()
                         navigator.dismissSheet()
                     }
                     PrimaryCTAButton(title: "保存する", systemImage: "star.fill", isDisabled: orderStore.favoriteSaveCandidate == nil) {
@@ -223,6 +204,9 @@ struct SaveFavoriteSheet: View {
                 if name.isEmpty, let draft = orderStore.favoriteSaveCandidate {
                     name = draft.suggestedFavoriteName
                 }
+            }
+            .onDisappear {
+                orderStore.clearPreparedFavoriteSave()
             }
         }
     }
@@ -281,12 +265,20 @@ struct DraftSnapshotCard: View {
 
 private struct CompletedOrderCard: View {
     let order: CompletedOrder
+    let isSavedFavoriteItem: (CartLineItem) -> Bool
+    let onSaveFavorite: (DraftOrder) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
             SectionHeader("ご注文内容")
             ForEach(order.cartItems) { item in
-                CompletedOrderLineCard(item: item)
+                CompletedOrderLineCard(
+                    item: item,
+                    isSavedFavorite: isSavedFavoriteItem(item),
+                    onSaveFavorite: {
+                        onSaveFavorite(item.draft)
+                    }
+                )
             }
 
             VStack(alignment: .leading, spacing: POCSpacing.s) {
@@ -304,6 +296,8 @@ private struct CompletedOrderCard: View {
 
 private struct CompletedOrderLineCard: View {
     let item: CartLineItem
+    let isSavedFavorite: Bool
+    let onSaveFavorite: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
@@ -326,6 +320,12 @@ private struct CompletedOrderLineCard: View {
             )
 
             HStack {
+                if isSavedFavorite {
+                    SavedFavoriteBadge()
+                } else {
+                    SaveFavoriteInlineButton(action: onSaveFavorite)
+                }
+
                 Spacer()
 
                 Text(item.subtotal.completeYenText)
@@ -339,6 +339,52 @@ private struct CompletedOrderLineCard: View {
             RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
                 .fill(POCColor.elevatedStrong)
         )
+    }
+}
+
+private struct SaveFavoriteInlineButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: POCSpacing.xxs) {
+                Image(systemName: "star")
+                    .accessibilityHidden(true)
+                Text("保存する")
+            }
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(POCColor.curry)
+            .padding(.horizontal, POCSpacing.s)
+            .padding(.vertical, POCSpacing.xs)
+            .background(
+                Capsule()
+                    .fill(POCColor.elevated)
+            )
+            .overlay(
+                Capsule()
+                    .stroke(POCColor.line, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("この注文内容を保存する")
+    }
+}
+
+private struct SavedFavoriteBadge: View {
+    var body: some View {
+        Text("保存済み")
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(POCColor.success)
+            .padding(.horizontal, POCSpacing.s)
+            .padding(.vertical, POCSpacing.xs)
+            .background(
+                Capsule()
+                    .fill(POCColor.success.opacity(0.12))
+            )
+            .overlay(
+                Capsule()
+                    .stroke(POCColor.success.opacity(0.18), lineWidth: 1)
+            )
     }
 }
 

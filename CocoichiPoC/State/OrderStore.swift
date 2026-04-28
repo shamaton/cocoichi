@@ -52,8 +52,10 @@ final class OrderStore: ObservableObject {
     @Published var favoriteCombos: [FavoriteCombo]
     @Published var completedOrder: CompletedOrder?
     @Published var recentlySavedFavoriteName: String?
+    @Published private(set) var recentlySavedFavoriteDraftID: DraftOrder.ID?
     @Published private(set) var pendingFavoriteResume: FavoriteCombo?
     @Published private(set) var pendingMenuSelection: MenuItem?
+    @Published private var preparedFavoriteSaveCandidate: DraftOrder?
     // S5 初回到達時だけクーポン sheet を自動表示し、その後は明示操作に戻すためのフラグ。
     @Published var hasPresentedCouponSuggestion = false
 
@@ -157,6 +159,9 @@ final class OrderStore: ObservableObject {
     }
 
     var favoriteSaveCandidate: DraftOrder? {
+        if let preparedFavoriteSaveCandidate {
+            return preparedFavoriteSaveCandidate
+        }
         if let completedDraft = completedOrder?.cartItems.last?.draft {
             return completedDraft.sanitizedForFavorite()
         }
@@ -185,8 +190,10 @@ final class OrderStore: ObservableObject {
         appliedCoupon = nil
         completedOrder = nil
         recentlySavedFavoriteName = nil
+        recentlySavedFavoriteDraftID = nil
         pendingFavoriteResume = nil
         pendingMenuSelection = nil
+        preparedFavoriteSaveCandidate = nil
         hasPresentedCouponSuggestion = false
     }
 
@@ -206,8 +213,10 @@ final class OrderStore: ObservableObject {
         isDraftConfirmedForReview = false
         completedOrder = nil
         recentlySavedFavoriteName = nil
+        recentlySavedFavoriteDraftID = nil
         pendingFavoriteResume = nil
         pendingMenuSelection = nil
+        preparedFavoriteSaveCandidate = nil
         if cartItems.isEmpty {
             hasPresentedCouponSuggestion = false
         }
@@ -258,14 +267,17 @@ final class OrderStore: ObservableObject {
         // 保存済み構成は再編集前提なので、クーポンは持ち越さず注文内容だけ再開する。
         var resumedDraft = favorite.draft.sanitizedForFavorite()
         resumedDraft.store = store
+        resumedDraft.sourceFavoriteID = favorite.id
         selectedStore = store
         draftOrder = resumedDraft
         pendingReviewInsertionIndex = nil
         isDraftConfirmedForReview = false
         completedOrder = nil
         recentlySavedFavoriteName = nil
+        recentlySavedFavoriteDraftID = nil
         pendingFavoriteResume = nil
         pendingMenuSelection = nil
+        preparedFavoriteSaveCandidate = nil
         if cartItems.isEmpty {
             hasPresentedCouponSuggestion = false
         }
@@ -347,12 +359,26 @@ final class OrderStore: ObservableObject {
         let favorite = FavoriteCombo(
             id: UUID(),
             name: resolvedName,
-            draft: draftOrder.sanitizedForFavorite(),
+            draft: draftOrder.sanitizedForFavorite().clearingFavoriteSource(),
             lastUsedAt: .now
         )
         favoriteCombos.insert(favorite, at: 0)
         recentlySavedFavoriteName = resolvedName
+        recentlySavedFavoriteDraftID = draftOrder.id
+        preparedFavoriteSaveCandidate = nil
         persistFavorites()
+    }
+
+    func prepareFavoriteSave(for draft: DraftOrder) {
+        preparedFavoriteSaveCandidate = draft.sanitizedForFavorite()
+    }
+
+    func clearPreparedFavoriteSave() {
+        preparedFavoriteSaveCandidate = nil
+    }
+
+    func isSavedFavoriteItem(_ item: CartLineItem) -> Bool {
+        item.draft.sourceFavoriteID != nil || recentlySavedFavoriteDraftID == item.draft.id
     }
 
     func moveCurrentDraftToCart() {
@@ -418,6 +444,8 @@ final class OrderStore: ObservableObject {
         let pickupStart = Calendar.current.date(byAdding: .minute, value: store.pickupLeadTimeMin, to: placedAt) ?? placedAt
         let pickupEnd = Calendar.current.date(byAdding: .minute, value: store.pickupLeadTimeMax, to: placedAt) ?? pickupStart
         recentlySavedFavoriteName = nil
+        recentlySavedFavoriteDraftID = nil
+        preparedFavoriteSaveCandidate = nil
 
         // PoC では API を持たないため、完了画面に必要な受取情報をローカルで確定させる。
         completedOrder = CompletedOrder(
@@ -441,8 +469,10 @@ final class OrderStore: ObservableObject {
         appliedCoupon = nil
         completedOrder = nil
         recentlySavedFavoriteName = nil
+        recentlySavedFavoriteDraftID = nil
         pendingFavoriteResume = nil
         pendingMenuSelection = nil
+        preparedFavoriteSaveCandidate = nil
         hasPresentedCouponSuggestion = false
 
         // 完了後の再注文では店舗維持、店舗変更では完全リセットに分ける。
