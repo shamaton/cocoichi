@@ -347,6 +347,10 @@
    Id: 32-store-gated-menu-backstack
    Scope: Next / M1-M2
    Files: docs/poc-screen-flow-2026-03-28.md, docs/poc-home-tab-architecture-2026-04-12.md, docs/poc-wireframes-s1-store-select-2026-04-12.md, docs/poc-wireframes-home-tabs-2026-04-12.md, docs/poc-wireframes-s2-s3-2026-03-28.md, docs/poc-implementation-tasks-2026-03-29.md, CocoichiPoC/App/AppNavigator.swift, CocoichiPoC/Features/AppRootView.swift, CocoichiPoC/Features/StoreSelectView.swift, CocoichiPoC/Features/MenuDiscoveryView.swift, CocoichiPoC/State/OrderStore.swift
-   Note: 店舗未設定のMenu商品選択後にS1を挟み、S2を履歴に積んでS3へ直行する導線を実装する
+   Note: S1/S2をNavigationStack履歴へ積む商品選択後の店舗ゲートを実装。make build成功、make testはscheme test action未設定で失敗
    Detail: tasks/details/32-store-gated-menu-backstack.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-29T23:50:06Z
+   Done by: CODEX
+   Done at: 2026-04-29T23:52:13Z
 

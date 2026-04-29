@@ -16,3 +16,11 @@
 - S3 から戻った S2 は、選択済み店舗の共通メニュー + 店舗限定メニューを表示する
 - 注文作成中の店舗変更は即時自由変更ではなく、戻る履歴または破棄確認付き操作に寄せる
 - 店舗変更時に既存の `cartItems / pending draft / applied coupon` がある場合は破棄確認が働く
+
+## Implementation Notes
+
+- `AppScreen.storeSelect` と `AppScreen.menuDiscovery` を追加し、商品選択後の S1/S2 を NavigationStack 上の履歴として扱う
+- 店舗未設定で商品を選んだ時は `pushStoreSelectForMenuSelection()` で `Menu` タブへ移り、`path = [.storeSelect]` にする
+- S1 で店舗確定後、保留していた商品で draft を開始できた場合は `path = [.storeSelect, .menuDiscovery, .curryDetail]` にする
+- draft を開始できない場合は `path = [.storeSelect, .menuDiscovery]` にし、店舗文脈つきメニューへ戻す
+- stack 内の S2 で店舗カードを押した場合は full-screen S1 を出さず、履歴上の S1 へ戻す

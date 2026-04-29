@@ -8,6 +8,8 @@ enum AppTab: Hashable {
 }
 
 enum AppScreen: Hashable {
+    case storeSelect
+    case menuDiscovery
     case curryDetail
     case curryToppings
     case savedCombos
@@ -50,14 +52,45 @@ final class AppNavigator: ObservableObject {
         presentedSheet = nil
     }
 
+    func pushStoreSelectForMenuSelection() {
+        selectedTab = .menu
+        path = [.storeSelect]
+        presentedCover = nil
+        presentedSheet = nil
+    }
+
     func completeStoreSelection(pathOverride: [AppScreen]? = nil) {
         selectedTab = nextTabAfterStoreSelect
         path = pathOverride ?? nextPathAfterStoreSelect
         presentedCover = nil
     }
 
-    func dismissStoreSelect() {
+    func completeStackStoreSelection(pathAfterStoreSelect: [AppScreen]) {
+        selectedTab = .menu
+        if let storeSelectIndex = path.lastIndex(of: .storeSelect) {
+            let prefix = path.prefix(through: storeSelectIndex)
+            path = Array(prefix) + pathAfterStoreSelect
+        } else {
+            path = pathAfterStoreSelect
+        }
         presentedCover = nil
+    }
+
+    func dismissStoreSelect() {
+        if presentedCover == nil, path.last == .storeSelect {
+            pop()
+            return
+        }
+        presentedCover = nil
+    }
+
+    var isStoreSelectInStack: Bool {
+        path.contains(.storeSelect)
+    }
+
+    func popToStoreSelectInStack() {
+        guard let storeSelectIndex = path.lastIndex(of: .storeSelect) else { return }
+        path = Array(path.prefix(through: storeSelectIndex))
     }
 
     func push(_ screen: AppScreen) {

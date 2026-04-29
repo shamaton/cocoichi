@@ -743,6 +743,11 @@ struct StoreSelectView: View {
         orderStore.selectStore(store)
         orderStore.completePendingFavoriteResumeIfNeeded(using: store)
         let startedPendingMenu = orderStore.completePendingMenuSelectionIfNeeded(using: store)
+        if navigator.isStoreSelectInStack {
+            let nextPath: [AppScreen] = startedPendingMenu ? [.menuDiscovery, .curryDetail] : [.menuDiscovery]
+            navigator.completeStackStoreSelection(pathAfterStoreSelect: nextPath)
+            return
+        }
         if hadPendingMenuSelection && !startedPendingMenu {
             navigator.completeStoreSelection(pathOverride: [])
             return

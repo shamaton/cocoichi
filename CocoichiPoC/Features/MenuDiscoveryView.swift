@@ -17,7 +17,11 @@ struct MenuDiscoveryView: View {
                         StoreContextCard(store: store) {
                             orderStore.clearPendingFavoriteResume()
                             orderStore.clearPendingMenuSelection()
-                            navigator.presentStoreSelect()
+                            if navigator.isStoreSelectInStack {
+                                navigator.popToStoreSelectInStack()
+                            } else {
+                                navigator.presentStoreSelect()
+                            }
                         }
                     } else {
                         MissingStoreCard {
@@ -166,7 +170,7 @@ struct MenuDiscoveryView: View {
         guard orderStore.selectedStore != nil else {
             orderStore.clearPendingFavoriteResume()
             orderStore.prepareMenuSelectionAfterStoreSelection(item)
-            navigator.presentStoreSelect(nextTab: .menu, nextPath: [.curryDetail])
+            navigator.pushStoreSelectForMenuSelection()
             return
         }
         orderStore.beginOrder(with: item)

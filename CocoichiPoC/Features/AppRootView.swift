@@ -38,6 +38,10 @@ struct AppRootView: View {
     @ViewBuilder
     private func destination(for screen: AppScreen) -> some View {
         switch screen {
+        case .storeSelect:
+            StoreSelectView()
+        case .menuDiscovery:
+            MenuDiscoveryView()
         case .curryDetail:
             CurryDetailView()
         case .curryToppings:
@@ -307,7 +311,7 @@ private struct HomeView: View {
         guard orderStore.selectedStore != nil else {
             orderStore.clearPendingFavoriteResume()
             orderStore.prepareMenuSelectionAfterStoreSelection(item)
-            navigator.presentStoreSelect(nextTab: .menu, nextPath: [.curryDetail])
+            navigator.pushStoreSelectForMenuSelection()
             return
         }
         orderStore.beginOrder(with: item)
