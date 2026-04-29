@@ -268,6 +268,10 @@ private struct CollapsibleFavoriteDetailGroup: View {
                 }
             } label: {
                 HStack(spacing: POCSpacing.xs) {
+                    Image(systemName: isExpanded ? "minus.circle.fill" : "plus.circle.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(POCColor.curry)
+
                     Text(isExpanded ? "ベース" : "ベース・トッピング")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(POCColor.textPrimary)
