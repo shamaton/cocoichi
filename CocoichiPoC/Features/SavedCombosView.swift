@@ -298,7 +298,7 @@ private struct CollapsibleFavoriteDetailGroup: View {
                     bulletList(toppingItems)
                         .padding(.top, POCSpacing.xxs)
                 }
-                .transition(.opacity.combined(with: .move(edge: .top)))
+                .transition(.opacity)
             }
         }
         .padding(POCSpacing.s)
