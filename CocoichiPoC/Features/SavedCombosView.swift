@@ -8,14 +8,14 @@ struct SavedCombosView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
-                SectionHeader("お気に入り確認")
-
                 if orderStore.favoriteCombos.isEmpty {
                     EmptyStateCard(title: "保存済みの組み合わせはまだありません", message: "注文完了後に保存すると、ここからすぐ再開できます。")
                 } else {
                     if !readyFavorites.isEmpty {
                         VStack(alignment: .leading, spacing: POCSpacing.s) {
-                            SectionHeader(orderStore.selectedStore == nil ? "店舗を選んで使うお気に入り" : "すぐ使えるお気に入り")
+                            if orderStore.selectedStore != nil {
+                                SectionHeader("すぐ使えるお気に入り")
+                            }
                             ForEach(readyFavorites) { favorite in
                                 SavedComboCard(
                                     favorite: favorite,
