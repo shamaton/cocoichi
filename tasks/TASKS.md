@@ -343,3 +343,10 @@
    Done by: CODEX
    Done at: 2026-04-28T13:40:33Z
 
+32. store-gated-menu-backstack
+   Id: 32-store-gated-menu-backstack
+   Scope: Next / M1-M2
+   Files: docs/poc-screen-flow-2026-03-28.md, docs/poc-home-tab-architecture-2026-04-12.md, docs/poc-wireframes-s1-store-select-2026-04-12.md, docs/poc-wireframes-home-tabs-2026-04-12.md, docs/poc-wireframes-s2-s3-2026-03-28.md, docs/poc-implementation-tasks-2026-03-29.md, CocoichiPoC/App/AppNavigator.swift, CocoichiPoC/Features/AppRootView.swift, CocoichiPoC/Features/StoreSelectView.swift, CocoichiPoC/Features/MenuDiscoveryView.swift, CocoichiPoC/State/OrderStore.swift
+   Note: 店舗未設定のMenu商品選択後にS1を挟み、S2を履歴に積んでS3へ直行する導線を実装する
+   Detail: tasks/details/32-store-gated-menu-backstack.md
+

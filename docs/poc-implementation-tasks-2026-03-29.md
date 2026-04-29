@@ -101,6 +101,7 @@
 | T06 | Shared UI Components | Primary/Secondary CTA、chip、card、price row、store header、sheet header を共通化する | T02,T05 | S2-S8 で共通UIを使い回せる |
 | T07 | S1 Store Select | 注文開始や店舗変更時に呼び出せる店舗選択ゲート、`現在地 / 駅名 / 郵便番号 / 店名` の検索入口、受取目安表示、`保存済みから始める` 導線を実装する | T04,T05,T06 | 店舗選択後に S2 へ進める。GPS 失敗時も手入力検索で継続できる |
 | T08 | Home / S2 MenuDiscovery Layout | Home の受取先カード、期間限定バナー、おすすめ、他タブ導線と、S2 の店舗ヘッダー、検索欄、quick filters、For You、Popular、Menu List、下部導線を実装する。S2 では店舗限定メニューをヘッダー直下または一覧バッジで自然に混ぜる | T04,T05,T06,T07 | Home から受取先設定やメニュー閲覧へ進め、S2 では商品カードから S3 へ遷移できる。店舗設定済み時だけ限定メニューを表示できる。限定商品が 0 件の店舗では無理にセクションを出さない。S3 から戻って別メニューを選んだ時は pending draft が新しい選択で置き換わる |
+| T08-a | Store-Gated Menu Backstack | 店舗未設定の Menu で商品を選んだ時、S1 を NavigationStack 上のゲートとして挟み、店舗確定後に S2 を履歴へ積んで S3 へ直接進める。注文作成中の店舗変更は戻る履歴または破棄確認付き操作へ寄せる | T01,T05,T07,T08,T12 | `Menu -> 商品選択 -> S1 -> S2(stack) -> S3` が成立する。`S3 -> 戻る -> S2 -> 戻る -> S1` で店舗選択へ戻れる。店舗変更時は `cartItems / pending draft / applied coupon` の破棄確認が働く |
 | T09 | Order / Rewards Placeholder | `Order` タブの空状態と `Rewards` タブの将来機能プレースホルダーを実装する | T01,T05,T06 | 店舗未設定時の `Order` では開始方法が分かり、Rewards は主導線を邪魔しない最低限の受け皿になる |
 | T10 | S2 Search / Filter Interaction | 検索アクティブ状態、候補キーワード、検索結果、Saved Combos 該当表示を入れる | T08 | 検索入力で一覧が切り替わる |
 | T11 | S4 Saved Combos Minimal Screen | 保存済み構成一覧、再開、メニューへ戻る、店舗変更の最低限 UI を作る | T05,T06,T07 | S1/S2/S8 から S4 に入り S3 へ進める |
@@ -128,6 +129,11 @@
 3. `T11-T14`
 4. `T17-T21`
 5. `T22-T27`
+
+補足:
+
+- `T08-a Store-Gated Menu Backstack` は既存の Home / S2 / S3 がある前提の導線修正なので、次のナビゲーション調整タスクとして優先してよい
+- `T08-a` 完了後に、S3/S5/S8 の店舗変更導線が即時自由変更に戻っていないかを確認する
 
 ## 並行で進めやすいタスク
 
@@ -171,6 +177,8 @@
 
 - `S4 Saved Combos` は `再開の速さ` を最優先にし、店舗不一致や限定商品の調整は `確認して再開` で吸収する
 - `S3 Curry Detail / Customize` の具体的な phase UI は後続で詰めるが、`基本設定 -> トッピング` の順番と `Review Order` CTA から S5 に抜ける状態管理は先に固定する
+- 店舗未設定の Menu から商品を選んだ場合は、S1 完了後に S2 を履歴へ積んだうえで S3 を表示し、戻る操作で `S3 -> S2 -> S1` へ戻れることを固定する
+- 店舗変更は注文中の自由なグローバル切り替えではなく、戻る履歴または注文内容破棄確認つきの明示操作として扱う
 - `S6 Coupon Suggestion` は販促画面ではなく `注文の補助UI` として実装する
 - `S8 Order Complete` は `Done` ではなく `注文できた` と `どう受け取るか` を明示する
 - お気に入り保存は `注文確定後の構成だけを対象にする` 前提で設計する

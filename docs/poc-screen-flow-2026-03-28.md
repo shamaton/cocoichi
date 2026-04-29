@@ -18,6 +18,8 @@
 
 - 画面の主遷移は `NavigationStack` を前提とした push 中心
 - 補助操作は `sheet` または `bottom sheet` で見せる
+- 店舗未設定でも Home / Menu の閲覧は許可し、注文可能な状態へ進む瞬間に `S1` をゲートとして挟む
+- 店舗未設定の Menu から商品を選んだ場合は、`S1 -> S2 -> S3` の履歴を作ったうえで `S2` の表示をスキップし、選択済み商品の `S3` へ直接進める
 - ベースのカレー選択後は、基本設定を一画面で決めてからトッピングへ進む 2段階でカスタマイズを進める
 - 完了後は戻るのではなく、明確な完了画面を経由する
 - ログイン前提の分岐は持たない
@@ -101,6 +103,40 @@ S1 Store Select
 - 店舗変更では `cartItems / pending draft / applied coupon` を全て破棄して `S1` に戻る
 - 注文完了では `cartItems + pending draft` を `CompletedOrder` へ確定し、その後に active order state を初期化する
 
+### 1-a. 店舗未設定メニュー閲覧からの注文フロー
+
+店舗未設定でも Menu は閲覧できる。
+ただし、商品を選んで注文状態へ進む時点で店舗が必要になるため、次の履歴を作る。
+
+```text
+Home / Menu
+  -> 商品を選択
+  -> S1 Store Select
+  -> S2 Menu Discovery を stack する
+  -> S3 Curry Detail / Customize を表示する
+```
+
+戻る操作:
+
+```text
+S3 Curry Detail / Customize
+  -> 戻る: S2 Menu Discovery
+  -> 戻る: S1 Store Select
+```
+
+狙い:
+
+- 店舗選択をアプリ起動時の強制入口にしない
+- メニュー閲覧で食べたいものを先に決められるようにする
+- 店舗選択後は注文文脈を固定し、S3 以降で店舗を自由変更させない
+- 店舗を変える場合は、注文文脈を戻る操作または明示的な店舗変更確認として扱う
+
+補足:
+
+- `S2 Menu Discovery` は履歴上に積むが、店舗選択直後は表示をスキップしてよい
+- 戻って表示される `S2` は、選択済み店舗の共通メニュー + 店舗限定メニューを持つ状態に切り替わっている
+- 店舗変更時に既存の `pending draft / cartItems / applied coupon` がある場合は破棄確認を必須にする
+
 ### 2. お気に入り経由フロー
 
 常連利用に向けた時短導線です。
@@ -149,6 +185,7 @@ UI方針:
 遷移:
 
 - `店舗を選択` -> `S2 Menu Discovery`
+- `店舗未設定の Menu で商品選択後に店舗を選択` -> `S2 Menu Discovery` を履歴に積んだうえで `S3 Curry Detail / Customize`
 - `保存済みから始める` -> `S4 Saved Combos`
 
 UIメモ:
@@ -156,6 +193,8 @@ UIメモ:
 - 店舗選択は `注文開始時` または `店舗変更時` に開くゲート画面として扱う
 - アプリ全体の初期表示を Home タブにしてもよい
 - 店舗確定時に軽い成功演出を返す
+- 呼び出し元が商品選択後の場合、店舗選択後に追加確認を挟まず、選択済み商品の基本設定 phase へ進める
+- その場合も戻る履歴では `S2` を経由させ、店舗変更は `S3 -> S2 -> S1` の順で戻って行えるようにする
 
 ### S2. Menu Discovery
 
@@ -167,7 +206,8 @@ UIメモ:
 
 遷移:
 
-- `商品カードを選択` -> `S3 Curry Detail / Customize`
+- `商品カードを選択` -> 店舗設定済みなら `S3 Curry Detail / Customize`
+- `商品カードを選択` -> 店舗未設定なら `S1 Welcome / Store Select`
 - `保存済み構成を見る` -> `S4 Saved Combos`
 - `店舗変更` -> `S1 Welcome / Store Select`
 
@@ -176,6 +216,7 @@ UIメモ:
 - おすすめ、定番、最近見た構成などの区切りを試す
 - 検索や絞り込みはネイティブの検索UIを使う
 - 商品カード選択後は、S3 の基本設定 phase へ自然につなげる
+- 店舗未設定で先に商品を選んだ場合、店舗選択後に表示される S3 から戻ると、店舗文脈つきの S2 が表示される
 
 ### S3. Curry Detail / Customize
 
@@ -189,6 +230,7 @@ UIメモ:
 
 - `Review Order` -> `S5 Order Review`
 - `戻る` -> `S2 Menu Discovery` または `S4 Saved Combos`
+- 店舗未設定 Menu から入った場合の `戻る` -> `S2 Menu Discovery`、さらに `戻る` -> `S1 Welcome / Store Select`
 
 UIメモ:
 
@@ -200,6 +242,7 @@ UIメモ:
 - 価格とビジュアルの変化を遅延なく見せる
 - `S3` は draft を作り込む画面、`S5` は pending draft を受けて review / 追加注文 / 注文確定を判断する画面として責務を分ける
 - 保存導線は完了後に寄せ、`S3` では作り込むことに集中させる
+- `S3` 以降では店舗を直接自由変更させず、変更が必要な時は戻る履歴または確認付きの明示操作に寄せる
 
 ### S4. Saved Combos
 
