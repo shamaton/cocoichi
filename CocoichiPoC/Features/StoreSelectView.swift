@@ -181,20 +181,56 @@ struct StoreSelectView: View {
     @ViewBuilder
     private var header: some View {
         if let selectedStore = orderStore.selectedStore {
-            HStack(alignment: .top, spacing: POCSpacing.s) {
-                Spacer(minLength: 0)
-
-                VStack(alignment: .trailing, spacing: POCSpacing.xxs) {
-                    Text("現在の店舗")
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(POCColor.textTertiary)
-                    Text(selectedStore.name)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(POCColor.curry)
-                        .multilineTextAlignment(.trailing)
-                }
-            }
+            selectedStoreSummaryCard(selectedStore)
         }
+    }
+
+    private func selectedStoreSummaryCard(_ store: Store) -> some View {
+        HStack(alignment: .top, spacing: POCSpacing.s) {
+            Image(systemName: "info.circle.fill")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(POCColor.curry)
+                .frame(width: 36, height: 36)
+                .background(
+                    Circle()
+                        .fill(POCColor.cheese.opacity(0.28))
+                )
+
+            VStack(alignment: .leading, spacing: POCSpacing.xxs) {
+                Text("選択中の受取先")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(POCColor.curry)
+
+                Text(store.name)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .lineLimit(2)
+
+                Text(store.address)
+                    .font(.caption)
+                    .foregroundStyle(POCColor.textSecondary)
+                    .lineLimit(2)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(POCSpacing.m)
+        .background(
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [POCColor.elevatedStrong, POCColor.elevated],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                .stroke(POCColor.curry.opacity(0.32), lineWidth: 1.5)
+        )
+        .shadow(color: Color.black.opacity(0.07), radius: 18, x: 0, y: 8)
+        .accessibilityElement(children: .combine)
     }
 
     private var fulfillmentModeSwitcher: some View {
