@@ -163,39 +163,48 @@ private struct SavedComboCard: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: POCSpacing.s) {
-                HStack(alignment: .top, spacing: POCSpacing.s) {
-                    VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                        Text(favorite.name)
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(POCColor.textPrimary)
-                        Text(favorite.draft.menuItem.name)
-                            .font(.subheadline)
-                            .foregroundStyle(POCColor.textSecondary)
-                    }
-
-                    Spacer(minLength: 0)
-                }
-
-                OrderDetailBulletGroup(
-                    title: "ベース設定",
-                    items: baseSummaryItems
-                )
-
-                OrderDetailBulletGroup(
-                    title: "トッピング",
-                    items: toppingSummaryItems
-                )
-
-                if let statusMessage {
-                    Text(statusMessage)
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            HStack(alignment: .top, spacing: POCSpacing.s) {
+                VStack(alignment: .leading, spacing: POCSpacing.xs) {
+                    Text(favorite.name)
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+                    Text(favorite.draft.menuItem.name)
                         .font(.subheadline)
-                        .foregroundStyle(statusColor)
+                        .foregroundStyle(POCColor.textSecondary)
                 }
+
+                Spacer(minLength: 0)
+
+                selectButton
             }
-            .padding(POCSpacing.m)
-            .pocCard(fill: backgroundFill)
+
+            CollapsibleFavoriteDetailGroup(
+                baseItems: baseSummaryItems,
+                toppingItems: toppingSummaryItems
+            )
+
+            if let statusMessage {
+                Text(statusMessage)
+                    .font(.subheadline)
+                    .foregroundStyle(statusColor)
+            }
+        }
+        .padding(POCSpacing.m)
+        .pocCard(fill: backgroundFill)
+    }
+
+    private var selectButton: some View {
+        Button(action: action) {
+            Text("選択")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(state.isSelectable ? Color.white : POCColor.textTertiary)
+                .padding(.horizontal, POCSpacing.m)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule(style: .continuous)
+                        .fill(state.isSelectable ? POCColor.curry : POCColor.elevatedStrong)
+                )
         }
         .buttonStyle(.plain)
         .disabled(!state.isSelectable)
@@ -242,6 +251,73 @@ private struct SavedComboCard: View {
             return POCColor.elevatedStrong
         case .storeSelectionRequired:
             return POCColor.elevated.opacity(0.72)
+        }
+    }
+}
+
+private struct CollapsibleFavoriteDetailGroup: View {
+    let baseItems: [String]
+    let toppingItems: [String]
+    @State private var isExpanded = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.xs) {
+            Button {
+                withAnimation(.snappy(duration: 0.2, extraBounce: 0)) {
+                    isExpanded.toggle()
+                }
+            } label: {
+                HStack(spacing: POCSpacing.xs) {
+                    Text(isExpanded ? "ベース" : "ベース・トッピング")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+
+                    Spacer(minLength: 0)
+
+                    Text(isExpanded ? "閉じる" : "表示")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(POCColor.curry)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                VStack(alignment: .leading, spacing: POCSpacing.xxs) {
+                    bulletList(baseItems)
+
+                    Text("トッピング")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+                        .padding(.top, POCSpacing.xs)
+
+                    bulletList(toppingItems)
+                        .padding(.top, POCSpacing.xxs)
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding(POCSpacing.s)
+        .background(
+            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                .fill(POCColor.elevated.opacity(0.85))
+        )
+    }
+
+    private func bulletList(_ items: [String]) -> some View {
+        VStack(alignment: .leading, spacing: POCSpacing.xxs) {
+            ForEach(items, id: \.self) { item in
+                HStack(alignment: .top, spacing: POCSpacing.xs) {
+                    Text("•")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(POCColor.textSecondary)
+
+                    Text(item)
+                        .font(.subheadline)
+                        .foregroundStyle(POCColor.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
         }
     }
 }
