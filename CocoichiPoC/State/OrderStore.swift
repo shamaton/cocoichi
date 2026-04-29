@@ -305,7 +305,7 @@ final class OrderStore: ObservableObject {
         }
 
         if isAvailableAtCurrentStore {
-            return .ready(message: "\(selectedStore.name)向けに受取時間を再計算して再開します")
+            return .ready(message: "\(selectedStore.name)向けに内容を調整して再開します")
         }
 
         return .needsReview(message: "この店舗では内容調整が必要です")

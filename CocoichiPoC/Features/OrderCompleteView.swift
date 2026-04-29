@@ -13,7 +13,6 @@ struct OrderCompleteView: View {
                     VStack(alignment: .leading, spacing: POCSpacing.s) {
                         SectionHeader("受取情報")
                         SummaryRow(title: "店舗", value: completedOrder.store.name)
-                        SummaryRow(title: "受取時間", value: completedOrder.pickupWindowText)
                         SummaryRow(title: "受付番号", value: completedOrder.referenceID)
                     }
                     .padding(POCSpacing.m)
@@ -213,20 +212,11 @@ struct DraftSnapshotCard: View {
     var title = "この注文"
     var fillColor: Color = POCColor.elevated
     var showsStore = false
-    var showsPickup = false
     var emphasizesTotal = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            HStack(alignment: .firstTextBaseline) {
-                SectionHeader(title)
-                if showsPickup {
-                    Spacer(minLength: 0)
-                    Text(draft.pickupWindowText)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(POCColor.curry)
-                }
-            }
+            SectionHeader(title)
             if showsStore {
                 SummaryRow(title: "店舗", value: draft.store.name)
             }

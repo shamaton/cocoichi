@@ -384,7 +384,7 @@ private struct OrderTabView: View {
                 } else {
                     EmptyStateCard(
                         title: "受取先を選んで注文を始める",
-                        message: "まずは店舗を選ぶと、受取時間と注文導線が確定します。"
+                        message: "まずは店舗を選ぶと、注文導線が確定します。"
                     )
 
                     HStack(spacing: POCSpacing.s) {
@@ -417,7 +417,6 @@ private struct OrderTabView: View {
                     title: "\(index + 1)皿目",
                     fillColor: POCColor.elevated,
                     showsStore: false,
-                    showsPickup: false,
                     emphasizesTotal: false
                 )
             }
@@ -429,7 +428,6 @@ private struct OrderTabView: View {
                     title: orderStore.cartItems.isEmpty ? "この注文" : "追加中の1皿",
                     fillColor: POCColor.elevatedStrong,
                     showsStore: false,
-                    showsPickup: false,
                     emphasizesTotal: true
                 )
             }

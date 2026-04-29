@@ -15,7 +15,9 @@ struct OrderReviewView: View {
 
                             if let store = orderStore.reviewStore {
                                 VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                    SummaryRow(title: store.name, value: store.pickupLeadTimeText)
+                                    Text(store.name)
+                                        .font(.headline.weight(.semibold))
+                                        .foregroundStyle(POCColor.textPrimary)
                                 }
                                 .padding(POCSpacing.m)
                                 .pocCard(fill: POCColor.elevated)
