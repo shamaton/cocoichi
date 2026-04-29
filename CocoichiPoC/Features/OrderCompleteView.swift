@@ -30,11 +30,6 @@ struct OrderCompleteView: View {
                         }
                     )
 
-                    EmptyStateCard(
-                        title: "次にすること",
-                        message: "受取時間に店舗へお越しください。この試作版では受付番号を仮表示しています。"
-                    )
-
                     VStack(spacing: POCSpacing.s) {
                         PrimaryCTAButton(title: "もう一度メニューを見る", systemImage: "fork.knife") {
                             orderStore.resetForNextOrder(keepingStore: true)
