@@ -116,6 +116,11 @@ final class AppNavigator: ObservableObject {
         path = []
     }
 
+    func pushMenuDiscovery() {
+        selectedTab = .menu
+        path.append(.menuDiscovery)
+    }
+
     func resetToStoreSelect() {
         presentStoreSelect()
     }

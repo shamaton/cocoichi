@@ -111,7 +111,7 @@ private struct AppTabShellView: View {
 
     private var showsMenuCartFooter: Bool {
         navigator.selectedTab == .menu
-            && navigator.path.isEmpty
+            && (navigator.path.isEmpty || navigator.path.last == .menuDiscovery)
             && orderStore.confirmedCartItemCount > 0
     }
 }

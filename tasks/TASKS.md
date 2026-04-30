@@ -376,3 +376,14 @@
    Done by: CODEX
    Done at: 2026-04-30T00:17:46Z
 
+35. continue-order-menu-context-back
+   Id: 35-continue-order-menu-context-back
+   Scope: Now / M2-M3
+   Files: CocoichiPoC/App/AppNavigator.swift, CocoichiPoC/Features/AppRootView.swift, CocoichiPoC/Features/MenuDiscoveryView.swift, CocoichiPoC/Features/OrderReviewView.swift, docs/poc-wireframes-s2-s3-2026-03-28.md, docs/poc-screen-flow-2026-03-28.md, tasks/TASKS.md
+   Note: 続けて注文後のS2をS5上にpushし、店舗名をジャンル選択上に固定表示。make build成功
+   Detail: tasks/details/35-continue-order-menu-context-back.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-30T00:20:42Z
+   Done by: CODEX
+   Done at: 2026-04-30T00:21:46Z
+
