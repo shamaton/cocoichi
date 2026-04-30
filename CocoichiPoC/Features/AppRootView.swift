@@ -19,12 +19,6 @@ struct AppRootView: View {
                     }
             }
         }
-        .fullScreenCover(item: Binding(
-            get: { navigator.presentedCover },
-            set: { navigator.presentedCover = $0 }
-        )) { cover in
-            coverView(for: cover)
-        }
         .sheet(item: Binding(
             get: { navigator.presentedSheet },
             set: { navigator.presentedSheet = $0 }
@@ -52,19 +46,6 @@ struct AppRootView: View {
             OrderReviewView()
         case .orderComplete:
             OrderCompleteView()
-        }
-    }
-
-    @ViewBuilder
-    private func coverView(for cover: AppCover) -> some View {
-        switch cover {
-        case .storeSelect:
-            NavigationStack {
-                ZStack {
-                    POCBackgroundLayer()
-                    StoreSelectView()
-                }
-            }
         }
     }
 

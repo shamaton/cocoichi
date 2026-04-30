@@ -19,8 +19,9 @@
 
 ## Implementation Notes
 
-- `AppScreen.storeSelect` と `AppScreen.menuDiscovery` を追加し、商品選択後の S1/S2 を NavigationStack 上の履歴として扱う
+- `AppScreen.storeSelect` と `AppScreen.menuDiscovery` を追加し、S1/S2 を NavigationStack 上の履歴として扱う
 - 店舗未設定で商品を選んだ時は `pushStoreSelectForMenuSelection()` で `Menu` タブへ移り、`path = [.storeSelect]` にする
 - S1 で店舗確定後、保留していた商品で draft を開始できた場合は `path = [.storeSelect, .menuDiscovery, .curryDetail]` にする
 - draft を開始できない場合は `path = [.storeSelect, .menuDiscovery]` にし、店舗文脈つきメニューへ戻す
-- stack 内の S2 で店舗カードを押した場合は full-screen S1 を出さず、履歴上の S1 へ戻す
+- 通常の店舗選択も full-screen S1 を出さず、stack 上の S1 へ遷移する
+- stack 内の S2 で店舗カードを押した場合は、履歴上の S1 へ戻す

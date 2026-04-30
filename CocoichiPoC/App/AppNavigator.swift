@@ -17,12 +17,6 @@ enum AppScreen: Hashable {
     case orderComplete
 }
 
-enum AppCover: String, Identifiable {
-    case storeSelect
-
-    var id: String { rawValue }
-}
-
 enum AppSheet: String, Identifiable {
     case couponSuggestion
     case saveFavorite
@@ -35,7 +29,6 @@ final class AppNavigator: ObservableObject {
     // PoC では Home を root に置き、注文開始時だけ S1 をゲートとして開く。
     @Published var selectedTab: AppTab = .home
     @Published var path: [AppScreen] = []
-    @Published var presentedCover: AppCover?
     @Published var presentedSheet: AppSheet?
     private var nextTabAfterStoreSelect: AppTab = .menu
     private var nextPathAfterStoreSelect: [AppScreen] = []
@@ -45,51 +38,35 @@ final class AppNavigator: ObservableObject {
         path = []
     }
 
-    func presentStoreSelect(nextTab: AppTab = .menu, nextPath: [AppScreen] = []) {
+    func presentStoreSelect(nextTab: AppTab = .menu, nextPath: [AppScreen] = [.menuDiscovery]) {
         nextTabAfterStoreSelect = nextTab
         nextPathAfterStoreSelect = nextPath
-        presentedCover = .storeSelect
+        path = [.storeSelect]
         presentedSheet = nil
     }
 
     func pushStoreSelectForMenuSelection() {
-        selectedTab = .menu
-        path = [.storeSelect]
-        presentedCover = nil
-        presentedSheet = nil
+        presentStoreSelect(nextTab: .menu, nextPath: [.menuDiscovery, .curryDetail])
     }
 
-    func completeStoreSelection(pathOverride: [AppScreen]? = nil) {
+    func completeStackStoreSelection(pathAfterStoreSelect: [AppScreen]? = nil) {
         selectedTab = nextTabAfterStoreSelect
-        path = pathOverride ?? nextPathAfterStoreSelect
-        presentedCover = nil
-    }
-
-    func completeStackStoreSelection(pathAfterStoreSelect: [AppScreen]) {
-        selectedTab = .menu
+        let nextPath = pathAfterStoreSelect ?? nextPathAfterStoreSelect
         if let storeSelectIndex = path.lastIndex(of: .storeSelect) {
             let prefix = path.prefix(through: storeSelectIndex)
-            path = Array(prefix) + pathAfterStoreSelect
+            path = Array(prefix) + nextPath
         } else {
-            path = pathAfterStoreSelect
+            path = nextPath
         }
-        presentedCover = nil
-    }
-
-    func dismissStoreSelect() {
-        if presentedCover == nil, path.last == .storeSelect {
-            pop()
-            return
-        }
-        presentedCover = nil
     }
 
     var isStoreSelectInStack: Bool {
         path.contains(.storeSelect)
     }
 
-    func popToStoreSelectInStack() {
+    func popToStoreSelectInStack(nextPath: [AppScreen] = [.menuDiscovery]) {
         guard let storeSelectIndex = path.lastIndex(of: .storeSelect) else { return }
+        nextPathAfterStoreSelect = nextPath
         path = Array(path.prefix(through: storeSelectIndex))
     }
 

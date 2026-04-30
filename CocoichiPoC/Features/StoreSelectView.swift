@@ -103,6 +103,7 @@ struct StoreSelectView: View {
     @State private var isShowingSearchFilters = false
     @State private var focusedStoreID: Store.ID?
     @State private var mapCameraPosition: MapCameraPosition = .region(StoreSelectView.defaultMapRegion)
+    @State private var didCompleteSelection = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -127,18 +128,6 @@ struct StoreSelectView: View {
         }
         .navigationTitle("受取先を選ぶ")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    navigator.dismissStoreSelect()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.headline.weight(.semibold))
-                }
-                .foregroundStyle(POCColor.textPrimary)
-                .accessibilityLabel("閉じる")
-            }
-        }
         .onAppear {
             if let selectedStore = orderStore.selectedStore {
                 focusedStoreID = selectedStore.id
@@ -164,6 +153,12 @@ struct StoreSelectView: View {
         .onChange(of: orderStore.selectedStore?.id) {
             focusedStoreID = orderStore.selectedStore?.id ?? activeStores.first?.id
             recenterMap(for: mapStores, preferredStoreID: focusedStoreID)
+        }
+        .onDisappear {
+            if !didCompleteSelection {
+                orderStore.clearPendingFavoriteResume()
+                orderStore.clearPendingMenuSelection()
+            }
         }
         .alert("店舗を変更しますか？", isPresented: isShowingStoreChangeAlert, presenting: pendingStoreChange) { store in
             Button("キャンセル", role: .cancel) {
@@ -743,16 +738,15 @@ struct StoreSelectView: View {
         orderStore.selectStore(store)
         orderStore.completePendingFavoriteResumeIfNeeded(using: store)
         let startedPendingMenu = orderStore.completePendingMenuSelectionIfNeeded(using: store)
-        if navigator.isStoreSelectInStack {
+        didCompleteSelection = true
+        if resetsOrder {
+            navigator.completeStackStoreSelection(pathAfterStoreSelect: [.menuDiscovery])
+        } else if hadPendingMenuSelection {
             let nextPath: [AppScreen] = startedPendingMenu ? [.menuDiscovery, .curryDetail] : [.menuDiscovery]
             navigator.completeStackStoreSelection(pathAfterStoreSelect: nextPath)
-            return
+        } else {
+            navigator.completeStackStoreSelection()
         }
-        if hadPendingMenuSelection && !startedPendingMenu {
-            navigator.completeStoreSelection(pathOverride: [])
-            return
-        }
-        navigator.completeStoreSelection()
     }
 
     private var filteredStores: [Store] {
