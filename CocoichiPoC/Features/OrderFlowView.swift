@@ -120,7 +120,10 @@ struct CurryDetailView: View {
         .toolbar {
             if let draft = orderStore.draftOrder {
                 ToolbarItem(placement: .principal) {
-                    OrderFlowNavigationTitle(draft: draft)
+                    OrderContextNavigationTitle(
+                        title: draft.menuItem.name,
+                        storeName: draft.store.name
+                    )
                 }
             }
         }
@@ -215,7 +218,10 @@ struct CurryToppingsView: View {
         .toolbar {
             if let draft = orderStore.draftOrder {
                 ToolbarItem(placement: .principal) {
-                    OrderFlowNavigationTitle(draft: draft)
+                    OrderContextNavigationTitle(
+                        title: draft.menuItem.name,
+                        storeName: draft.store.name
+                    )
                 }
             }
         }
@@ -241,16 +247,17 @@ struct CurryToppingsView: View {
     }
 }
 
-private struct OrderFlowNavigationTitle: View {
-    let draft: DraftOrder
+struct OrderContextNavigationTitle: View {
+    let title: String
+    let storeName: String
 
     var body: some View {
         VStack(spacing: 1) {
-            Text(draft.menuItem.name)
+            Text(title)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(POCColor.textPrimary)
                 .lineLimit(1)
-            Text(draft.store.name)
+            Text(storeName)
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(POCColor.textSecondary)
                 .lineLimit(1)
@@ -258,7 +265,7 @@ private struct OrderFlowNavigationTitle: View {
         .frame(maxWidth: 220)
         .frame(height: 34)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(draft.menuItem.name)、\(draft.store.name)")
+        .accessibilityLabel("\(title)、\(storeName)")
     }
 }
 

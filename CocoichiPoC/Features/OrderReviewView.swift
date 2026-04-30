@@ -11,18 +11,6 @@ struct OrderReviewView: View {
                 if orderStore.hasReviewItems {
                     ScrollView {
                         VStack(alignment: .leading, spacing: POCSpacing.l) {
-                            SectionHeader("受取情報")
-
-                            if let store = orderStore.reviewStore {
-                                VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                    Text(store.name)
-                                        .font(.headline.weight(.semibold))
-                                        .foregroundStyle(POCColor.textPrimary)
-                                }
-                                .padding(POCSpacing.m)
-                                .pocCard(fill: POCColor.elevated)
-                            }
-
                             ReviewCartCard(
                                 lineItems: orderStore.reviewLineItems,
                                 onDelete: { item, reviewIndex in
@@ -117,6 +105,16 @@ struct OrderReviewView: View {
         .navigationTitle("ご注文内容の確認")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(orderStore.isDraftConfirmedForReview)
+        .toolbar {
+            if let store = orderStore.reviewStore {
+                ToolbarItem(placement: .principal) {
+                    OrderContextNavigationTitle(
+                        title: "ご注文内容の確認",
+                        storeName: store.name
+                    )
+                }
+            }
+        }
         .pocProgressWaveBackground(.review)
     }
 
