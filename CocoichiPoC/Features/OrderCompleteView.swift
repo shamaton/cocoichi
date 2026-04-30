@@ -23,14 +23,6 @@ struct OrderCompleteView: View {
                         PrimaryCTAButton(title: "ホームへ", systemImage: "house.fill") {
                             navigator.showHome()
                         }
-                        SecondaryCTAButton(title: "保存済みを確認", systemImage: "clock") {
-                            navigator.goToSavedCombosFromCompletion()
-                        }
-                        SecondaryCTAButton(title: "店舗を変更", systemImage: "mappin.and.ellipse") {
-                            orderStore.resetForNextOrder(keepingStore: false)
-                            orderStore.clearPendingFavoriteResume()
-                            navigator.resetToStoreSelect()
-                        }
                     }
                 } else {
                     EmptyStateCard(title: "完了済みの注文がありません", message: "注文確認から注文を確定してください。")
