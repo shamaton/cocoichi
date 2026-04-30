@@ -393,6 +393,15 @@ final class OrderStore: ObservableObject {
         normalizeAppliedCoupon()
     }
 
+    func discardCurrentDraftSelection() {
+        guard draftOrder != nil else { return }
+        draftOrder = nil
+        pendingReviewInsertionIndex = nil
+        isDraftConfirmedForReview = false
+        preparedFavoriteSaveCandidate = nil
+        normalizeAppliedCoupon()
+    }
+
     func beginEditingCartItem(_ lineItemID: CartLineItem.ID, reviewIndex: Int) {
         guard let index = cartItems.firstIndex(where: { $0.id == lineItemID }) else { return }
 

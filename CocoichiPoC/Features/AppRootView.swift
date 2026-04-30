@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AppRootView: View {
     @EnvironmentObject private var navigator: AppNavigator
+    @EnvironmentObject private var orderStore: OrderStore
 
     var body: some View {
         ZStack {
@@ -10,7 +11,7 @@ struct AppRootView: View {
             NavigationStack(
                 path: Binding(
                     get: { navigator.path },
-                    set: { navigator.path = $0 }
+                    set: { updateNavigationPath($0) }
                 )
             ) {
                 AppTabShellView()
@@ -27,6 +28,20 @@ struct AppRootView: View {
                 .presentationDetents(sheet == .couponSuggestion ? [.medium, .large] : [.medium])
                 .presentationDragIndicator(.visible)
         }
+    }
+
+    private func updateNavigationPath(_ newPath: [AppScreen]) {
+        let previousPath = navigator.path
+        navigator.path = newPath
+
+        if shouldDiscardDraftSelection(from: previousPath, to: newPath) {
+            orderStore.discardCurrentDraftSelection()
+        }
+    }
+
+    private func shouldDiscardDraftSelection(from previousPath: [AppScreen], to newPath: [AppScreen]) -> Bool {
+        guard newPath.last == .menuDiscovery else { return false }
+        return previousPath.last == .curryDetail || previousPath.last == .curryToppings
     }
 
     @ViewBuilder

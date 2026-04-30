@@ -797,6 +797,8 @@ struct StoreSelectView: View {
         } else if hadPendingMenuSelection {
             let nextPath: [AppScreen] = startedPendingMenu ? [.menuDiscovery, .curryDetail] : [.menuDiscovery]
             navigator.completeStackStoreSelection(pathAfterStoreSelect: nextPath)
+        } else if orderStore.draftOrder == nil {
+            navigator.completeStackStoreSelection(pathAfterStoreSelect: [.menuDiscovery])
         } else {
             navigator.completeStackStoreSelection()
         }

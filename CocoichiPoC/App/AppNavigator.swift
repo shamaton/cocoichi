@@ -90,6 +90,17 @@ final class AppNavigator: ObservableObject {
         path = [.curryDetail, .curryToppings]
     }
 
+    func showCurryToppingsFromMenuDiscoveryBackstack() {
+        selectedTab = .menu
+        let nextPath: [AppScreen] = [.menuDiscovery, .curryDetail, .curryToppings]
+        if let storeSelectIndex = path.lastIndex(of: .storeSelect) {
+            let prefix = path.prefix(through: storeSelectIndex)
+            path = Array(prefix) + nextPath
+        } else {
+            path = nextPath
+        }
+    }
+
     func pop() {
         guard !path.isEmpty else { return }
         path.removeLast()
@@ -118,6 +129,9 @@ final class AppNavigator: ObservableObject {
 
     func showStoreMenuBackstack() {
         selectedTab = .menu
+        nextTabAfterStoreSelect = .menu
+        // 続けて注文では商品未選択の状態でS1へ戻れるため、再選択時は必ずS2へ戻す。
+        nextPathAfterStoreSelect = [.menuDiscovery]
         path = [.storeSelect, .menuDiscovery]
     }
 

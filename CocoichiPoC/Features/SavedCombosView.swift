@@ -139,10 +139,10 @@ struct SavedCombosView: View {
         switch orderStore.favoriteResumeState(for: favorite) {
         case .chooseStore:
             orderStore.prepareFavoriteResumeAfterStoreSelection(favorite)
-            navigator.presentStoreSelect(nextTab: .menu, nextPath: [.curryDetail, .curryToppings])
+            navigator.presentStoreSelect(nextTab: .menu, nextPath: [.menuDiscovery, .curryDetail, .curryToppings])
         case .ready:
             orderStore.resumeFavorite(favorite)
-            navigator.showCurryToppings()
+            navigator.showCurryToppingsFromMenuDiscoveryBackstack()
         case .needsReview:
             selectedFavoriteForReview = favorite
         case .storeSelectionRequired:
@@ -153,7 +153,7 @@ struct SavedCombosView: View {
     private func resumeFavorite(_ favorite: FavoriteCombo) {
         guard orderStore.favoriteResumeState(for: favorite).isSelectable else { return }
         orderStore.resumeFavorite(favorite)
-        navigator.showCurryToppings()
+        navigator.showCurryToppingsFromMenuDiscoveryBackstack()
     }
 }
 

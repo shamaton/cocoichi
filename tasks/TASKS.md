@@ -420,3 +420,36 @@
    Done by: CODEX
    Done at: 2026-04-30T01:56:28Z
 
+39. continue-order-current-store-menu-fallback
+   Id: 39-continue-order-current-store-menu-fallback
+   Scope: Now / M2-M3
+   Files: CocoichiPoC/App/AppNavigator.swift, CocoichiPoC/Features/StoreSelectView.swift, tasks/TASKS.md
+   Note: 続けて注文後の選択中店舗再選択で、商品未選択ならS2へ戻すよう修正。make build成功、git diff --check問題なし
+   Detail: tasks/details/39-continue-order-current-store-menu-fallback.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-30T07:10:36Z
+   Done by: CODEX
+   Done at: 2026-04-30T07:13:06Z
+
+40. favorite-resume-backstack
+   Id: 40-favorite-resume-backstack
+   Scope: Now / M2-M3
+   Files: CocoichiPoC/App/AppNavigator.swift, CocoichiPoC/Features/SavedCombosView.swift, tasks/TASKS.md
+   Note: お気に入り再開後はS4ではなくS2を戻り先にし、プリセット再選択しやすいstackへ修正。make build成功、git diff --check問題なし
+   Detail: tasks/details/40-favorite-resume-backstack.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-30T07:20:04Z
+   Done by: CODEX
+   Done at: 2026-04-30T07:20:04Z
+
+41. reset-draft-on-menu-return
+   Id: 41-reset-draft-on-menu-return
+   Scope: Now / M2-M3
+   Files: CocoichiPoC/Features/AppRootView.swift, CocoichiPoC/State/OrderStore.swift, tasks/TASKS.md
+   Note: S3/S3 toppingsからS2へ戻った時にdraftOrderを破棄し、メニュー上のカレー選択状態をリセット。make build成功、git diff --check問題なし
+   Detail: tasks/details/41-reset-draft-on-menu-return.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-30T07:52:47Z
+   Done by: CODEX
+   Done at: 2026-04-30T07:52:47Z
+
