@@ -365,3 +365,14 @@
    Done by: CODEX
    Done at: 2026-04-30T00:13:38Z
 
+34. confirm-reset-on-store-select-back
+   Id: 34-confirm-reset-on-store-select-back
+   Scope: Now / M1-M2
+   Files: CocoichiPoC/App/AppNavigator.swift, CocoichiPoC/Features/StoreSelectView.swift, docs/poc-wireframes-s1-store-select-2026-04-12.md, docs/poc-screen-flow-2026-03-28.md, tasks/TASKS.md
+   Note: S1戻る時に注文中なら確認ダイアログを表示し、承諾時に店舗/注文状態をリセットしてHomeへ戻す。docs更新、make build成功
+   Detail: tasks/details/34-confirm-reset-on-store-select-back.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-30T00:16:47Z
+   Done by: CODEX
+   Done at: 2026-04-30T00:17:46Z
+

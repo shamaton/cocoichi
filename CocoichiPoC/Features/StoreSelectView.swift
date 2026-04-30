@@ -100,6 +100,7 @@ struct StoreSelectView: View {
     @State private var selectedListTab: StoreListTab = .all
     @State private var query = ""
     @State private var pendingStoreChange: Store?
+    @State private var isShowingBackResetAlert = false
     @State private var isShowingSearchFilters = false
     @State private var focusedStoreID: Store.ID?
     @State private var mapCameraPosition: MapCameraPosition = .region(StoreSelectView.defaultMapRegion)
@@ -128,6 +129,23 @@ struct StoreSelectView: View {
         }
         .navigationTitle("受取先を選ぶ")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    handleBackNavigation()
+                } label: {
+                    HStack(spacing: POCSpacing.xs) {
+                        Image(systemName: "chevron.left")
+                            .font(.subheadline.weight(.semibold))
+                        Text("戻る")
+                            .font(.subheadline.weight(.semibold))
+                    }
+                }
+                .foregroundStyle(POCColor.textPrimary)
+                .accessibilityLabel("戻る")
+            }
+        }
         .onAppear {
             if let selectedStore = orderStore.selectedStore {
                 focusedStoreID = selectedStore.id
@@ -170,6 +188,16 @@ struct StoreSelectView: View {
             }
         } message: { _ in
             Text("現在のご注文内容はリセットされます。")
+        }
+        .alert("注文をリセットして戻りますか？", isPresented: $isShowingBackResetAlert) {
+            Button("キャンセル", role: .cancel) {}
+            Button("リセットして戻る", role: .destructive) {
+                didCompleteSelection = true
+                orderStore.resetForNextOrder(keepingStore: false)
+                navigator.showHome()
+            }
+        } message: {
+            Text("現在の店舗とご注文内容はリセットされます。")
         }
     }
 
@@ -728,6 +756,14 @@ struct StoreSelectView: View {
     private func shouldConfirmStoreChange(to store: Store) -> Bool {
         guard orderStore.selectedStore?.id != store.id else { return false }
         return orderStore.selectedStore != nil && orderStore.hasReviewItems
+    }
+
+    private func handleBackNavigation() {
+        guard orderStore.selectedStore != nil, orderStore.hasReviewItems else {
+            navigator.pop()
+            return
+        }
+        isShowingBackResetAlert = true
     }
 
     private func commitStoreSelection(_ store: Store, resetsOrder: Bool) {

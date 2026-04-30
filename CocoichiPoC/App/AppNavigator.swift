@@ -38,6 +38,12 @@ final class AppNavigator: ObservableObject {
         path = []
     }
 
+    func showHome() {
+        selectedTab = .home
+        path = []
+        presentedSheet = nil
+    }
+
     func presentStoreSelect(nextTab: AppTab = .menu, nextPath: [AppScreen] = [.menuDiscovery]) {
         nextTabAfterStoreSelect = nextTab
         nextPathAfterStoreSelect = nextPath
