@@ -117,6 +117,13 @@ struct CurryDetailView: View {
         .navigationTitle(orderStore.draftOrder?.menuItem.name ?? "カレー")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(orderStore.isDraftConfirmedForReview)
+        .toolbar {
+            if let draft = orderStore.draftOrder {
+                ToolbarItem(placement: .principal) {
+                    OrderFlowNavigationTitle(draft: draft)
+                }
+            }
+        }
         .pocProgressWaveBackground(.basics)
     }
 
@@ -205,6 +212,13 @@ struct CurryToppingsView: View {
         .navigationTitle(orderStore.draftOrder?.menuItem.name ?? "カレー")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(orderStore.isDraftConfirmedForReview)
+        .toolbar {
+            if let draft = orderStore.draftOrder {
+                ToolbarItem(placement: .principal) {
+                    OrderFlowNavigationTitle(draft: draft)
+                }
+            }
+        }
         .pocProgressWaveBackground(.toppings)
     }
 
@@ -224,6 +238,27 @@ struct CurryToppingsView: View {
     private func confirmDraft() {
         orderStore.confirmCurrentDraftForReview()
         showOrderReview()
+    }
+}
+
+private struct OrderFlowNavigationTitle: View {
+    let draft: DraftOrder
+
+    var body: some View {
+        VStack(spacing: 1) {
+            Text(draft.menuItem.name)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(POCColor.textPrimary)
+                .lineLimit(1)
+            Text(draft.store.name)
+                .font(.caption2.weight(.medium))
+                .foregroundStyle(POCColor.textSecondary)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: 220)
+        .frame(height: 34)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(draft.menuItem.name)、\(draft.store.name)")
     }
 }
 
