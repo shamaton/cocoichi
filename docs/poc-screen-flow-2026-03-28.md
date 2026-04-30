@@ -97,7 +97,8 @@ S1 Store Select
 
 - `S3 -> S5` 到達時点では現在の注文は `pending draft` として保持し、まだ cart line item へ昇格させない
 - `続けて注文` を押した時に `pending draft` を cart line item に昇格させ、`S5 -> S2 -> S3 -> S5` のループで 2皿目やサイド追加へ戻れるようにする
-- `続けて注文` 後の `S2` は `S5` の上に stack し、戻る操作で S5 に戻れるようにする
+- `続けて注文` 後は `S5` を履歴に残さず、`S1 Store Select -> S2 Menu Discovery` の stack を作って S2 を表示する
+- `続けて注文` 後の `S2` で戻ると `S1` に戻り、さらに S1 から戻る場合は注文リセット確認を出す
 - `注文を確定` では `cartItems + pending draft` をまとめて確定対象に含める
 - PoC 初版では `pending draft` は常に 1 件だけ保持する
 - `S5 -> S3` の `内容を修正` では `pending draft` を保持したまま編集に戻る

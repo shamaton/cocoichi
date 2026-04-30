@@ -387,3 +387,14 @@
    Done by: CODEX
    Done at: 2026-04-30T00:21:46Z
 
+36. continue-order-store-menu-stack
+   Id: 36-continue-order-store-menu-stack
+   Scope: Now / M2-M3
+   Files: CocoichiPoC/App/AppNavigator.swift, CocoichiPoC/Features/OrderReviewView.swift, docs/poc-screen-flow-2026-03-28.md, docs/poc-wireframes-s2-s3-2026-03-28.md, tasks/TASKS.md
+   Note: 続けて注文後はS5を履歴に残さずS1/S2 stackを作るよう変更。make build成功
+   Detail: tasks/details/36-continue-order-store-menu-stack.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-30T00:25:20Z
+   Done by: CODEX
+   Done at: 2026-04-30T00:26:15Z
+

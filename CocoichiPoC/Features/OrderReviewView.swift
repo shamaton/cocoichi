@@ -122,7 +122,7 @@ struct OrderReviewView: View {
 
     private func continueOrdering() {
         orderStore.moveCurrentDraftToCart()
-        navigator.pushMenuDiscovery()
+        navigator.showStoreMenuBackstack()
     }
 
     private func confirmOrder() {

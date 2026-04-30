@@ -116,9 +116,9 @@ final class AppNavigator: ObservableObject {
         path = []
     }
 
-    func pushMenuDiscovery() {
+    func showStoreMenuBackstack() {
         selectedTab = .menu
-        path.append(.menuDiscovery)
+        path = [.storeSelect, .menuDiscovery]
     }
 
     func resetToStoreSelect() {
