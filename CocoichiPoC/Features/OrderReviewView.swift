@@ -98,7 +98,7 @@ struct OrderReviewView: View {
         }
         .animation(.snappy(duration: 0.22, extraBounce: 0), value: pendingDeletion != nil)
         .task(id: orderStore.hasReviewItems) {
-            guard !orderStore.hasReviewItems else { return }
+            guard !orderStore.hasReviewItems, orderStore.completedOrder == nil else { return }
             navigator.dismissSheet()
             navigator.popBackToMenuDiscovery()
         }

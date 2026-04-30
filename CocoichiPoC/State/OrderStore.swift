@@ -462,7 +462,7 @@ final class OrderStore: ObservableObject {
         preparedFavoriteSaveCandidate = nil
 
         // PoC では API を持たないため、完了画面に必要な受取情報をローカルで確定させる。
-        completedOrder = CompletedOrder(
+        let completedOrder = CompletedOrder(
             id: UUID(),
             referenceID: "POC-\(Self.referenceStamp(from: placedAt))",
             placedAt: placedAt,
@@ -472,6 +472,15 @@ final class OrderStore: ObservableObject {
             cartItems: finalizedItems,
             appliedCoupon: appliedCoupon
         )
+        self.completedOrder = completedOrder
+        cartItems = []
+        draftOrder = nil
+        pendingReviewInsertionIndex = nil
+        isDraftConfirmedForReview = false
+        appliedCoupon = nil
+        pendingFavoriteResume = nil
+        pendingMenuSelection = nil
+        hasPresentedCouponSuggestion = false
     }
 
     func resetForNextOrder(keepingStore: Bool) {

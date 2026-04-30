@@ -368,11 +368,13 @@ private struct OrderTabView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
-                HeroBanner(
-                    eyebrow: "オーダー",
-                    title: orderStore.hasReviewItems ? "今の注文に戻る" : "注文を始める",
-                    accent: [POCColor.curry, POCColor.cheese]
-                )
+                if orderStore.completedOrder == nil || orderStore.hasReviewItems {
+                    HeroBanner(
+                        eyebrow: "オーダー",
+                        title: orderTabHeroTitle,
+                        accent: [POCColor.curry, POCColor.cheese]
+                    )
+                }
 
                 if orderStore.hasReviewItems {
                     currentOrderSummary
@@ -380,6 +382,17 @@ private struct OrderTabView: View {
                     PrimaryCTAButton(title: "注文内容を確認", systemImage: "cart") {
                         navigator.push(.orderReview)
                     }
+                } else if let completedOrder = orderStore.completedOrder {
+                    CompletedOrderInformationView(
+                        order: completedOrder,
+                        isSavedFavoriteItem: { item in
+                            orderStore.isSavedFavoriteItem(item)
+                        },
+                        onSaveFavorite: { draft in
+                            orderStore.prepareFavoriteSave(for: draft)
+                            navigator.showSheet(.saveFavorite)
+                        }
+                    )
                 } else if let store = orderStore.selectedStore {
                     StoreContextCard(store: store) {
                         orderStore.clearPendingFavoriteResume()
@@ -452,6 +465,14 @@ private struct OrderTabView: View {
             }
         }
     }
+
+    private var orderTabHeroTitle: String {
+        if orderStore.hasReviewItems {
+            return "今の注文に戻る"
+        }
+        return "注文を始める"
+    }
+
 }
 
 private struct RewardsPlaceholderView: View {

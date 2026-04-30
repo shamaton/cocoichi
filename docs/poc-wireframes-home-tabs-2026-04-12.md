@@ -314,6 +314,7 @@
 - `Order` は注文の再開場所であり、販促面にしない
 - 店舗未設定時は `始め方` を明確に示す
 - draft や cart がある時は、この空状態を出さず `S5 Order Review` へ戻す
+- 完了済み注文がある時は、空状態、遷移ボタン、追加のヒーロー見出しを出さず、`S8 Order Complete` と同じ受取情報、注文内容、料金確認をその場で出す
 
 ## Tab Bar
 
@@ -371,6 +372,7 @@
 - `Menu root + cart line item あり -> カートフッター` で `S5 Order Review`
 - `Order -> 受取先を選んで注文を始める` で `S1`
 - `Order -> メニューを見る` で `Menu` または `S2`
+- `Order + 完了済み注文あり` では `S8 Order Complete` の情報を Order タブ内で直接確認できる
 
 ## この資料が固定すること
 

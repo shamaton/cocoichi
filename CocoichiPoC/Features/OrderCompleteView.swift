@@ -8,17 +8,7 @@ struct OrderCompleteView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: POCSpacing.l) {
                 if let completedOrder = orderStore.completedOrder {
-                    OrderCompleteHeroBanner()
-
-                    VStack(alignment: .leading, spacing: POCSpacing.s) {
-                        SectionHeader("受取情報")
-                        SummaryRow(title: "店舗", value: completedOrder.store.name)
-                        SummaryRow(title: "受付番号", value: completedOrder.referenceID)
-                    }
-                    .padding(POCSpacing.m)
-                    .pocCard(fill: POCColor.elevated)
-
-                    CompletedOrderCard(
+                    CompletedOrderInformationView(
                         order: completedOrder,
                         isSavedFavoriteItem: { item in
                             orderStore.isSavedFavoriteItem(item)
@@ -30,12 +20,10 @@ struct OrderCompleteView: View {
                     )
 
                     VStack(spacing: POCSpacing.s) {
-                        PrimaryCTAButton(title: "もう一度メニューを見る", systemImage: "fork.knife") {
-                            orderStore.resetForNextOrder(keepingStore: true)
-                            navigator.popToMenuDiscovery()
+                        PrimaryCTAButton(title: "ホームへ", systemImage: "house.fill") {
+                            navigator.showHome()
                         }
                         SecondaryCTAButton(title: "保存済みを確認", systemImage: "clock") {
-                            orderStore.resetForNextOrder(keepingStore: true)
                             navigator.goToSavedCombosFromCompletion()
                         }
                         SecondaryCTAButton(title: "店舗を変更", systemImage: "mappin.and.ellipse") {
@@ -52,6 +40,34 @@ struct OrderCompleteView: View {
         }
         .navigationTitle("注文完了")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+    }
+}
+
+struct CompletedOrderInformationView: View {
+    let order: CompletedOrder
+    let isSavedFavoriteItem: (CartLineItem) -> Bool
+    let onSaveFavorite: (DraftOrder) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.l) {
+            OrderCompleteHeroBanner()
+
+            VStack(alignment: .leading, spacing: POCSpacing.s) {
+                SectionHeader("受取情報")
+                SummaryRow(title: "店舗", value: order.store.name)
+                SummaryRow(title: "受取目安", value: order.pickupWindowText)
+                SummaryRow(title: "受付番号", value: order.referenceID)
+            }
+            .padding(POCSpacing.m)
+            .pocCard(fill: POCColor.elevated)
+
+            CompletedOrderCard(
+                order: order,
+                isSavedFavoriteItem: isSavedFavoriteItem,
+                onSaveFavorite: onSaveFavorite
+            )
+        }
     }
 }
 
