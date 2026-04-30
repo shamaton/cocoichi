@@ -104,7 +104,7 @@ struct OrderReviewView: View {
         }
         .navigationTitle("ご注文内容の確認")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(orderStore.isDraftConfirmedForReview)
+        .navigationBarBackButtonHidden(hidesBackButton)
         .toolbar {
             if let store = orderStore.reviewStore {
                 ToolbarItem(placement: .principal) {
@@ -116,6 +116,10 @@ struct OrderReviewView: View {
             }
         }
         .pocProgressWaveBackground(.review)
+    }
+
+    private var hidesBackButton: Bool {
+        orderStore.isDraftConfirmedForReview || navigator.isShowingOrderReviewFromMenuCartFooter
     }
 
     private func continueOrdering() {

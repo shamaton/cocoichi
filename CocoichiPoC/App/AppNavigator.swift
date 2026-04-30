@@ -70,6 +70,12 @@ final class AppNavigator: ObservableObject {
         path.contains(.storeSelect)
     }
 
+    var isShowingOrderReviewFromMenuCartFooter: Bool {
+        guard selectedTab == .menu, path.last == .orderReview else { return false }
+        let previousScreen = path.dropLast().last
+        return previousScreen == nil || previousScreen == .menuDiscovery
+    }
+
     func popToStoreSelectInStack(nextPath: [AppScreen] = [.menuDiscovery]) {
         guard let storeSelectIndex = path.lastIndex(of: .storeSelect) else { return }
         nextPathAfterStoreSelect = nextPath
