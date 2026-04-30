@@ -453,3 +453,14 @@
    Done by: CODEX
    Done at: 2026-04-30T07:52:47Z
 
+42. s5-empty-review-preserve-store-context
+   Id: 42-s5-empty-review-preserve-store-context
+   Scope: Bugfix
+   Files: CocoichiPoC/State/OrderStore.swift, CocoichiPoC/App/AppNavigator.swift, CocoichiPoC/Features/OrderReviewView.swift
+   Note: S5全削除後も店舗を保持し、既存のS1->S2 stackへ戻す。make build成功、git diff --check問題なし
+   Detail: tasks/details/42-s5-empty-review-preserve-store-context.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-30T12:21:24Z
+   Done by: CODEX
+   Done at: 2026-04-30T12:23:15Z
+

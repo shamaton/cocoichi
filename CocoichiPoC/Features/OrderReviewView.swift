@@ -100,7 +100,7 @@ struct OrderReviewView: View {
         .task(id: orderStore.hasReviewItems) {
             guard !orderStore.hasReviewItems else { return }
             navigator.dismissSheet()
-            navigator.popToMenuDiscovery()
+            navigator.popBackToMenuDiscovery()
         }
         .navigationTitle("ご注文内容の確認")
         .navigationBarTitleDisplayMode(.inline)

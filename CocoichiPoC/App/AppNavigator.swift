@@ -127,6 +127,15 @@ final class AppNavigator: ObservableObject {
         path = []
     }
 
+    func popBackToMenuDiscovery() {
+        selectedTab = .menu
+        guard let menuDiscoveryIndex = path.lastIndex(of: .menuDiscovery) else {
+            path = []
+            return
+        }
+        path = Array(path.prefix(through: menuDiscoveryIndex))
+    }
+
     func showStoreMenuBackstack() {
         selectedTab = .menu
         nextTabAfterStoreSelect = .menu

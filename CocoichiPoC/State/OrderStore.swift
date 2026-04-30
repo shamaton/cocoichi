@@ -423,6 +423,11 @@ final class OrderStore: ObservableObject {
     }
 
     func removeReviewItem(_ item: ReviewLineItem, reviewIndex: Int) {
+        if selectedStore == nil {
+            selectedStore = item.draft.store
+            selectedFulfillmentMode = .pickup
+        }
+
         switch item.source {
         case let .cart(lineItemID):
             removeCartItem(lineItemID, reviewIndex: reviewIndex)
