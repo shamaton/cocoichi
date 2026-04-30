@@ -28,6 +28,25 @@ struct AppRootView: View {
                 .presentationDetents(sheet == .couponSuggestion ? [.medium, .large] : [.medium])
                 .presentationDragIndicator(.visible)
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if showsMenuCartFooter {
+                MenuCartFooter(
+                    itemCount: orderStore.confirmedCartItemCount,
+                    total: orderStore.confirmedCartTotal
+                ) {
+                    navigator.push(.orderReview)
+                }
+            }
+        }
+        .toolbar(showsMenuCartFooter ? .hidden : .visible, for: .tabBar)
+        .toolbarBackground(.visible, for: .tabBar)
+        .toolbarBackground(.thinMaterial, for: .tabBar)
+    }
+
+    private var showsMenuCartFooter: Bool {
+        navigator.selectedTab == .menu
+            && (navigator.path.isEmpty || navigator.path.last == .menuDiscovery)
+            && orderStore.confirmedCartItemCount > 0
     }
 
     private func updateNavigationPath(_ newPath: [AppScreen]) {
@@ -77,7 +96,6 @@ struct AppRootView: View {
 
 private struct AppTabShellView: View {
     @EnvironmentObject private var navigator: AppNavigator
-    @EnvironmentObject private var orderStore: OrderStore
 
     var body: some View {
         ZStack {
@@ -109,25 +127,6 @@ private struct AppTabShellView: View {
                     }
             }
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            if showsMenuCartFooter {
-                MenuCartFooter(
-                    itemCount: orderStore.confirmedCartItemCount,
-                    total: orderStore.confirmedCartTotal
-                ) {
-                    navigator.push(.orderReview)
-                }
-            }
-        }
-        .toolbar(showsMenuCartFooter ? .hidden : .visible, for: .tabBar)
-        .toolbarBackground(.visible, for: .tabBar)
-        .toolbarBackground(.thinMaterial, for: .tabBar)
-    }
-
-    private var showsMenuCartFooter: Bool {
-        navigator.selectedTab == .menu
-            && (navigator.path.isEmpty || navigator.path.last == .menuDiscovery)
-            && orderStore.confirmedCartItemCount > 0
     }
 }
 
@@ -137,8 +136,8 @@ private struct MenuCartFooter: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: POCSpacing.l) {
+        HStack(spacing: POCSpacing.m) {
+            HStack(spacing: POCSpacing.s) {
                 ZStack(alignment: .topTrailing) {
                     Image(systemName: "cart.fill")
                         .font(.title2.weight(.bold))
@@ -156,27 +155,47 @@ private struct MenuCartFooter: View {
                         .contentTransition(.numericText(value: Double(itemCount)))
                 }
 
-                Text(total.yenText)
-                    .font(.title2.weight(.bold))
-                    .foregroundStyle(POCColor.textPrimary)
-                    .monospacedDigit()
-                    .contentTransition(.numericText(value: Double(total)))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("現在の注文")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(POCColor.textSecondary)
+
+                    Text(total.yenText)
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(POCColor.textPrimary)
+                        .monospacedDigit()
+                        .contentTransition(.numericText(value: Double(total)))
+                }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, POCSpacing.l)
-            .padding(.top, POCSpacing.s)
-            .padding(.bottom, POCSpacing.s)
-            .background(.ultraThinMaterial)
-            .overlay(alignment: .top) {
-                Rectangle()
-                    .fill(POCColor.line)
-                    .frame(height: 1)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button(action: action) {
+                HStack(spacing: POCSpacing.xs) {
+                    Text("注文確認へ")
+                        .font(.subheadline.weight(.semibold))
+                    Image(systemName: "chevron.right")
+                        .font(.subheadline.weight(.bold))
+                }
+                .foregroundStyle(Color.white)
+                .padding(.horizontal, POCSpacing.m)
+                .padding(.vertical, POCSpacing.s)
+                .background(
+                    RoundedRectangle(cornerRadius: POCRadius.cta, style: .continuous)
+                        .fill(POCColor.curry)
+                )
             }
-            .contentShape(Rectangle())
+            .buttonStyle(.plain)
+            .accessibilityLabel("注文内容を確認、注文数 \(itemCount) 点、合計 \(total.yenText)")
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("注文数 \(itemCount) 点、合計 \(total.yenText)")
-        .accessibilityHint("注文内容の確認に移動します")
+        .padding(.horizontal, POCSpacing.l)
+        .padding(.top, POCSpacing.s)
+        .padding(.bottom, POCSpacing.s)
+        .background(.ultraThinMaterial)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(POCColor.line)
+                .frame(height: 1)
+        }
     }
 }
 
