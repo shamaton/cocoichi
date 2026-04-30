@@ -86,7 +86,12 @@ struct CurryDetailView: View {
                     heroMinY = value
                 }
                 .overlay(alignment: .top) {
-                    CompactCurryDetailHeader(draft: draft, phase: .basics)
+                    CompactCurryDetailHeader(
+                        draft: draft,
+                        phase: .basics,
+                        orderTotal: orderStore.confirmedCartTotal + draft.total,
+                        currentDishTotal: orderStore.cartItems.isEmpty ? nil : draft.total
+                    )
                         .padding(.horizontal, POCSpacing.l)
                         .padding(.top, POCSpacing.xs)
                         .opacity(showsCompactHeader ? 1 : 0)
@@ -96,7 +101,8 @@ struct CurryDetailView: View {
                 .animation(.snappy(duration: 0.24), value: showsCompactHeader)
                 .safeAreaInset(edge: .bottom) {
                     OrderFlowFooterBar(
-                        total: draft.total,
+                        total: orderStore.confirmedCartTotal + draft.total,
+                        currentDishTotal: orderStore.cartItems.isEmpty ? nil : draft.total,
                         summaryItems: [],
                         secondaryTitle: "トッピング",
                         secondarySystemImage: "arrow.right",
@@ -187,7 +193,12 @@ struct CurryToppingsView: View {
                     heroMinY = value
                 }
                 .overlay(alignment: .top) {
-                    CompactCurryDetailHeader(draft: draft, phase: .toppings)
+                    CompactCurryDetailHeader(
+                        draft: draft,
+                        phase: .toppings,
+                        orderTotal: orderStore.confirmedCartTotal + draft.total,
+                        currentDishTotal: orderStore.cartItems.isEmpty ? nil : draft.total
+                    )
                         .padding(.horizontal, POCSpacing.l)
                         .padding(.top, POCSpacing.xs)
                         .opacity(showsCompactHeader ? 1 : 0)
@@ -197,7 +208,8 @@ struct CurryToppingsView: View {
                 .animation(.snappy(duration: 0.24), value: showsCompactHeader)
                 .safeAreaInset(edge: .bottom) {
                     OrderFlowFooterBar(
-                        total: draft.total,
+                        total: orderStore.confirmedCartTotal + draft.total,
+                        currentDishTotal: orderStore.cartItems.isEmpty ? nil : draft.total,
                         summaryItems: draft.toppingSelections,
                         secondaryTitle: "ベース設定",
                         secondarySystemImage: "arrow.uturn.backward",
@@ -271,6 +283,7 @@ struct OrderContextNavigationTitle: View {
 
 private struct OrderFlowFooterBar: View {
     let total: Int
+    let currentDishTotal: Int?
     let summaryItems: [DraftToppingSelection]
     let secondaryTitle: String
     let secondarySystemImage: String?
@@ -309,14 +322,25 @@ private struct OrderFlowFooterBar: View {
                 )
             }
 
-            Text(footerPriceText)
-                .font(.title3.weight(.bold))
-                .foregroundStyle(POCColor.textPrimary)
-                .monospacedDigit()
-                .contentTransition(.numericText(value: Double(total)))
-                .animation(.snappy(duration: 0.28, extraBounce: 0), value: total)
-                .padding(.trailing, POCSpacing.xs)
-                .frame(maxWidth: .infinity, alignment: .trailing)
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(footerPriceText)
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .monospacedDigit()
+                    .contentTransition(.numericText(value: Double(total)))
+                    .animation(.snappy(duration: 0.28, extraBounce: 0), value: total)
+
+                if let currentDishTotal {
+                    Text(currentDishPriceText(for: currentDishTotal))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(POCColor.textSecondary)
+                        .monospacedDigit()
+                        .contentTransition(.numericText(value: Double(currentDishTotal)))
+                        .animation(.snappy(duration: 0.28, extraBounce: 0), value: currentDishTotal)
+                }
+            }
+            .padding(.trailing, POCSpacing.xs)
+            .frame(maxWidth: .infinity, alignment: .trailing)
 
             HStack(spacing: POCSpacing.s) {
                 SecondaryCTAButton(title: secondaryTitle, systemImage: secondarySystemImage) {
@@ -335,7 +359,14 @@ private struct OrderFlowFooterBar: View {
     }
 
     private var footerPriceText: String {
-        "￥\(total.formatted(.number.grouping(.automatic)))"
+        guard currentDishTotal != nil else {
+            return "￥\(total.formatted(.number.grouping(.automatic)))"
+        }
+        return "合計 ￥\(total.formatted(.number.grouping(.automatic)))"
+    }
+
+    private func currentDishPriceText(for amount: Int) -> String {
+        "￥\(amount.formatted(.number.grouping(.automatic)))"
     }
 
     private var usesScrollableSummary: Bool {

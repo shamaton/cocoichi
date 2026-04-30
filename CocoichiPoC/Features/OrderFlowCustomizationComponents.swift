@@ -574,6 +574,8 @@ private enum CurryDetailHeroLayout {
 struct CompactCurryDetailHeader: View {
     let draft: DraftOrder
     let phase: CustomizationPhase
+    let orderTotal: Int
+    let currentDishTotal: Int?
 
     var body: some View {
         HStack(alignment: .center, spacing: POCSpacing.m) {
@@ -592,13 +594,16 @@ struct CompactCurryDetailHeader: View {
             Spacer(minLength: 0)
 
             VStack(alignment: .trailing, spacing: 2) {
-                Text(draft.total.yenText)
+                Text(primaryPriceText)
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(POCColor.textPrimary)
+                    .monospacedDigit()
+                    .contentTransition(.numericText(value: Double(orderTotal)))
 
-                Text("現在の合計")
+                Text(secondaryPriceText)
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(POCColor.textTertiary)
+                    .monospacedDigit()
             }
         }
         .padding(.horizontal, POCSpacing.m)
@@ -609,6 +614,18 @@ struct CompactCurryDetailHeader: View {
                 .stroke(POCColor.line, lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.06), radius: 14, x: 0, y: 8)
+    }
+
+    private var primaryPriceText: String {
+        if currentDishTotal != nil {
+            return "合計 \(orderTotal.yenText)"
+        }
+        return orderTotal.yenText
+    }
+
+    private var secondaryPriceText: String {
+        guard let currentDishTotal else { return "現在の合計" }
+        return currentDishTotal.yenText
     }
 }
 
