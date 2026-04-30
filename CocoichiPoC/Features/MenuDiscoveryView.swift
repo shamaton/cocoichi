@@ -165,56 +165,36 @@ struct MenuDiscoveryView: View {
     }
 
     private var favoriteEntrySection: some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("お気に入りから選ぶ")
+        Button {
+            navigator.push(.savedCombos)
+        } label: {
+            HStack(spacing: POCSpacing.xs) {
+                Text("お気に入りから選ぶ")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
 
-            Button {
-                navigator.push(.savedCombos)
-            } label: {
-                HStack(spacing: POCSpacing.m) {
-                    VStack(alignment: .leading, spacing: POCSpacing.xs) {
-                        Text(favoriteEntryTitle)
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(POCColor.textPrimary)
-                        Text(favoriteEntryMessage)
-                            .font(.subheadline)
-                            .foregroundStyle(POCColor.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                Spacer(minLength: 0)
 
-                    Spacer()
-
-                    Image(systemName: "arrow.right")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(POCColor.curry)
-                }
-                .padding(POCSpacing.m)
-                .pocCard(fill: POCColor.elevatedStrong)
+                Image(systemName: "chevron.right")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(POCColor.curry)
+                    .frame(width: 28, height: 28)
+                    .background(
+                        Circle()
+                            .fill(POCColor.curry.opacity(0.10))
+                    )
+                    .overlay(
+                        Circle()
+                            .stroke(POCColor.curry.opacity(0.32), lineWidth: 1)
+                    )
             }
-            .buttonStyle(.plain)
+            .padding(POCSpacing.m)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .pocCard(fill: POCColor.elevatedStrong)
+            .contentShape(Rectangle())
         }
-    }
-
-    private var favoriteEntryTitle: String {
-        if let favorite = orderStore.featuredFavorite {
-            return favorite.name
-        }
-        return "保存済みのお気に入りを見る"
-    }
-
-    private var favoriteEntryMessage: String {
-        if let favorite = orderStore.featuredFavorite {
-            switch orderStore.favoriteResumeState(for: favorite) {
-            case .chooseStore:
-                return "店舗を選んでからお気に入りを再開できます"
-            case .storeSelectionRequired:
-                return "限定メニューを含むため、店舗を選ぶと再開できます"
-            case .ready, .needsReview:
-                break
-            }
-            return "\(favorite.draft.menuItem.name) からすぐ再開できます"
-        }
-        return "注文後に保存した組み合わせを、ここからすぐ呼び出せます。"
+        .buttonStyle(.plain)
+        .accessibilityLabel("お気に入りから選ぶ")
     }
 
     private var groupedSections: [GroupedMenuSection] {
