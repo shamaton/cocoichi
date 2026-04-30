@@ -54,7 +54,7 @@ struct OrderReviewView: View {
                             }
 
                             VStack(alignment: .leading, spacing: POCSpacing.s) {
-                                SectionHeader("料金確認")
+                                SectionHeader("お会計")
                                 SummaryRow(title: "小計", value: orderStore.reviewSubtotal.reviewYenText)
                                 SummaryRow(title: "クーポン", value: orderStore.reviewDiscount == 0 ? "-" : "-\(orderStore.reviewDiscount.reviewYenText)")
                                 SummaryRow(title: "合計", value: orderStore.reviewTotal.reviewYenText)
@@ -147,7 +147,7 @@ private struct ReviewCartCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: POCSpacing.s) {
-            SectionHeader("ご注文内容の確認")
+            SectionHeader("ご注文内容")
 
             ForEach(Array(lineItems.enumerated()), id: \.element.id) { index, item in
                 CartLineSummaryCard(
@@ -408,7 +408,7 @@ private struct ReviewFooterBar: View {
             .frame(maxWidth: .infinity, alignment: .trailing)
 
             HStack(spacing: POCSpacing.s) {
-                SecondaryCTAButton(title: "続けて注文", systemImage: "plus.circle", isDisabled: isDisabled) {
+                SecondaryCTAButton(title: "続けて追加", systemImage: "plus.circle", isDisabled: isDisabled) {
                     continueAction()
                 }
 
