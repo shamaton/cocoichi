@@ -20,7 +20,7 @@ struct MenuDiscoveryView: View {
                 .padding(.top, POCSpacing.l)
                 .padding(.bottom, POCSpacing.l)
             }
-            .navigationTitle(orderStore.selectedStore == nil ? "メニューを選ぶ" : "")
+            .navigationTitle(orderStore.selectedStore?.name ?? "メニューを選ぶ")
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .top, spacing: 0) {
                 pinnedNavigationHeader(contentWidth: contentWidth)
@@ -95,12 +95,7 @@ struct MenuDiscoveryView: View {
     }
 
     private func pinnedNavigationHeader(contentWidth: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: POCSpacing.s) {
-            if let store = orderStore.selectedStore {
-                storeNavigationButton(store)
-            }
-            genreHeader
-        }
+        genreHeader
         .frame(width: contentWidth, alignment: .leading)
         .padding(.horizontal, POCSpacing.l)
         .padding(.top, POCSpacing.s)
@@ -111,27 +106,6 @@ struct MenuDiscoveryView: View {
                 .fill(POCColor.line)
                 .frame(height: 1)
         }
-    }
-
-    private func storeNavigationButton(_ store: Store) -> some View {
-        Button {
-            returnToStoreSelect()
-        } label: {
-            HStack(spacing: POCSpacing.xs) {
-                Image(systemName: "mappin.and.ellipse")
-                    .font(.caption.weight(.semibold))
-                Text(store.name)
-                    .font(.subheadline.weight(.semibold))
-                    .lineLimit(1)
-                Image(systemName: "chevron.down")
-                    .font(.caption2.weight(.bold))
-                Spacer(minLength: 0)
-            }
-            .foregroundStyle(POCColor.textPrimary)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(store.name)、店舗選択に戻る")
     }
 
     private var genreHeader: some View {
@@ -183,16 +157,6 @@ struct MenuDiscoveryView: View {
         }
         orderStore.beginOrder(with: item)
         navigator.push(.curryDetail)
-    }
-
-    private func returnToStoreSelect() {
-        orderStore.clearPendingFavoriteResume()
-        orderStore.clearPendingMenuSelection()
-        if navigator.isStoreSelectInStack {
-            navigator.popToStoreSelectInStack()
-        } else {
-            navigator.presentStoreSelect(nextTab: .menu)
-        }
     }
 
     private func availableContentWidth(in proxy: GeometryProxy) -> CGFloat {

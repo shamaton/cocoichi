@@ -398,3 +398,14 @@
    Done by: CODEX
    Done at: 2026-04-30T00:26:15Z
 
+37. menu-store-title-static
+   Id: 37-menu-store-title-static
+   Scope: Now / M2-M3
+   Files: CocoichiPoC/Features/MenuDiscoveryView.swift, docs/poc-home-tab-architecture-2026-04-12.md, docs/poc-wireframes-home-tabs-2026-04-12.md, docs/poc-wireframes-s2-s3-2026-03-28.md, tasks/TASKS.md
+   Note: Menu店舗名をstatic navigation titleに変更し、店舗名タップでS1へ戻る導線を削除。make build成功
+   Detail: tasks/details/37-menu-store-title-static.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-30T01:49:30Z
+   Done by: CODEX
+   Done at: 2026-04-30T01:51:05Z
+
