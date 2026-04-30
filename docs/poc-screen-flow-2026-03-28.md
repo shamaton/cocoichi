@@ -104,7 +104,7 @@ S1 Store Select
 - `S5 -> S3` の `内容を修正` では `pending draft` を保持したまま編集に戻る
 - `S3 -> S2` で戻った時も `pending draft` は保持するが、別メニューを選んだ時点で新しい選択に置き換える
 - 店舗変更では `cartItems / pending draft / applied coupon` を全て破棄して `S1` に戻る
-- 注文完了では `cartItems + pending draft` を `CompletedOrder` へ確定し、その後に active order state を初期化する
+- 注文完了では `cartItems + pending draft` と受取店舗を `CompletedOrder` へ確定し、その後に選択店舗を含む active order state を初期化する
 
 ### 1-a. 店舗未設定メニュー閲覧からの注文フロー
 

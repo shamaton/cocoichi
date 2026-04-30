@@ -480,6 +480,8 @@ final class OrderStore: ObservableObject {
         appliedCoupon = nil
         pendingFavoriteResume = nil
         pendingMenuSelection = nil
+        selectedStore = nil
+        selectedFulfillmentMode = .pickup
         hasPresentedCouponSuggestion = false
     }
 
