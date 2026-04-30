@@ -96,12 +96,13 @@ struct AppRootView: View {
 
 private struct AppTabShellView: View {
     @EnvironmentObject private var navigator: AppNavigator
+    @EnvironmentObject private var orderStore: OrderStore
 
     var body: some View {
         ZStack {
             POCBackgroundLayer()
 
-            TabView(selection: $navigator.selectedTab) {
+            TabView(selection: tabSelection) {
                 HomeView()
                     .tag(AppTab.home)
                     .tabItem {
@@ -127,6 +128,46 @@ private struct AppTabShellView: View {
                     }
             }
         }
+    }
+
+    private var tabSelection: Binding<AppTab> {
+        Binding(
+            get: { navigator.selectedTab },
+            set: { selectTab($0) }
+        )
+    }
+
+    private func selectTab(_ tab: AppTab) {
+        guard tab == .order else {
+            navigator.selectedTab = tab
+            return
+        }
+
+        openOrderTab()
+    }
+
+    private func openOrderTab() {
+        if orderStore.hasReviewItems {
+            navigator.selectedTab = .order
+            navigator.path = [.orderReview]
+            return
+        }
+
+        if orderStore.completedOrder != nil {
+            navigator.selectedTab = .order
+            navigator.path = []
+            return
+        }
+
+        guard orderStore.selectedStore == nil else {
+            navigator.selectedTab = .order
+            navigator.path = []
+            return
+        }
+
+        orderStore.clearPendingFavoriteResume()
+        orderStore.clearPendingMenuSelection()
+        navigator.presentStoreSelect(nextTab: .menu)
     }
 }
 
@@ -306,19 +347,19 @@ private struct HomeView: View {
 
     private var primaryTabsSection: some View {
         HStack(spacing: POCSpacing.s) {
-                HomeShortcutCard(
-                    title: "メニュー",
-                    systemImage: "fork.knife"
-                ) {
-                    navigator.selectedTab = .menu
-                }
+            HomeShortcutCard(
+                title: "メニュー",
+                systemImage: "fork.knife"
+            ) {
+                navigator.selectedTab = .menu
+            }
 
-                HomeShortcutCard(
-                    title: "オーダー",
-                    systemImage: "cart"
-                ) {
-                    navigator.selectedTab = .order
-                }
+            HomeShortcutCard(
+                title: "オーダー",
+                systemImage: "cart"
+            ) {
+                navigator.selectedTab = .order
+            }
         }
     }
 
