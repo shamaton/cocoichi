@@ -135,12 +135,10 @@ struct StoreSelectView: View {
                 Button {
                     handleBackNavigation()
                 } label: {
-                    HStack(spacing: POCSpacing.xs) {
-                        Image(systemName: "chevron.left")
-                            .font(.subheadline.weight(.semibold))
-                        Text("戻る")
-                            .font(.subheadline.weight(.semibold))
-                    }
+                    Image(systemName: "chevron.left")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(width: 32, height: 32)
+                        .contentShape(Rectangle())
                 }
                 .foregroundStyle(POCColor.textPrimary)
                 .accessibilityLabel("戻る")
