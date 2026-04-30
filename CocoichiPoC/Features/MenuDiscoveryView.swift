@@ -13,24 +13,6 @@ struct MenuDiscoveryView: View {
 
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: POCSpacing.l) {
-                    if let store = orderStore.selectedStore {
-                        StoreContextCard(store: store) {
-                            orderStore.clearPendingFavoriteResume()
-                            orderStore.clearPendingMenuSelection()
-                            if navigator.isStoreSelectInStack {
-                                navigator.popToStoreSelectInStack()
-                            } else {
-                                navigator.presentStoreSelect()
-                            }
-                        }
-                    } else {
-                        MissingStoreCard {
-                            orderStore.clearPendingFavoriteResume()
-                            orderStore.clearPendingMenuSelection()
-                            navigator.presentStoreSelect(nextTab: .menu)
-                        }
-                    }
-
                     genreContent(contentWidth: contentWidth)
                 }
                 .frame(width: contentWidth, alignment: .leading)
@@ -38,8 +20,30 @@ struct MenuDiscoveryView: View {
                 .padding(.top, POCSpacing.l)
                 .padding(.bottom, POCSpacing.l)
             }
-            .navigationTitle("メニューを選ぶ")
+            .navigationTitle(orderStore.selectedStore == nil ? "メニューを選ぶ" : "")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                if let store = orderStore.selectedStore {
+                    ToolbarItem(placement: .principal) {
+                        Button {
+                            returnToStoreSelect()
+                        } label: {
+                            HStack(spacing: POCSpacing.xs) {
+                                Image(systemName: "mappin.and.ellipse")
+                                    .font(.caption.weight(.semibold))
+                                Text(store.name)
+                                    .font(.subheadline.weight(.semibold))
+                                    .lineLimit(1)
+                                Image(systemName: "chevron.down")
+                                    .font(.caption2.weight(.bold))
+                            }
+                            .foregroundStyle(POCColor.textPrimary)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("\(store.name)、店舗選択に戻る")
+                    }
+                }
+            }
             .safeAreaInset(edge: .top, spacing: 0) {
                 pinnedNavigationHeader(contentWidth: contentWidth)
             }
@@ -177,6 +181,16 @@ struct MenuDiscoveryView: View {
         navigator.push(.curryDetail)
     }
 
+    private func returnToStoreSelect() {
+        orderStore.clearPendingFavoriteResume()
+        orderStore.clearPendingMenuSelection()
+        if navigator.isStoreSelectInStack {
+            navigator.popToStoreSelectInStack()
+        } else {
+            navigator.presentStoreSelect(nextTab: .menu)
+        }
+    }
+
     private func availableContentWidth(in proxy: GeometryProxy) -> CGFloat {
         let horizontalInsets = proxy.safeAreaInsets.leading + proxy.safeAreaInsets.trailing
         return max(0, proxy.size.width - horizontalInsets - (POCSpacing.l * 2))
@@ -312,46 +326,6 @@ private struct MenuGenreChip: View {
                     Capsule()
                         .stroke(isSelected ? POCColor.cheese : POCColor.line, lineWidth: 1)
                 )
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-private struct MissingStoreCard: View {
-    let onSelectStore: () -> Void
-
-    var body: some View {
-        Button(action: onSelectStore) {
-            HStack(spacing: POCSpacing.m) {
-                VStack(alignment: .leading, spacing: POCSpacing.s) {
-                    Text("店舗が未設定です")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(POCColor.textPrimary)
-                    Text("選ぶと店舗限定メニューも確認できます")
-                        .font(.subheadline)
-                        .foregroundStyle(POCColor.textSecondary)
-                }
-
-                Spacer(minLength: 0)
-
-                Text("選ぶ")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(POCColor.curry)
-                    .padding(.horizontal, POCSpacing.s)
-                    .padding(.vertical, POCSpacing.xs)
-                    .background(
-                        Capsule()
-                            .fill(POCColor.elevated)
-                    )
-                    .overlay(
-                        Capsule()
-                            .stroke(POCColor.line, lineWidth: 1)
-                    )
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
-            .padding(POCSpacing.m)
-            .pocCard(fill: POCColor.elevatedStrong)
         }
         .buttonStyle(.plain)
     }

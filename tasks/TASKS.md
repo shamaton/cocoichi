@@ -354,3 +354,14 @@
    Done by: CODEX
    Done at: 2026-04-29T23:52:13Z
 
+33. menu-store-navigation-title
+   Id: 33-menu-store-navigation-title
+   Scope: Now / M1-M2
+   Files: CocoichiPoC/Features/MenuDiscoveryView.swift, docs/poc-home-tab-architecture-2026-04-12.md, docs/poc-wireframes-home-tabs-2026-04-12.md, docs/poc-wireframes-s2-s3-2026-03-28.md, tasks/TASKS.md
+   Note: Menu本文の店舗カードを削除し、店舗設定済み時はnavigation titleの店舗名からS1へ戻る導線に変更。docs更新、make build成功
+   Detail: tasks/details/33-menu-store-navigation-title.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-30T00:12:23Z
+   Done by: CODEX
+   Done at: 2026-04-30T00:13:38Z
+
