@@ -409,3 +409,14 @@
    Done by: CODEX
    Done at: 2026-04-30T01:51:05Z
 
+38. selected-store-continue-card
+   Id: 38-selected-store-continue-card
+   Scope: Now / M1-M2
+   Files: CocoichiPoC/Features/StoreSelectView.swift, docs/poc-wireframes-s1-store-select-2026-04-12.md, tasks/TASKS.md
+   Note: S1選択中店舗カードに右矢印を追加し、同じ店舗で次へ進めるように変更。make build成功
+   Detail: tasks/details/38-selected-store-continue-card.md
+   Claimed by: CODEX
+   Claimed at: 2026-04-30T01:55:35Z
+   Done by: CODEX
+   Done at: 2026-04-30T01:56:28Z
+

@@ -209,34 +209,44 @@ struct StoreSelectView: View {
     }
 
     private func selectedStoreSummaryCard(_ store: Store) -> some View {
-        HStack(alignment: .top, spacing: POCSpacing.s) {
-            Image(systemName: "info.circle.fill")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(POCColor.curry)
-                .frame(width: 36, height: 36)
-                .background(
-                    Circle()
-                        .fill(POCColor.cheese.opacity(0.28))
-                )
-
-            VStack(alignment: .leading, spacing: POCSpacing.xxs) {
-                Text("選択中の受取先")
-                    .font(.caption.weight(.semibold))
+        Button {
+            commitStoreSelection(store, resetsOrder: false)
+        } label: {
+            HStack(alignment: .center, spacing: POCSpacing.s) {
+                Image(systemName: "info.circle.fill")
+                    .font(.title3.weight(.semibold))
                     .foregroundStyle(POCColor.curry)
+                    .frame(width: 36, height: 36)
+                    .background(
+                        Circle()
+                            .fill(POCColor.cheese.opacity(0.28))
+                    )
 
-                Text(store.name)
+                VStack(alignment: .leading, spacing: POCSpacing.xxs) {
+                    Text("選択中の受取先")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(POCColor.curry)
+
+                    Text(store.name)
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(POCColor.textPrimary)
+                        .lineLimit(2)
+
+                    Text(store.address)
+                        .font(.caption)
+                        .foregroundStyle(POCColor.textSecondary)
+                        .lineLimit(2)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
                     .font(.headline.weight(.semibold))
-                    .foregroundStyle(POCColor.textPrimary)
-                    .lineLimit(2)
-
-                Text(store.address)
-                    .font(.caption)
-                    .foregroundStyle(POCColor.textSecondary)
-                    .lineLimit(2)
+                    .foregroundStyle(POCColor.curry)
             }
-
-            Spacer(minLength: 0)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
         .padding(POCSpacing.m)
         .background(
             RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
@@ -254,6 +264,7 @@ struct StoreSelectView: View {
         )
         .shadow(color: Color.black.opacity(0.07), radius: 18, x: 0, y: 8)
         .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(store.name)、この店舗で続ける")
     }
 
     private var fulfillmentModeSwitcher: some View {
