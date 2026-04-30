@@ -770,8 +770,14 @@ struct StoreSelectView: View {
     }
 
     private func handleBackNavigation() {
-        guard orderStore.selectedStore != nil, orderStore.hasReviewItems else {
+        guard orderStore.selectedStore != nil else {
             navigator.pop()
+            return
+        }
+        guard orderStore.hasReviewItems else {
+            didCompleteSelection = true
+            orderStore.resetForNextOrder(keepingStore: false)
+            navigator.showHome()
             return
         }
         isShowingBackResetAlert = true
