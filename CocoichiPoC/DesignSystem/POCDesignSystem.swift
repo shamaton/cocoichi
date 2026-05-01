@@ -185,6 +185,7 @@ struct PrimaryCTAButton: View {
     let title: String
     let systemImage: String?
     var isDisabled = false
+    var accessibilityIdentifier: String?
     let action: () -> Void
 
     var body: some View {
@@ -206,6 +207,7 @@ struct PrimaryCTAButton: View {
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
+        .accessibilityIdentifier(accessibilityIdentifier ?? "primary_cta_\(title)")
     }
 }
 
@@ -213,6 +215,7 @@ struct SecondaryCTAButton: View {
     let title: String
     let systemImage: String?
     var isDisabled = false
+    var accessibilityIdentifier: String?
     let action: () -> Void
 
     var body: some View {
@@ -238,6 +241,7 @@ struct SecondaryCTAButton: View {
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
+        .accessibilityIdentifier(accessibilityIdentifier ?? "secondary_cta_\(title)")
     }
 }
 

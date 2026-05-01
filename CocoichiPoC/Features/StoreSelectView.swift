@@ -651,6 +651,7 @@ struct StoreSelectView: View {
         .buttonStyle(.plain)
         .disabled(isSelected)
         .opacity(isSelected ? 0.82 : 1)
+        .accessibilityIdentifier("store_row_\(store.id)")
         .accessibilityHint(isSelected ? "現在選択中のため選べません" : "この店舗を選択します")
         .simultaneousGesture(
             TapGesture().onEnded {

@@ -298,6 +298,7 @@ private struct CompactToppingRow: View {
             }
             .accessibilityElement(children: isSelected ? .contain : .ignore)
             .accessibilityLabel(accessibilityLabel)
+            .accessibilityIdentifier("topping_row_\(topping.id)")
             .accessibilityAddTraits(isSelected ? [] : .isButton)
             .onAppear {
                 cachedToppingImage = loadToppingImage()

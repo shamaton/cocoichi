@@ -391,6 +391,7 @@ private struct CompactMenuRow: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("menu_item_\(item.id)")
     }
 }
 

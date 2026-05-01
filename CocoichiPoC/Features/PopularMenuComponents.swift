@@ -92,6 +92,7 @@ private struct PopularMenuCard: View {
             .frame(maxWidth: .infinity, minHeight: PopularMenuLayout.cardHeight, maxHeight: PopularMenuLayout.cardHeight, alignment: .topLeading)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("menu_item_\(item.id)")
     }
 }
 
