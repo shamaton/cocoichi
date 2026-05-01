@@ -166,7 +166,7 @@ struct CurryToppingsView: View {
         Group {
             if let draft = orderStore.draftOrder {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: POCSpacing.m, pinnedViews: [.sectionHeaders]) {
+                    LazyVStack(alignment: .leading, spacing: POCSpacing.m) {
                         CurryDetailHeroCard(draft: draft)
                             .padding(.horizontal, -POCSpacing.l)
                             .background {

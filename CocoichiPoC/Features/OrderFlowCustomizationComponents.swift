@@ -173,7 +173,7 @@ struct CurryToppingSectionList: View {
                     }
                 }
             } header: {
-                StickyToppingGroupHeader(group: section.group)
+                ToppingGroupHeader(group: section.group)
             }
         }
     }
@@ -216,7 +216,7 @@ private struct GroupedToppingSection: Identifiable {
     var id: ToppingGroup { group }
 }
 
-private struct StickyToppingGroupHeader: View {
+private struct ToppingGroupHeader: View {
     let group: ToppingGroup
 
     var body: some View {
