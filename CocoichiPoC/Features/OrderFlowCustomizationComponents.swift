@@ -275,27 +275,36 @@ private struct StickyToppingGroupHeader: View {
 }
 
 private struct CompactToppingRow: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     let topping: Topping
     let quantity: Int
     let isRecommended: Bool
     let onAdd: () -> Void
     let onDecrease: () -> Void
 
+    @State private var quantityChangeDirection: ToppingQuantityChangeDirection = .increase
+    @State private var isInteractionActive = false
+    @State private var isSelectionHighlightVisible = false
+    @State private var effectToken = 0
+    @State private var cachedToppingImage: UIImage?
+
     var body: some View {
-        Group {
-            if isSelected {
-                rowContent
-                    .accessibilityElement(children: .contain)
-                    .accessibilityLabel("\(topping.name)、\(topping.price.yenText)、\(quantity)個")
-            } else {
-                Button(action: onAdd) {
-                    rowContent
-                }
-                .buttonStyle(.plain)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel("\(topping.name)、\(topping.price.yenText)、未追加")
+        rowContent
+            .contentShape(RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous))
+            .onTapGesture {
+                guard !isSelected else { return }
+                addWithFeedback()
             }
-        }
+            .accessibilityElement(children: isSelected ? .contain : .ignore)
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityAddTraits(isSelected ? [] : .isButton)
+            .onAppear {
+                cachedToppingImage = loadToppingImage()
+            }
+            .onChange(of: topping.imagePath) { _, _ in
+                cachedToppingImage = loadToppingImage()
+            }
         .animation(.snappy(duration: 0.22), value: quantity)
     }
 
@@ -334,8 +343,15 @@ private struct CompactToppingRow: View {
         .padding(.vertical, ToppingRowLayout.verticalPadding)
         .frame(minHeight: ToppingRowLayout.minHeight)
         .background(
-            RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
-                .fill(topping.group.discoveryCardBackground)
+            ZStack {
+                RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                    .fill(topping.group.discoveryCardBackground)
+
+                if isSelectionHighlightVisible {
+                    RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
+                        .fill(topping.accentColor.opacity(0.14))
+                }
+            }
         )
         .overlay(
             RoundedRectangle(cornerRadius: POCRadius.card, style: .continuous)
@@ -345,6 +361,7 @@ private struct CompactToppingRow: View {
             if isRecommended {
                 ToppingRecommendationBadge()
                     .offset(x: 6, y: -6)
+                    .scaleEffect(isInteractionActive ? 1.08 : 1)
             }
         }
         .overlay(alignment: .trailing) {
@@ -352,30 +369,45 @@ private struct CompactToppingRow: View {
                 ToppingQuantityControl(
                     toppingName: topping.name,
                     quantity: quantity,
+                    changeDirection: quantityChangeDirection,
                     accentColor: topping.accentColor,
-                    onDecrease: onDecrease,
-                    onIncrease: onAdd
+                    onDecrease: decreaseWithFeedback,
+                    onIncrease: addWithFeedback
                 )
                 .padding(.trailing, ToppingRowLayout.quantityControlTrailingInset)
+                .transition(.asymmetric(
+                    insertion: .opacity.combined(with: .scale(scale: 0.96, anchor: .center)),
+                    removal: .opacity
+                ))
             }
         }
+        .scaleEffect(isInteractionActive ? 1.012 : 1)
         .shadow(color: isSelected ? topping.accentColor.opacity(0.14) : .clear, radius: 12, x: 0, y: 8)
     }
 
     @ViewBuilder
     private var toppingArtwork: some View {
-        if let toppingImage {
-            Image(uiImage: toppingImage)
+        if let cachedToppingImage {
+            Image(uiImage: cachedToppingImage)
                 .resizable()
                 .scaledToFit()
+                .scaleEffect(isInteractionActive ? 1.04 : 1)
         } else {
             Image(systemName: isSelected ? "checkmark.circle.fill" : topping.group.symbolName)
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(isSelected ? topping.accentColor : Color.white.opacity(0.92))
+                .scaleEffect(isInteractionActive ? 1.12 : 1)
         }
     }
 
-    private var toppingImage: UIImage? {
+    private var accessibilityLabel: String {
+        if isSelected {
+            return "\(topping.name)、\(topping.price.yenText)、\(quantity)個"
+        }
+        return "\(topping.name)、\(topping.price.yenText)、未追加"
+    }
+
+    private func loadToppingImage() -> UIImage? {
         guard let imagePath = topping.imagePath else { return nil }
         let resourcePath = imagePath as NSString
         let resourceName = resourcePath.deletingPathExtension
@@ -397,6 +429,52 @@ private struct CompactToppingRow: View {
     private var priceBadgeAccentColor: Color {
         Color(hex: topping.group.priceBadgeAccentHex)
     }
+
+    private func addWithFeedback() {
+        guard quantity < ToppingRowLayout.maximumQuantity else { return }
+        quantityChangeDirection = .increase
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        runInteractionEffect()
+        onAdd()
+    }
+
+    private func decreaseWithFeedback() {
+        guard quantity > 0 else { return }
+        quantityChangeDirection = .decrease
+        UISelectionFeedbackGenerator().selectionChanged()
+        runInteractionEffect()
+        onDecrease()
+    }
+
+    private func runInteractionEffect() {
+        guard !reduceMotion else { return }
+        effectToken += 1
+        let currentToken = effectToken
+
+        withAnimation(.spring(response: 0.18, dampingFraction: 0.62)) {
+            isInteractionActive = true
+            isSelectionHighlightVisible = true
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+            guard currentToken == effectToken else { return }
+            withAnimation(.spring(response: 0.24, dampingFraction: 0.78)) {
+                isInteractionActive = false
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.32) {
+            guard currentToken == effectToken else { return }
+            withAnimation(.easeOut(duration: 0.16)) {
+                isSelectionHighlightVisible = false
+            }
+        }
+    }
+}
+
+private enum ToppingQuantityChangeDirection {
+    case increase
+    case decrease
 }
 
 private struct ToppingPriceBadge: View {
@@ -442,6 +520,7 @@ private struct ToppingRecommendationBadge: View {
 private struct ToppingQuantityControl: View {
     let toppingName: String
     let quantity: Int
+    let changeDirection: ToppingQuantityChangeDirection
     let accentColor: Color
     let onDecrease: () -> Void
     let onIncrease: () -> Void
@@ -461,14 +540,13 @@ private struct ToppingQuantityControl: View {
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ToppingQuantityButtonStyle(isDisabled: false))
             .accessibilityLabel("\(toppingName)を1個減らす")
 
-            Text("\(quantity)")
-                .font(.subheadline.weight(.bold))
-                .foregroundStyle(POCColor.textPrimary)
-                .monospacedDigit()
-                .frame(minWidth: 16)
+            SlotQuantityText(
+                quantity: quantity,
+                changeDirection: changeDirection
+            )
 
             Button(action: onIncrease) {
                 ZStack {
@@ -483,7 +561,7 @@ private struct ToppingQuantityControl: View {
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ToppingQuantityButtonStyle(isDisabled: isAtMaximum))
             .disabled(isAtMaximum)
             .opacity(isAtMaximum ? 0.6 : 1)
             .accessibilityLabel("\(toppingName)を1個増やす")
@@ -502,6 +580,56 @@ private struct ToppingQuantityControl: View {
 
     private var isAtMaximum: Bool {
         quantity >= ToppingRowLayout.maximumQuantity
+    }
+}
+
+private struct SlotQuantityText: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    let quantity: Int
+    let changeDirection: ToppingQuantityChangeDirection
+
+    var body: some View {
+        ZStack {
+            Text("\(quantity)")
+                .id(quantity)
+                .transition(quantityTransition)
+        }
+        .font(.subheadline.weight(.bold))
+        .foregroundStyle(POCColor.textPrimary)
+        .monospacedDigit()
+        .frame(minWidth: 18)
+        .clipped()
+        .animation(.spring(response: 0.26, dampingFraction: 0.78), value: quantity)
+    }
+
+    private var quantityTransition: AnyTransition {
+        guard !reduceMotion else { return .opacity }
+        return .asymmetric(
+            insertion: .move(edge: insertionEdge).combined(with: .opacity),
+            removal: .move(edge: removalEdge).combined(with: .opacity)
+        )
+    }
+
+    private var insertionEdge: Edge {
+        changeDirection == .increase ? .bottom : .top
+    }
+
+    private var removalEdge: Edge {
+        changeDirection == .increase ? .top : .bottom
+    }
+}
+
+private struct ToppingQuantityButtonStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    let isDisabled: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed && !isDisabled && !reduceMotion ? 0.88 : 1)
+            .offset(y: configuration.isPressed && !isDisabled && !reduceMotion ? 1 : 0)
+            .animation(.spring(response: 0.16, dampingFraction: 0.68), value: configuration.isPressed)
     }
 }
 
