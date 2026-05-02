@@ -161,34 +161,33 @@ struct SaveFavoriteSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: POCSpacing.l) {
-                SectionHeader("お気に入りに保存")
+            ScrollView {
+                VStack(alignment: .leading, spacing: POCSpacing.l) {
+                    SectionHeader("お気に入りに保存")
 
-                TextField("名前", text: $name)
-                    .padding(.horizontal, POCSpacing.m)
-                    .padding(.vertical, 14)
-                    .background(
-                        RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                            .fill(POCColor.elevated)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
-                            .stroke(POCColor.line, lineWidth: 1)
-                    )
+                    TextField("名前", text: $name)
+                        .padding(.horizontal, POCSpacing.m)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                                .fill(POCColor.elevated)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: POCRadius.field, style: .continuous)
+                                .stroke(POCColor.line, lineWidth: 1)
+                        )
 
-                if let draft = orderStore.favoriteSaveCandidate {
-                    DraftSnapshotCard(
-                        draft: draft,
-                        showsCoupon: false,
-                        title: orderStore.completedOrder == nil ? "現在の注文" : "今回の1皿"
-                    )
-                } else {
-                    EmptyStateCard(title: "保存できる注文がありません", message: "商品を選んでから再度開いてください。")
+                    if let draft = orderStore.favoriteSaveCandidate {
+                        FavoriteSaveDraftCard(draft: draft)
+                    } else {
+                        EmptyStateCard(title: "保存できる注文がありません", message: "商品を選んでから再度開いてください。")
+                    }
                 }
-
-                Spacer()
-
-                HStack(spacing: POCSpacing.s) {
+                .padding(POCSpacing.l)
+                .padding(.bottom, 96)
+            }
+            .safeAreaInset(edge: .bottom) {
+                HStack(alignment: .center, spacing: POCSpacing.s) {
                     SecondaryCTAButton(title: "キャンセル", systemImage: "xmark") {
                         orderStore.clearPreparedFavoriteSave()
                         navigator.dismissSheet()
@@ -198,10 +197,11 @@ struct SaveFavoriteSheet: View {
                         navigator.dismissSheet()
                     }
                 }
+                .padding(.horizontal, POCSpacing.l)
+                .padding(.top, POCSpacing.xs)
+                .padding(.bottom, POCSpacing.xs)
+                .background(.ultraThinMaterial)
             }
-            .padding(POCSpacing.l)
-            .navigationTitle("お気に入り保存")
-            .navigationBarTitleDisplayMode(.inline)
             .task {
                 if name.isEmpty, let draft = orderStore.favoriteSaveCandidate {
                     name = draft.suggestedFavoriteName
@@ -211,6 +211,55 @@ struct SaveFavoriteSheet: View {
                 orderStore.clearPreparedFavoriteSave()
             }
         }
+    }
+}
+
+private struct FavoriteSaveDraftCard: View {
+    let draft: DraftOrder
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: POCSpacing.s) {
+            Text(draft.menuItem.name)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(POCColor.textPrimary)
+
+            OrderDetailBulletGroup(
+                title: "ベース",
+                items: baseSummaryItems
+            )
+
+            OrderDetailBulletGroup(
+                title: "トッピング",
+                items: toppingSummaryItems
+            )
+
+            HStack {
+                Text("合計")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(POCColor.textSecondary)
+
+                Spacer()
+
+                Text(draft.total.yenText)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(POCColor.textPrimary)
+                    .monospacedDigit()
+            }
+        }
+        .padding(POCSpacing.m)
+        .pocCard(fill: POCColor.elevated)
+    }
+
+    private var baseSummaryItems: [String] {
+        [
+            draft.currySauce.rawValue,
+            "ライス \(draft.riceGrams)g",
+            "辛さ \(draft.spiceLevelText)"
+        ]
+    }
+
+    private var toppingSummaryItems: [String] {
+        draft.toppings.isEmpty ? ["なし"] : draft.toppingsSummary.components(separatedBy: " / ")
     }
 }
 
