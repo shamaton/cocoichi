@@ -991,7 +991,12 @@ private struct RicePortionCard: View {
 
             VStack(alignment: .leading, spacing: POCSpacing.m) {
                 HStack {
-                    RiceAdjustButton(symbol: "minus", isDisabled: selectedOption.grams == options.first?.grams, action: onDecrease)
+                    RiceAdjustButton(
+                        symbol: "minus",
+                        accessibilityIdentifier: "rice_decrease",
+                        isDisabled: selectedOption.grams == options.first?.grams,
+                        action: onDecrease
+                    )
                     Spacer()
                     VStack(spacing: POCSpacing.s) {
                         RiceArtworkCarousel(
@@ -1003,7 +1008,12 @@ private struct RicePortionCard: View {
                             .frame(width: 220, height: 34)
                     }
                     Spacer()
-                    RiceAdjustButton(symbol: "plus", isDisabled: selectedOption.grams == options.last?.grams, action: onIncrease)
+                    RiceAdjustButton(
+                        symbol: "plus",
+                        accessibilityIdentifier: "rice_increase",
+                        isDisabled: selectedOption.grams == options.last?.grams,
+                        action: onIncrease
+                    )
                 }
 
                 RiceSelectionStrip(
@@ -1342,7 +1352,12 @@ private struct SpiceLevelCard: View {
 
             VStack(alignment: .leading, spacing: POCSpacing.m) {
                 HStack {
-                    RiceAdjustButton(symbol: "minus", isDisabled: selectedOption.level == options.first?.level, action: onDecrease)
+                    RiceAdjustButton(
+                        symbol: "minus",
+                        accessibilityIdentifier: "spice_decrease",
+                        isDisabled: selectedOption.level == options.first?.level,
+                        action: onDecrease
+                    )
                     Spacer()
                     VStack(spacing: POCSpacing.s) {
                         SpiceArtworkCarousel(
@@ -1354,7 +1369,12 @@ private struct SpiceLevelCard: View {
                             .frame(width: 220, height: 34)
                     }
                     Spacer()
-                    RiceAdjustButton(symbol: "plus", isDisabled: selectedOption.level == options.last?.level, action: onIncrease)
+                    RiceAdjustButton(
+                        symbol: "plus",
+                        accessibilityIdentifier: "spice_increase",
+                        isDisabled: selectedOption.level == options.last?.level,
+                        action: onIncrease
+                    )
                 }
 
                 SpiceSelectionStrip(
@@ -1757,6 +1777,7 @@ private struct SauceAmountDisclosureCard: View {
 
 private struct RiceAdjustButton: View {
     let symbol: String
+    let accessibilityIdentifier: String
     let isDisabled: Bool
     let action: () -> Void
 
@@ -1777,6 +1798,7 @@ private struct RiceAdjustButton: View {
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
 }
 

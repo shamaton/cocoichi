@@ -192,6 +192,7 @@ private struct SavedComboCard: View {
         }
         .padding(POCSpacing.m)
         .pocCard(fill: backgroundFill)
+        .accessibilityIdentifier("favorite_card_\(favorite.id.uuidString.lowercased())")
     }
 
     private var selectButton: some View {
@@ -208,6 +209,7 @@ private struct SavedComboCard: View {
         }
         .buttonStyle(.plain)
         .disabled(!state.isSelectable)
+        .accessibilityIdentifier("favorite_select_\(favorite.id.uuidString.lowercased())")
     }
 
     private var baseSummaryItems: [String] {

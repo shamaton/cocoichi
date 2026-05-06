@@ -195,6 +195,7 @@ struct MenuDiscoveryView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("お気に入りから選ぶ")
+        .accessibilityIdentifier("favorite_entry")
     }
 
     private var groupedSections: [GroupedMenuSection] {
@@ -276,6 +277,7 @@ private struct MenuGenreChip: View {
                 )
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("genre_chip_\(genre.id)")
     }
 }
 

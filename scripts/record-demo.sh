@@ -3,7 +3,15 @@ set -euo pipefail
 
 usage() {
   printf "%s\n" \
-    "Usage: scripts/record-demo.sh [store-to-complete]" \
+    "Usage: scripts/record-demo.sh [scenario]" \
+    "" \
+    "Scenarios:" \
+    "  order-flow       Menu selection to order complete without coupon" \
+    "  menu-discovery   Menu browsing and category switching" \
+    "  customize        Rice, spice, and topping customization without coupon" \
+    "  saved-combo      Resume a saved combo without applying a coupon" \
+    "  coupon-complete  Coupon application to order complete" \
+    "  store-to-complete Legacy alias for coupon-complete" \
     "" \
     "Environment:" \
     "  SIM_NAME       Simulator name or auto (default: auto)" \
@@ -20,6 +28,21 @@ SCHEME="CocoichiPoC"
 DERIVED_DATA="build/DerivedData/${AGENT_NAME}-demo-recording"
 
 case "$SCENARIO" in
+  order-flow)
+    TEST_ID="CocoichiPoCUITests/DemoRecordingUITests/testOrderFlowNoCoupon"
+    ;;
+  menu-discovery)
+    TEST_ID="CocoichiPoCUITests/DemoRecordingUITests/testMenuDiscovery"
+    ;;
+  customize)
+    TEST_ID="CocoichiPoCUITests/DemoRecordingUITests/testCustomizeNoCoupon"
+    ;;
+  saved-combo)
+    TEST_ID="CocoichiPoCUITests/DemoRecordingUITests/testSavedComboNoCoupon"
+    ;;
+  coupon-complete)
+    TEST_ID="CocoichiPoCUITests/DemoRecordingUITests/testCouponComplete"
+    ;;
   store-to-complete)
     TEST_ID="CocoichiPoCUITests/DemoRecordingUITests/testStoreSelectToComplete"
     ;;
